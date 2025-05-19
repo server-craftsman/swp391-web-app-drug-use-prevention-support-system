@@ -1,6 +1,23 @@
-.body {
-    background-color: #f0f0f0;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font-title {
+    @apply font-sans;
+}
+
+.bg-primary {
+    @apply bg-[#20558A];
+}
+
+.hover-primary {
+    @apply hover:underline transition-colors duration-300 font-sans;
+}
+
+.bg-secondary {
+    @apply bg-[#153759];
+}
+
+.text-primary {
+    @apply text-[#20558A];
 }

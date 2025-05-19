@@ -1,16 +1,17 @@
 export const ROUTER_URL = {
     AUTH: {
-        LOGIN: "/auth/login",
-        SIGN_UP: "/auth/sign-up",
-        FORGOT_PASSWORD: "/auth/forgot-password",
-        RESET_PASSWORD: "/auth/reset-password",
-        VERIFY_EMAIL: "/auth/verify-email",
-        UNAUTHOZIZED: "/auth/unauthorized",
+        LOGIN: "/login",
+        SIGN_UP: "/register",
+        FORGOT_PASSWORD: "/forgot-password",
+        RESET_PASSWORD: "/reset-password",
+        VERIFY_EMAIL: "/verify-email",
+        UNAUTHOZIZED: "/unauthorized",
     },
     COMMON: {
-        HOME: "/home",
+        HOME: "/",
         ABOUT: "/about",
         CONTACT: "/contact",
         FAQ: "/faq",
+        COVER: "/cover",
     }
 };
