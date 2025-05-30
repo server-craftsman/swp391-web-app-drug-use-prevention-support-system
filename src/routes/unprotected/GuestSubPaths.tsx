@@ -1,6 +1,8 @@
 import { lazy } from "react";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
+import About from "../../pages/about";
+import CourseList from "../../components/client/course/CourseList.com";
 //================= PUBLIC SUB PATHS =================
 const MainLayout = lazy(() => import("../../layouts/main_layout/main.layout"));
 const HomePage = lazy(() => import("../../pages/home"));
@@ -16,27 +18,35 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
       children: [
         {
           path: ROUTER_URL.COMMON.HOME,
-          element: <HomePage />
-        }
-      ]
-    }
+          element: <HomePage />,
+        },
+        {
+          path: ROUTER_URL.COMMON.ABOUT,
+          element: <About />,
+        },
+        {
+          path: ROUTER_URL.CLIENT.COURSE,
+          element: <CourseList />,
+        },
+      ],
+    },
   ],
   [ROUTER_URL.AUTH.LOGIN]: [
     {
       element: <LoginPage />,
-      path: ROUTER_URL.AUTH.LOGIN
-    }
+      path: ROUTER_URL.AUTH.LOGIN,
+    },
   ],
   [ROUTER_URL.AUTH.SIGN_UP]: [
     {
       element: <RegisterPage />,
-      path: ROUTER_URL.AUTH.SIGN_UP
-    }
+      path: ROUTER_URL.AUTH.SIGN_UP,
+    },
   ],
   [ROUTER_URL.AUTH.FORGOT_PASSWORD]: [
     {
       element: <ForgotPasswordPage />,
-      path: ROUTER_URL.AUTH.FORGOT_PASSWORD
-    }
-  ]
+      path: ROUTER_URL.AUTH.FORGOT_PASSWORD,
+    },
+  ],
 };
