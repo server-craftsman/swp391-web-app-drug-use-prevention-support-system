@@ -1,34 +1,21 @@
 import React from "react";
 import { Card } from "antd";
 const { Meta } = Card;
+import type { Course } from "../../../types/course/CourseModel";
 
-interface Course {
-  id: number;
-  name: string;
-  userId: number;
-  categoryId: number;
-  content: string;
-  status: string;
-  targetAudience: string;
-  videoUrl: string;
-  imageUrl: string;
-  price: number;
-  discount: number;
-  createdAt: string;
-  updatedAt: string;
-  isDeleted: boolean;
+interface CourseCardProps {
+  course: Course;
 }
-
-const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
+const CourseCard: React.FC<CourseCardProps> = ({ course }) => (
   <Card
     hoverable
-    className="m-3 p-2"
-    style={{ width: 240 }}
+    className="m-1 p-2"
+    style={{ width: 300, height: 500 }}
     cover={
       <img
         alt={course.name}
         src={course.imageUrl}
-        style={{ width: "240px", height: "300px", objectFit: "cover" }}
+        style={{ width: "300px", height: "400px", objectFit: "cover" }}
       />
     }
   >
