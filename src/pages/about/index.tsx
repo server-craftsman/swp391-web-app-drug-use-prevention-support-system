@@ -1,94 +1,82 @@
 export default function About() {
   return (
-    <>
-      <section className="bg-white py-16 px-6 md:px-20 lg:px-32">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-blue-800 mb-4">
-            Về Chúng Tôi
-          </h2>
-          <p className="text-gray-700 text-lg mb-8">
-            Chúng tôi là một tổ chức tình nguyện phi lợi nhuận, hướng đến mục
-            tiêu phòng ngừa và giảm thiểu tác hại của ma túy trong cộng đồng.
-            Với nền tảng số này, chúng tôi hỗ trợ giáo dục, tư vấn và can thiệp
-            sớm để giúp mọi người – đặc biệt là giới trẻ – tránh xa ma túy.
+    <section className="bg-white py-16 px-6 md:px-20 lg:px-32">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-bold text-blue-800 mb-6">
+          Giới Thiệu Về Chúng Tôi
+        </h2>
+        <p className="text-gray-700 text-lg leading-relaxed mb-10">
+          Chúng tôi là một tổ chức tình nguyện phi lợi nhuận, hoạt động với sứ
+          mệnh phòng ngừa và giảm thiểu tác hại của ma túy trong cộng đồng. Nền
+          tảng số của chúng tôi cung cấp các giải pháp giáo dục, tư vấn và can
+          thiệp sớm — đặc biệt hướng đến thanh thiếu niên — nhằm nâng cao nhận
+          thức, thay đổi hành vi và tạo ra môi trường sống lành mạnh, an toàn.
+        </p>
+
+        <h3 className="text-2xl font-semibold text-blue-700 mb-5">
+          Tính Năng Nổi Bật
+        </h3>
+        <ul className="space-y-6 text-gray-800 text-base leading-relaxed">
+          {[
+            {
+              icon: "🎓",
+              title: "Khóa học trực tuyến",
+              desc: "Học các chủ đề như nhận thức về ma túy, kỹ năng phòng ngừa, kỹ năng từ chối, phù hợp theo từng nhóm tuổi (học sinh, sinh viên, phụ huynh...).",
+            },
+            {
+              icon: "🧠",
+              title: "Đánh giá nguy cơ",
+              desc: "Thực hiện các bài khảo sát khoa học như ASSIST và CRAFFT để xác định nguy cơ sử dụng ma túy và nhận gợi ý phù hợp.",
+            },
+            {
+              icon: "🗓️",
+              title: "Đặt lịch tư vấn",
+              desc: "Kết nối nhanh chóng và an toàn với các chuyên gia tâm lý và tư vấn giàu kinh nghiệm.",
+            },
+            {
+              icon: "📢",
+              title: "Truyền thông cộng đồng",
+              desc: "Tham gia các hoạt động nâng cao nhận thức, được tổ chức định kỳ và đo lường hiệu quả qua khảo sát.",
+            },
+            {
+              icon: "👩‍⚕️",
+              title: "Quản lý chuyên viên",
+              desc: "Hệ thống lưu trữ và cập nhật hồ sơ chuyên môn, bằng cấp và lịch làm việc của đội ngũ tư vấn.",
+            },
+            {
+              icon: "👤",
+              title: "Hồ sơ người dùng",
+              desc: "Theo dõi hành trình học tập, tư vấn và tham gia chương trình để người dùng tự quản lý và phát triển bản thân.",
+            },
+            {
+              icon: "📊",
+              title: "Dashboard & Báo cáo",
+              desc: "Giao diện thống kê trực quan hỗ trợ quản trị viên theo dõi, đánh giá và tối ưu hoạt động hiệu quả.",
+            },
+          ].map((item, index) => (
+            <li
+              key={index}
+              className="transition-all duration-300 hover:bg-blue-50 hover:pl-4 border-l-4 border-transparent hover:border-blue-400 rounded-lg p-3"
+            >
+              <span className="font-semibold text-blue-600">
+                {item.icon} {item.title}:
+              </span>{" "}
+              {item.desc}
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-16 text-center">
+          <h4 className="text-2xl md:text-3xl font-bold text-blue-800 mb-4">
+            Cùng Nhau Xây Dựng Cộng Đồng Không Ma Túy
+          </h4>
+          <p className="text-gray-700 text-lg max-w-3xl mx-auto">
+            Mỗi hành động nhỏ hôm nay có thể tạo nên thay đổi lớn trong tương
+            lai. Hãy cùng chúng tôi lan tỏa tri thức, kết nối yêu thương và hành
+            động thiết thực để xây dựng một cộng đồng khỏe mạnh, không ma túy.
           </p>
-          <h3 className="text-2xl font-semibold text-blue-700 mb-4">
-            Tính Năng Nổi Bật
-          </h3>
-          <ul className="space-y-6 text-gray-800 text-base">
-            <li>
-              <span className="font-semibold text-blue-600">
-                🎓 Khóa học trực tuyến:
-              </span>
-              Đăng ký học các chủ đề như nhận thức về ma túy, kỹ năng phòng
-              tránh, từ chối, phù hợp theo độ tuổi (học sinh, sinh viên, phụ
-              huynh...).
-            </li>
-            <li>
-              <span className="font-semibold text-blue-600">
-                🧠 Đánh giá nguy cơ:
-              </span>
-              Làm các bài khảo sát ASSIST, CRAFFT để xác định nguy cơ sử dụng ma
-              túy và nhận gợi ý hành động phù hợp.
-            </li>
-            <li>
-              <span className="font-semibold text-blue-600">
-                🗓️ Đặt lịch tư vấn:
-              </span>
-              Kết nối với các chuyên viên tư vấn có chuyên môn qua lịch hẹn trực
-              tuyến nhanh chóng và bảo mật.
-            </li>
-            <li>
-              <span className="font-semibold text-blue-600">
-                📢 Truyền thông cộng đồng:
-              </span>
-              Tham gia các chương trình giáo dục cộng đồng, đồng thời đánh giá
-              hiệu quả thông qua khảo sát trước và sau.
-            </li>
-            <li>
-              <span className="font-semibold text-blue-600">
-                👩‍⚕️ Quản lý chuyên viên:
-              </span>
-              Thông tin chuyên môn, bằng cấp, lịch làm việc của đội ngũ tư vấn
-              được lưu trữ và cập nhật rõ ràng.
-            </li>
-            <li>
-              <span className="font-semibold text-blue-600">
-                👤 Hồ sơ người dùng:
-              </span>
-              Theo dõi lịch sử học tập, tư vấn và tham gia chương trình để người
-              dùng chủ động phát triển bản thân.
-            </li>
-            <li>
-              <span className="font-semibold text-blue-600">
-                📊 Dashboard &amp; Báo cáo:
-              </span>
-              Hệ thống báo cáo trực quan giúp quản trị viên đánh giá hiệu quả và
-              tối ưu hoạt động.
-            </li>
-          </ul>
-          <div className="mt-12 bg-blue-50 p-6 rounded-xl shadow-md">
-            <h4 className="text-xl font-semibold text-blue-700 mb-2">
-              Tại Sao Nên Đồng Hành Cùng Chúng Tôi?
-            </h4>
-            <ul className="list-disc pl-6 text-gray-700 space-y-2">
-              <li>Phù hợp với nhiều đối tượng khác nhau</li>
-              <li>Giao diện thân thiện, bảo mật cao</li>
-              <li>Nội dung được xây dựng bởi chuyên gia trong lĩnh vực</li>
-              <li>Kết nối nhanh chóng với tư vấn viên giàu kinh nghiệm</li>
-            </ul>
-          </div>
-          <div className="mt-12 text-center">
-            <h4 className="text-2xl font-bold text-blue-800 mb-4">
-              Hãy Cùng Chung Tay
-            </h4>
-            <p className="text-gray-700 text-lg mb-6">
-              Bằng tri thức, sự quan tâm và hành động đúng lúc, chúng ta có thể
-              bảo vệ bản thân và cộng đồng khỏi hiểm họa ma túy.
-            </p>
-          </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }
