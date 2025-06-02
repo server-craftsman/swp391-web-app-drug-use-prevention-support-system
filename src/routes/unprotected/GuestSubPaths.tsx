@@ -2,7 +2,7 @@ import { lazy } from "react";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
 import About from "../../pages/about";
-import CourseList from "../../components/client/course/CourseList.com";
+import Course from "../../pages/course";
 //================= PUBLIC SUB PATHS =================
 const MainLayout = lazy(() => import("../../layouts/main_layout/main.layout"));
 const HomePage = lazy(() => import("../../pages/home"));
@@ -26,7 +26,7 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
         },
         {
           path: ROUTER_URL.CLIENT.COURSE,
-          element: <CourseList />,
+          element: <Course />,
         },
       ],
     },
