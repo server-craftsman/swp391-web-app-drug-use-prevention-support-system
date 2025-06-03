@@ -17,5 +17,6 @@ export const ROUTER_URL = {
   CLIENT: {
     COURSE: "/courses",
     BLOG: "/blog",
+    COUNSEL: "/counseling",
   },
 };
