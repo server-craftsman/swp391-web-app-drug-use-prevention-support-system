@@ -1,0 +1,70 @@
+[
+  {
+    "id": 1,
+    "userId": 101,
+    "fullName": "Nguyễn Văn An",
+    "email": "an.nguyen@example.com",
+    "qualifications": ["Cử nhân Tâm lý học", "Chứng chỉ Tham vấn học đường"],
+    "jobTitle": "Chuyên viên tư vấn học đường",
+    "hireDate": "2022-03-15T00:00:00Z",
+    "salary": 1500.0,
+    "status": "ACTIVE",
+    "createdAt": "2022-03-15T00:00:00Z",
+    "avatar": "https://randomuser.me/api/portraits/men/11.jpg"
+  },
+  {
+    "id": 2,
+    "userId": 102,
+    "fullName": "Trần Thị Bình",
+    "email": "binh.tran@example.com",
+    "qualifications": ["Thạc sĩ Tâm lý lâm sàng", "Chứng chỉ CBT"],
+    "jobTitle": "Chuyên viên tư vấn tâm lý",
+    "hireDate": "2021-07-01T00:00:00Z",
+    "salary": 1800.0,
+    "status": "ACTIVE",
+    "createdAt": "2021-07-01T00:00:00Z",
+    "avatar": "https://randomuser.me/api/portraits/women/12.jpg"
+  },
+  {
+    "id": 3,
+    "userId": 103,
+    "fullName": "Lê Văn Cường",
+    "email": "cuong.le@example.com",
+    "qualifications": ["Cử nhân Xã hội học", "Chứng chỉ Kỹ năng mềm"],
+    "jobTitle": "Tư vấn viên cộng đồng",
+    "hireDate": "2023-01-10T00:00:00Z",
+    "salary": 1300.0,
+    "status": "ACTIVE",
+    "createdAt": "2023-01-10T00:00:00Z",
+    "avatar": "https://randomuser.me/api/portraits/men/13.jpg"
+  },
+  {
+    "id": 4,
+    "userId": 104,
+    "fullName": "Phạm Thu Dung",
+    "email": "dung.pham@example.com",
+    "qualifications": [
+      "Thạc sĩ Công tác xã hội",
+      "Chứng chỉ Tham vấn vị thành niên"
+    ],
+    "jobTitle": "Tư vấn viên vị thành niên",
+    "hireDate": "2020-09-20T00:00:00Z",
+    "salary": 1700.0,
+    "status": "ACTIVE",
+    "createdAt": "2020-09-20T00:00:00Z",
+    "avatar": "https://randomuser.me/api/portraits/women/14.jpg"
+  },
+  {
+    "id": 5,
+    "userId": 105,
+    "fullName": "Hoàng Minh Đức",
+    "email": "duc.hoang@example.com",
+    "qualifications": ["Tiến sĩ Tâm lý học", "Chứng chỉ trị liệu hành vi"],
+    "jobTitle": "Chuyên gia trị liệu",
+    "hireDate": "2019-05-05T00:00:00Z",
+    "salary": 2500.0,
+    "status": "INACTIVE",
+    "createdAt": "2019-05-05T00:00:00Z",
+    "avatar": "https://randomuser.me/api/portraits/men/15.jpg"
+  }
+]
