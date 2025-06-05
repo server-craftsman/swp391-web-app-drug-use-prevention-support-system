@@ -9,7 +9,7 @@ const typedPrograms = programData as Program[];
 
 const CustomPrevArrow = ({ onClick }: any) => (
   <div
-    className="absolute top-1/2 left-6 -translate-y-1/2 z-10 cursor-pointer  text-white p-2 rounded-full shadow-md hover:scale-110 transition-transform"
+    className="absolute top-1/2 left-6 -translate-y-1/2 z-10 cursor-pointer bg-[#20558A]  text-white p-2 rounded-full shadow-md hover:scale-110 transition-transform"
     onClick={onClick}
   >
     <LeftOutlined className="text-base" />
@@ -19,7 +19,7 @@ const CustomPrevArrow = ({ onClick }: any) => (
 // Custom nút phải
 const CustomNextArrow = ({ onClick }: any) => (
   <div
-    className="absolute top-1/2 right-6 -translate-y-1/2 z-10 cursor-pointer  text-white p-2 rounded-full shadow-md hover:scale-110 transition-transform"
+    className="absolute top-1/2 right-6 -translate-y-1/2 z-10 cursor-pointer bg-[#20558A]  text-white p-2 rounded-full shadow-md hover:scale-110 transition-transform"
     onClick={onClick}
   >
     <RightOutlined className="text-base" />
