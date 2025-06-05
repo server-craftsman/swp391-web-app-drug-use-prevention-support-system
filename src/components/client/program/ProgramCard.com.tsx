@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import type { Program } from "../../../types/program/ProgramModel";
 
 interface Props {
@@ -6,8 +6,6 @@ interface Props {
 }
 
 const ProgramCard: React.FC<Props> = ({ program }) => {
-  const [expanded, setExpanded] = useState(false);
-
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString("vi-VN", {
       day: "2-digit",
@@ -17,41 +15,35 @@ const ProgramCard: React.FC<Props> = ({ program }) => {
 
   return (
     <div
-      className="border rounded-xl p-4 shadow hover:shadow-lg transition bg-white flex flex-col"
-      style={{ width: "100%", height: 400, boxSizing: "border-box" }}
+      className="border rounded-xl shadow-md hover:shadow-xl transition bg-white flex flex-col"
+      style={{ width: "100%", height: 510, boxSizing: "border-box" }}
     >
-      <img
-        src={program.programImgUrl}
-        alt={program.name}
-        className="w-full h-48 object-cover rounded-md mb-3 flex-shrink-0"
-      />
-      <h3 className="text-lg font-bold text-[#20558A] mb-1 flex-shrink-0">
-        {program.name}
-      </h3>
-      <p className="text-sm text-gray-500 mb-2 flex-shrink-0">
-        {program.location}
-      </p>
-
-      {/* Mô tả với giới hạn dòng và nút xem thêm */}
-      <p
-        className={`text-sm text-gray-700 ${
-          expanded ? "" : "line-clamp-3"
-        } transition-all duration-300 flex-grow overflow-hidden`}
+      <div
+        className="overflow-hidden rounded-t-xl flex-shrink-0 m-4 bg-gray-100 flex items-center justify-center"
+        style={{ height: 330 }}
       >
-        {program.description}
-      </p>
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="text-blue-600 text-xs mt-1 hover:underline self-start"
-      >
-        {expanded ? "View Less" : "View More"}
-      </button>
-
-      <div className="text-xs text-gray-500 mt-3 flex-shrink-0">
-        {formatDate(program.startDate)} → {formatDate(program.endDate)}
+        <img
+          src={program.programImgUrl}
+          alt={program.name}
+          className="w-full h-full object-cover block transition-transform duration-300 hover:scale-105"
+        />
       </div>
-      <div className="mt-2 text-xs inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-800 font-medium flex-shrink-0">
-        {program.type.replace("_", " ")}
+
+      <div className="p-5 flex flex-col flex-grow">
+        <h3 className="text-xl font-extrabold text-[#20558A] mb-1">
+          {program.name}
+        </h3>
+        <p className="text-sm text-gray-600 mb-2">{program.location}</p>
+        <p className="text-gray-700 text-sm mb-3">{program.description}</p>
+
+        <div className="flex justify-between items-center text-xs text-gray-500">
+          <div>
+            {formatDate(program.startDate)} → {formatDate(program.endDate)}
+          </div>
+          <div className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-semibold">
+            {program.type.replace("_", " ")}
+          </div>
+        </div>
       </div>
     </div>
   );

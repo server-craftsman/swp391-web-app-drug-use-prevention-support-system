@@ -80,7 +80,7 @@ export default function BookingForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md space-y-4 "
+      className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md space-y-4 border-2 border-[#20558A] "
     >
       <h2 className="text-xl font-bold text-[#20558A] mb-2">Đặt lịch tư vấn</h2>
 

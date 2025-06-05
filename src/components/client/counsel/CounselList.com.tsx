@@ -16,7 +16,7 @@ export default function CounselList() {
       </div>
 
       {/* Lịch đặt hẹn */}
-      <div className="sticky top-20 h-fit bg-white shadow-md rounded-xl p-4">
+      <div className="sticky top-20 h-fit bg-white rounded-xl p-4">
         <BookingSchedule />
       </div>
     </div>
