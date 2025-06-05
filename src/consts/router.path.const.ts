@@ -18,5 +18,6 @@ export const ROUTER_URL = {
     COURSE: "/courses",
     BLOG: "/blog",
     COUNSEL: "/counseling",
+    COMMUNITY: "/community",
   },
 };

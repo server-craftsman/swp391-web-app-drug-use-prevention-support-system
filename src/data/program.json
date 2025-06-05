@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "name": "Tập Huấn Kỹ Năng Sống",
+    "description": "Trang bị kỹ năng sống tích cực cho thanh thiếu niên nhằm tăng khả năng tự bảo vệ trước nguy cơ sử dụng ma túy.",
+    "location": "TP. Hồ Chí Minh",
+    "type": "FULL_TIME",
+    "startDate": "2025-06-01T09:00:00",
+    "endDate": "2026-06-01T17:00:00",
+    "programImgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8mVL6hxcqAv9kSmvYL_VxnEtWzBH5AxOb-A&s"
+  },
+  {
+    "id": 2,
+    "name": "Phân Tích Tình Hình Ma Túy",
+    "description": "Phân tích dữ liệu cộng đồng để xây dựng chiến lược can thiệp sớm và hiệu quả trong phòng ngừa ma túy.",
+    "location": "Hà Nội",
+    "type": "PART_TIME",
+    "startDate": "2025-07-01T10:00:00",
+    "endDate": "2025-12-31T16:00:00",
+    "programImgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSN63XCRDCedNOAu8XPkhlnDF39bChTLF48Pg&s"
+  },
+  {
+    "id": 3,
+    "name": "Quản Lý Dự Án Cộng Đồng",
+    "description": "Điều phối các hoạt động phòng chống ma túy, kết nối các bên liên quan và đo lường hiệu quả chương trình.",
+    "location": "Đà Nẵng",
+    "type": "FULL_TIME",
+    "startDate": "2025-06-15T08:30:00",
+    "endDate": "2026-06-15T17:30:00",
+    "programImgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQE4yhJE6cAM6Q8jvsEM1Oq8GdJFiKKJ93klQ&s"
+  },
+  {
+    "id": 4,
+    "name": "Thiết Kế Truyền Thông Tích Cực",
+    "description": "Xây dựng các sản phẩm truyền thông sáng tạo nhằm nâng cao nhận thức và thay đổi hành vi về phòng chống ma túy.",
+    "location": "Cần Thơ",
+    "type": "CONTRACT",
+    "startDate": "2025-08-01T09:00:00",
+    "endDate": "2025-11-30T17:00:00",
+    "programImgUrl": "https://kenh14cdn.com/203336854389633024/2023/1/1/photo-2-16725458529351896062289.jpg"
+  },
+  {
+    "id": 5,
+    "name": "Vận Hành Hệ Thống Hỗ Trợ",
+    "description": "Quản lý nền tảng kỹ thuật giúp cung cấp thông tin, tư vấn và đặt lịch hỗ trợ cho người có nguy cơ cao.",
+    "location": "Hải Phòng",
+    "type": "FULL_TIME",
+    "startDate": "2025-06-10T09:00:00",
+    "endDate": "2026-06-10T17:00:00",
+    "programImgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCjYtnWJOc2MLLTu-j9DnQibYtW9NP5dEcDQ&s"
+  },
+  {
+    "id": 6,
+    "name": "Chiến Dịch Nâng Cao Nhận Thức",
+    "description": "Lên kế hoạch và triển khai chiến dịch tuyên truyền nhằm lan tỏa thông điệp sống lành mạnh, không ma túy.",
+    "location": "Huế",
+    "type": "FULL_TIME",
+    "startDate": "2025-07-01T09:00:00",
+    "endDate": "2026-07-01T17:00:00",
+    "programImgUrl": "https://i.ytimg.com/vi/KtFjzkh7Dac/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDJDynmovjtnG4Ldupwu3xb2Q-jug"
+  },
+  {
+    "id": 7,
+    "name": "Hỗ Trợ Người Dân",
+    "description": "Tiếp nhận và giải đáp thắc mắc về phòng chống ma túy, hỗ trợ kết nối với dịch vụ y tế và tâm lý.",
+    "location": "TP. Hồ Chí Minh",
+    "type": "PART_TIME",
+    "startDate": "2025-06-20T13:00:00",
+    "endDate": "2025-12-20T17:00:00",
+    "programImgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLnmS0HeLCajt90YXA2iNpMHWzhO3nsWCSFw&s"
+  },
+  {
+    "id": 8,
+    "name": "An Ninh Mạng & Trẻ Em",
+    "description": "Theo dõi và ngăn chặn các hành vi dụ dỗ trẻ vị thành niên vào sử dụng ma túy qua nền tảng số.",
+    "location": "Hà Nội",
+    "type": "FULL_TIME",
+    "startDate": "2025-07-15T08:00:00",
+    "endDate": "2026-07-15T17:00:00",
+    "programImgUrl": "https://i.ytimg.com/vi/zX0pkRVW3GY/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLADLzIr7OSWES5hiYK2OAil8PjaCw"
+  },
+  {
+    "id": 9,
+    "name": "Biên Tập Nội Dung Giáo Dục",
+    "description": "Soạn thảo nội dung truyền thông và bài học phòng chống ma túy phù hợp với lứa tuổi học sinh, sinh viên.",
+    "location": "Đà Nẵng",
+    "type": "CONTRACT",
+    "startDate": "2025-08-05T10:00:00",
+    "endDate": "2025-12-05T16:00:00",
+    "programImgUrl": "https://image.congan.com.vn/thumbnail/CATP-480-2022-7-21/h3.jpg"
+  },
+  {
+    "id": 10,
+    "name": "Thực Tập Sinh Nghiên Cứu",
+    "description": "Hỗ trợ nghiên cứu về hành vi giới trẻ và các giải pháp phòng ngừa hiệu quả việc sử dụng chất gây nghiện.",
+    "location": "TP. Hồ Chí Minh",
+    "type": "INTERNSHIP",
+    "startDate": "2025-07-01T09:00:00",
+    "endDate": "2025-12-31T17:00:00",
+    "programImgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMoOGQTP5FljlfKE-8BDBT8K01FiytG0SZFA&s"
+  }
+]

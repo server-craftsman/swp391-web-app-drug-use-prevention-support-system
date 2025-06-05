@@ -5,6 +5,7 @@ import About from "../../pages/about";
 import Course from "../../pages/course";
 import Blog from "../../pages/blog";
 import Counsel from "../../pages/counsel";
+import Community from "../../pages/community";
 //================= PUBLIC SUB PATHS =================
 const MainLayout = lazy(() => import("../../layouts/main_layout/main.layout"));
 const HomePage = lazy(() => import("../../pages/home"));
@@ -37,6 +38,10 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
         {
           path: ROUTER_URL.CLIENT.COUNSEL,
           element: <Counsel />,
+        },
+        {
+          path: ROUTER_URL.CLIENT.COMMUNITY,
+          element: <Community />,
         },
       ],
     },
