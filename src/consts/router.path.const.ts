@@ -16,8 +16,10 @@ export const ROUTER_URL = {
   },
   CLIENT: {
     COURSE: "/courses",
+    COURSE_DETAIL: "/courses/:courseId",
     BLOG: "/blog",
     COUNSEL: "/counseling",
     COMMUNITY: "/community",
+    ASSESSMENT: "/assessment",
   },
 };

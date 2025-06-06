@@ -3,8 +3,9 @@ import CourseCard from "./CourseCard.com";
 import courseData from "../../../data/course.json";
 import type { Course } from "../../../types/course/CourseModel";
 import DropdownComponent from "../../common/dropdown.com";
-import "antd/dist/reset.css";
 import PaginationComponent from "../../common/pagination.com";
+import "antd/dist/reset.css";
+
 const typedCourseData = courseData as Course[];
 
 export default function CourseList() {
@@ -12,7 +13,7 @@ export default function CourseList() {
   const [priceSort, setPriceSort] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const items = [
+  const categoryItems = [
     { label: "Tất cả", key: "" },
     { label: "Phòng Chống", key: "1" },
     { label: "Kỹ Năng", key: "2" },
@@ -28,31 +29,33 @@ export default function CourseList() {
     { label: "Giá giảm dần", key: "desc" },
   ];
 
-  // Filter theo category
-  const filteredCourses =
-    selectedCategory === ""
-      ? typedCourseData
-      : typedCourseData.filter(
-          (course) => course.categoryId === Number(selectedCategory)
-        );
+  // Lọc theo category
+  const filteredCourses = selectedCategory
+    ? typedCourseData.filter(
+        (course) => course.categoryId === Number(selectedCategory)
+      )
+    : typedCourseData;
 
-  // Sort theo giá
+  // Sắp xếp theo giá
   const sortedCourses = [...filteredCourses].sort((a, b) => {
     if (priceSort === "asc") return a.price - b.price;
     if (priceSort === "desc") return b.price - a.price;
     return 0;
   });
 
-  // Pagination
+  // Phân trang
   const itemsPerPage = 12;
   const totalPages = Math.ceil(sortedCourses.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCourses = sortedCourses.slice(
-    startIndex,
-    startIndex + itemsPerPage
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
-  // Reset về trang 1 khi thay đổi bộ lọc
+  // Cuộn về đầu khi đổi trang
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
+
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
     setCurrentPage(1);
@@ -63,17 +66,14 @@ export default function CourseList() {
     setCurrentPage(1);
   };
 
-  // 👉 Cuộn về đầu trang khi currentPage thay đổi
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
   return (
     <>
       <div className="flex gap-4 mb-4">
         <DropdownComponent
-          items={items}
+          items={categoryItems}
           value={selectedCategory}
           onChange={handleCategoryChange}
+          placeholder="Chọn danh mục"
         />
         <DropdownComponent
           items={priceSortItems}
