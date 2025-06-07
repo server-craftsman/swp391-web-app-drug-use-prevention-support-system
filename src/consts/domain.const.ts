@@ -1,1 +1,1 @@
-export const DOMAIN_API = "https://drugpreventionsystem-bzfxb7cndxdtdjbr.eastasia-01.azurewebsites.net/";
+export const DOMAIN_API = "https://drugpreventionsystem-bzfxb7cndxdtdjbr.eastasia-01.azurewebsites.net/api/";

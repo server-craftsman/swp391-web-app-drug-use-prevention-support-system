@@ -1,103 +1,131 @@
 import { Route, Routes } from "react-router-dom";
-// import { lazy, useEffect } from "react";
+import { lazy } from "react";
 
 //import context
-// import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/Auth.context";
 
 // Import router path
 import { ROUTER_URL } from "../../consts/router.path.const";
-// import { UserRole } from "../../models/prototype/User";
+import { UserRole } from "../../app/enums";
 
 // Import guard routes
-// import GuardProtectedRoute from "../protected/GuardProtectedRoute";
+import GuardProtectedRoute from "../protected/GuardProtectedRoute";
 import GuardPublicRoute from "../unprotected/GuardGuestRoute";
 
 // Import layout
-// const AdminLayout = lazy(() => import("../../layout/admin/AdminLayout"));
-// const InstructorLayout = lazy(() => import("../../layout/instructor/InstructorLayout"));
-// const StudentLayout = lazy(() => import("../../layout/student/StudentDashboard"));
+const AdminLayout = lazy(() => import("../../layouts/admin/Admin.layout"));
 
 // Import sub paths
 import { publicSubPaths } from "../unprotected/GuestSubPaths";
-const RunRoutes = () => {
-  // const { role } = useAuth();
+import { AdminRoutes } from "../protected/access/adminPermission";
 
-  // COMMENTED OUT: All protected route logic and role-based redirects
-  /*
+const RunRoutes = () => {
+  const { role, isLoading } = useAuth();
+
   const getDefaultPath = (role: string) => {
     switch (role) {
-      case "admin":
+      case UserRole.ADMIN:
         return ROUTER_URL.ADMIN.BASE;
-      case "instructor":
-        return ROUTER_URL.INSTRUCTOR.BASE;
-      case "student":
-        return ROUTER_URL.STUDENT.BASE;
+      case UserRole.CUSTOMER:
+        return ROUTER_URL.COMMON.HOME;
+      case UserRole.MANAGER:
+        return ROUTER_URL.COMMON.HOME;
+      case UserRole.STAFF:
+        return ROUTER_URL.COMMON.HOME;
+      case UserRole.CONSULTANT:
+        return ROUTER_URL.COMMON.HOME;
       default:
         return ROUTER_URL.COMMON.HOME;
     }
   };
 
-  useEffect(() => {
-    const currentRole = role || (localStorage.getItem("role") as UserRole);
-    if (currentRole && window.location.pathname === "/") {
-      const defaultPath = getDefaultPath(currentRole);
-      window.location.href = defaultPath;
-    }
-  }, [role]);
-
   const renderProtectedRoutes = () => {
-    const currentRole = role || (localStorage.getItem("role") as UserRole);
-    // console.log("Rendering protected routes with role:", currentRole);
+    if (isLoading) {
+      return null; // Don't render protected routes while authentication is loading
+    }
 
-    if (!currentRole) {
-      // console.log("No role found, protected routes will not render");
-      return null;
+    if (!role) {
+      return null; // Don't render protected routes if not authenticated
     }
 
     const handleAccessDenied = () => {
-      // console.error("Access denied for role:", currentRole);
-      const defaultPath = getDefaultPath(currentRole);
-      window.location.href = defaultPath;
+      const defaultPath = getDefaultPath(role);
+      window.location.replace(defaultPath);
     };
 
     return (
       <>
-        <Route path={ROUTER_URL.ADMIN.BASE} element={<GuardProtectedRoute component={<AdminLayout />} userRole={currentRole} allowedRoles={["admin"]} onAccessDenied={handleAccessDenied} />}>
-          {adminSubPaths[ROUTER_URL.ADMIN.BASE]?.map((route) => (
+        <Route path={ROUTER_URL.ADMIN.BASE} element={
+          <GuardProtectedRoute 
+            component={<AdminLayout />} 
+            allowedRoles={[UserRole.ADMIN]} 
+            onAccessDenied={handleAccessDenied} 
+          />
+        }>
+          {AdminRoutes[ROUTER_URL.ADMIN.BASE]?.map((route) => (
             <Route
               key={route.path || "index"}
-              index={route.index} //loading index
-              path={route.path?.replace("/admin/", "")} // Remove /admin/ prefix
+              index={route.index}
+              path={route.path?.replace("/admin/", "")}
               element={route.element}
             />
           ))}
         </Route>
-
-        <Route path={ROUTER_URL.INSTRUCTOR.BASE} element={<GuardProtectedRoute component={<InstructorLayout />} userRole={currentRole} allowedRoles={["instructor"]} onAccessDenied={handleAccessDenied} />}>
-          {instructorSubPaths[ROUTER_URL.INSTRUCTOR.BASE]?.map((route) => <Route key={route.path || "index"} index={route.index} path={!route.index ? route.path : undefined} element={route.element} />)}
-        </Route>
-
-        <Route path={ROUTER_URL.STUDENT.BASE} element={<GuardProtectedRoute component={<StudentLayout />} userRole={currentRole} allowedRoles={["student"]} onAccessDenied={handleAccessDenied} />}>
-          {studentSubPaths[ROUTER_URL.STUDENT.BASE]?.map((route) => <Route key={route.path || "index"} index={route.index} path={!route.index ? route.path : undefined} element={route.element} />)}
-        </Route>
+        
+        {/* Other role-based routes can be added here */}
       </>
     );
   };
-  */
 
+  // Create a mapping of each route type
+  const renderPublicRoutes = () => {
+    const mainLayoutRoutes = publicSubPaths[ROUTER_URL.COMMON.HOME] || [];
+    const authRoutes = [
+      ...(publicSubPaths[ROUTER_URL.AUTH.LOGIN] || []),
+      ...(publicSubPaths[ROUTER_URL.AUTH.SIGN_UP] || []),
+      ...(publicSubPaths[ROUTER_URL.AUTH.FORGOT_PASSWORD] || []),
+      ...(publicSubPaths[ROUTER_URL.AUTH.UNAUTHOZIZED] || []),
+    ];
+
+    return (
+      <>
+        {/* Main Layout with Home and Content Pages */}
+        {mainLayoutRoutes.map(route => (
+          <Route
+            key="main-layout"
+            element={<GuardPublicRoute component={route.element} />}
+          >
+            {route.children?.map(childRoute => (
+              <Route
+                key={childRoute.path}
+                path={childRoute.path}
+                element={childRoute.element}
+                index={childRoute.path === ROUTER_URL.COMMON.HOME}
+              />
+            ))}
+          </Route>
+        ))}
+
+        {/* Auth Pages */}
+        {authRoutes.map(route => (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={<GuardPublicRoute component={route.element} />}
+          />
+        ))}
+      </>
+    );
+  };
+
+  // Render all routes
   return (
     <Routes>
-      {/* Public Routes - Only these will run */}
-      {Object.entries(publicSubPaths).map(([key, routes]) =>
-        routes.map((route) => (
-          <Route key={route.path || "index"} path={route.path} element={key === ROUTER_URL.COMMON.HOME ? <GuardPublicRoute component={route.element} /> : route.element}>
-            {route.children?.map((childRoute) => <Route key={childRoute.path} path={childRoute.path} element={childRoute.element} />)}
-          </Route>
-        ))
-      )}
+      {/* Public Routes */}
+      {renderPublicRoutes()}
 
-      {/* Protected Routes - Commented out for now */}
-      {/* {renderProtectedRoutes()} */}
+      {/* Protected Routes */}
+      {renderProtectedRoutes()}
     </Routes>
   );
 };

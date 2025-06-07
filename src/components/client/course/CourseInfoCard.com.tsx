@@ -3,6 +3,7 @@ import { Card, Typography, Button } from "antd";
 import AddToCartButton from "../../common/addToCartButton.com";
 import { useNavigate } from "react-router-dom";
 import type { Course } from "../../../types/course/Course.type";
+import { formatCurrency } from "../../../utils/helper";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -21,7 +22,7 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course }) => {
       <Paragraph>
         <Text strong>Giá:</Text>{" "}
         <Text type="warning" style={{ fontSize: 18 }}>
-          ${course.price}
+          {formatCurrency(course.price)}
         </Text>
       </Paragraph>
       <AddToCartButton />

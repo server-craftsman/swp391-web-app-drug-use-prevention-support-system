@@ -1,81 +1,83 @@
-// import { useEffect, useState, Suspense } from "react";
-// import { Navigate } from "react-router-dom";
-// import type { RouteObject } from 'react-router-dom';
-// import { UserRole } from "../../models/prototype/User";
-// import adminRoutes from "../subs/adminRoutes";
-// import instructorRoutes from "../subs/instructorRoutes";
-// import studentRoutes from "../subs/studentRoutes";
-// import Loading from "../../app/redux/Loading";
+import { Suspense, type JSX } from "react";
+import { Navigate } from "react-router-dom";
+import type { RouteObject } from 'react-router-dom';
+import { UserRole } from "../../app/enums";
+import { AdminRoutes } from "../protected/access/adminPermission";
+import Loading from "../../app/screens/Loading";
+import { ROUTER_URL } from "../../consts/router.path.const";
+import { useAuth } from "../../contexts/Auth.context";
+import GuardProtectedRoute from "./GuardProtectedRoute";
 
-// const useProtectedRoutes = (): RouteObject[] => {
-//   const [role, setRole] = useState<UserRole | null>(null);
+const useProtectedRoutes = (): RouteObject[] => {
+  const { role, isLoading } = useAuth();
 
-//   useEffect(() => {
-//     const storedRole = localStorage.getItem("role");
-//     console.log("storedRole", storedRole); // Kiểm tra giá trị storedRole
-//     if (storedRole) {
-//       setRole(storedRole as UserRole);
-//       console.log("Role set to:", storedRole); // Kiểm tra sau khi setRole
-//     }
-//   }, []);
+  let roleBasedRoutes: RouteObject[] = [];
 
-//   let roleBasedRoutes: RouteObject[] = [];
+  // Handle loading state
+  if (isLoading) {
+    return [
+      {
+        path: "*",
+        element: <Suspense fallback={<Loading />}><Loading /></Suspense>
+      }
+    ];
+  }
 
-//   // Ensure role is set before proceeding
-//   if (role === null) {
-//     return [
-//       {
-//         path: "*",
-//         element: <Navigate to="/" />
-//       }
-//     ];
-//   }
+  // Handle unauthenticated state
+  if (role === null) {
+    return [
+      {
+        path: "*",
+        element: <Navigate to={ROUTER_URL.AUTH.LOGIN} replace />
+      }
+    ];
+  }
 
-//   const mapRoutes = (routes: RouteObject[], allowedRole: UserRole): RouteObject[] => {
-//     return routes.map((route) => {
-//       if ("index" in route && route.index) {
-//         return {
-//           ...route,
-//           element: <Suspense fallback={<Loading />}>{role === allowedRole ? route.element : <Navigate to="/" replace />}</Suspense>
-//         };
-//       }
-//       return {
-//         ...route,
-//         element: (<Suspense fallback={<Loading />}>{role === allowedRole && route.element ? (route.element as JSX.Element) : <Navigate to="/" replace />}</Suspense>) as JSX.Element,
-//         children: Array.isArray(route.children) ? mapRoutes(route.children, allowedRole) : undefined
-//       };
-//     });
-//   };
+  const wrapRoute = (route: RouteObject, allowedRoles: UserRole[]): RouteObject => {
+    const wrappedRoute: RouteObject = {
+      ...route,
+      element: (
+        <Suspense fallback={<Loading />}>
+          <GuardProtectedRoute 
+            component={route.element as JSX.Element} 
+            allowedRoles={allowedRoles}
+          />
+        </Suspense>
+      )
+    };
 
-//   switch (role) {
-//     case UserRole.admin:
-//       console.log("Admin role detected");
-//       console.log("Admin routes:", adminRoutes); // Debug: Kiểm tra adminRoutes
-//       roleBasedRoutes = mapRoutes(adminRoutes, UserRole.admin) as RouteObject[];
-//       break;
-//     case UserRole.instructor:
-//       console.log("Instructor role detected");
-//       console.log("Instructor routes:", instructorRoutes); // Debug: Kiểm tra instructorRoutes
-//       roleBasedRoutes = mapRoutes(instructorRoutes, UserRole.instructor) as RouteObject[];
-//       break;
-//     case UserRole.student:
-//       console.log("Student role detected");
-//       console.log("Student routes:", studentRoutes); // Debug: Kiểm tra studentRoutes
-//       roleBasedRoutes = mapRoutes(studentRoutes, UserRole.student) as RouteObject[];
-//       break;
-//     default:
-//       console.log("No valid role detected");
-//       roleBasedRoutes = [
-//         {
-//           path: "*",
-//           element: <Navigate to="/" />
-//         }
-//       ];
-//       console.log("roleBasedRoutes", roleBasedRoutes); // Debug: Kiểm tra roleBasedRoutes
-//   }
+    if (route.children) {
+      wrappedRoute.children = route.children.map(child => 
+        wrapRoute(child, allowedRoles)
+      );
+    }
 
-//   // Return only the role-based routes, excluding the index route
-//   return roleBasedRoutes;
-// };
+    return wrappedRoute;
+  };
 
-// export default useProtectedRoutes;
+  switch (role) {
+    case UserRole.ADMIN:
+      // Ensure AdminRoutes is an array
+      if (Array.isArray(AdminRoutes)) {
+        roleBasedRoutes = AdminRoutes.map(route => wrapRoute(route, [UserRole.ADMIN]));
+      } else {
+        // If AdminRoutes is an object with route collections
+        roleBasedRoutes = Object.values(AdminRoutes)
+          .flat()
+          .map(route => wrapRoute(route, [UserRole.ADMIN]));
+      }
+      break;
+    // Add other role cases as needed
+    default:
+      roleBasedRoutes = [
+        {
+          path: "*",
+          element: <Navigate to={ROUTER_URL.AUTH.UNAUTHOZIZED} replace />
+        }
+      ];
+  }
+
+  return roleBasedRoutes;
+};
+
+export default useProtectedRoutes;

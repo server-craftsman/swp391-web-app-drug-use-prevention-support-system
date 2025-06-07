@@ -1,10 +1,17 @@
-// d:\CN8\SWP391\web-app\src\layouts\admin\Sidebar.layout.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ROUTER_URL } from '../../consts/router.path.const';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
-import { UserOutlined, SettingOutlined, DashboardOutlined } from '@ant-design/icons';
+import { 
+  UserOutlined, 
+  SettingOutlined, 
+  DashboardOutlined, 
+  MenuFoldOutlined, 
+  MenuUnfoldOutlined 
+} from '@ant-design/icons';
+import { Tooltip } from 'antd';
+import { cn } from '../../utils/cn';
 
 const navItems = [
   { name: 'Tổng Quan', to: ROUTER_URL.ADMIN.BASE, icon: <DashboardOutlined /> },
@@ -13,18 +20,52 @@ const navItems = [
 ];
 
 const SidebarLayout: React.FC = () => {
+  const [collapsed, setCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
+  };
+
   return (
-    <aside className="w-72 bg-[radial-gradient(rgba(255,255,255,0.15) 1px,transparent 1px)] text-white flex flex-col min-h-screen">
-      <div className="p-6 border-b border-neutral-700">
+    <motion.aside 
+      className={cn(
+        "bg-[radial-gradient(rgba(255,255,255,0.15) 1px,transparent 1px)] text-white flex flex-col min-h-screen relative transition-all duration-300 ease-in-out border-r border-neutral-200",
+        collapsed ? "w-16" : "w-72"
+      )}
+      animate={{ width: collapsed ? '4rem' : '18rem' }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+    >
+      {/* Toggle button */}
+      <button 
+        onClick={toggleSidebar}
+        className="absolute -right-3 top-20 bg-white rounded-full p-1 shadow-md border border-gray-200 text-primary hover:text-secondary transition-colors z-10"
+      >
+        {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+      </button>
+
+      <div className={cn(
+        "p-6 border-b border-neutral-200 flex items-center",
+        collapsed ? "justify-center" : "justify-start"
+      )}>
         <NavLink to={ROUTER_URL.COMMON.HOME} className="flex items-center space-x-3">
-          <div className="mr-2">
+          <div className="flex-shrink-0">
             <div className="bg-primary rounded p-2 text-white font-bold transform hover:rotate-3 transition-transform">
               PDP
             </div>
           </div>
-          <span className="text-2xl font-bold text-primary">
-            Admin <span className="text-secondary">Panel</span>
-          </span>
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span 
+                className="text-2xl font-bold text-primary whitespace-nowrap"
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "auto" }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                Admin <span className="text-secondary">Panel</span>
+              </motion.span>
+            )}
+          </AnimatePresence>
         </NavLink>
       </div>
 
@@ -33,35 +74,57 @@ const SidebarLayout: React.FC = () => {
           {navItems.map((item) => (
             <motion.li
               key={item.name}
-              whileHover={{ x: 5 }}
+              whileHover={{ x: collapsed ? 0 : 5 }}
               transition={{ type: 'spring', stiffness: 400, damping: 15 }}
             >
-              <NavLink
-                to={item.to}
-                end={item.to === ROUTER_URL.ADMIN.BASE}
-                className={({ isActive }) =>
-                  clsx(
-                    'flex items-center space-x-3 p-2 rounded-3xl transition-all duration-150 ease-in-out',
-                    isActive
-                      ? 'bg-primary text-[#fff]/100'
-                      : 'hover:bg-primary/20 hover:shadow-lg text-neutral-500'
-                  )
-                }
-              >
-                <span className="text-lg">{item.icon}</span>
-                <span>{item.name}</span>
-              </NavLink>
+              {collapsed ? (
+                <Tooltip title={item.name} placement="right">
+                  <NavLink
+                    to={item.to}
+                    end={item.to === ROUTER_URL.ADMIN.BASE}
+                    className={({ isActive }) =>
+                      clsx(
+                        'flex items-center justify-center p-2 rounded-full transition-all duration-150 ease-in-out',
+                        isActive
+                          ? 'bg-primary text-white'
+                          : 'hover:bg-primary/20 hover:shadow-lg text-neutral-500'
+                      )
+                    }
+                  >
+                    <span className="text-lg">{item.icon}</span>
+                  </NavLink>
+                </Tooltip>
+              ) : (
+                <NavLink
+                  to={item.to}
+                  end={item.to === ROUTER_URL.ADMIN.BASE}
+                  className={({ isActive }) =>
+                    clsx(
+                      'flex items-center space-x-3 p-2 rounded-3xl transition-all duration-150 ease-in-out',
+                      isActive
+                        ? 'bg-primary text-[#fff]/100'
+                        : 'hover:bg-primary/20 hover:shadow-lg text-neutral-500'
+                    )
+                  }
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span>{item.name}</span>
+                </NavLink>
+              )}
             </motion.li>
           ))}
         </ul>
       </nav>
 
-      <div className="p-4 border-t border-neutral-700 mt-auto">
-        <p className="text-xs text-neutral-500 text-center">
+      <div className={cn(
+        "p-4 border-t border-neutral-200 mt-auto",
+        collapsed ? "text-center" : ""
+      )}>
+        <p className="text-xs text-neutral-500">
           {new Date().getFullYear()} PDP
         </p>
       </div>
-    </aside>
+    </motion.aside>
   );
 };
 

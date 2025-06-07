@@ -13,6 +13,12 @@ export const ROUTER_URL = {
     USERS: "/admin/users",
     SETTINGS: "/admin/settings",
   },
+  CONSULTANT: {
+    BASE: "/consultant",
+    OVERVIEW: "/consultant/overview",
+    USERS: "/consultant/users",
+    SETTINGS: "/consultant/settings",
+  },
   COMMON: {
     HOME: "/",
     ABOUT: "/about",
