@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "antd";
 import TabsComponent from "../../common/tabs.com";
-import type { Course } from "../../../types/course/CourseModel";
+import type { Course } from "../../../types/course/Course.type";
 
 interface CourseMediaCardProps {
   course: Course;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Card } from "antd";
-import type { Blog } from "../../../types/blog/BlogModel";
+import type { Blog } from "../../../types/blog/Blog.type";
 import { Avatar } from "antd";
 interface BlogCardProps {
   blog: Blog;

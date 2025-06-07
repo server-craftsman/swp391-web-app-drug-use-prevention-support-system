@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Typography, Button } from "antd";
 import AddToCartButton from "../../common/addToCartButton.com";
 import { useNavigate } from "react-router-dom";
-import type { Course } from "../../../types/course/CourseModel";
+import type { Course } from "../../../types/course/Course.type";
 
 const { Title, Paragraph, Text } = Typography;
 

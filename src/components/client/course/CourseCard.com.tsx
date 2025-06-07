@@ -3,7 +3,7 @@ import React from "react";
 import { Card } from "antd";
 import { Link } from "react-router-dom";
 const { Meta } = Card;
-import type { Course } from "../../../types/course/CourseModel";
+import type { Course } from "../../../types/course/Course.type";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 
 interface CourseCardProps {
