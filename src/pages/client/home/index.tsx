@@ -1,4 +1,4 @@
-import Cover from "../../components/common/cover.com";
+import Cover from "../../../components/common/cover.com";
 
 const HomePage = () => {
   return (

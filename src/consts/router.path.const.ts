@@ -5,6 +5,7 @@ export const ROUTER_URL = {
     FORGOT_PASSWORD: "/forgot-password",
     RESET_PASSWORD: "/reset-password",
     VERIFY_EMAIL: "/verify-email",
+    CONFIRM_EMAIL: "/confirm-email",
     UNAUTHOZIZED: "/unauthorized",
   },
   ADMIN: {

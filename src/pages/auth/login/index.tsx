@@ -1,12 +1,12 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { FacebookFilled, TwitterOutlined, GoogleOutlined } from '@ant-design/icons'
-import Background from '../../assets/cover.jpg'
+import Background from '../../../assets/cover.jpg'
 import { useState, useEffect } from 'react'
-import { UserRole } from '../../app/enums'
-import { helpers } from '../../utils'
-import { useAuth } from '../../contexts/Auth.context'
-import type { UserResponse } from '../../types/user/User.res.type'
-import { ROUTER_URL } from '../../consts/router.path.const'
+import { UserRole } from '../../../app/enums'
+import { helpers } from '../../../utils'
+import { useAuth } from '../../../contexts/Auth.context'
+import type { UserResponse } from '../../../types/user/User.res.type'
+import { ROUTER_URL } from '../../../consts/router.path.const'
 
 const LoginPage = () => {
   const navigate = useNavigate();
