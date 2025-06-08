@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import CourseCard from "./CourseCard.com";
 import courseData from "../../../data/course.json";
-import type { Course } from "../../../types/course/CourseModel";
+import type { Course } from "../../../types/course/Course.type";
 import DropdownComponent from "../../common/dropdown.com";
 import PaginationComponent from "../../common/pagination.com";
 import "antd/dist/reset.css";

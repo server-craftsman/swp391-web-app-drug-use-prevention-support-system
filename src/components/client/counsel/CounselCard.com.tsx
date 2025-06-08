@@ -1,5 +1,5 @@
 import React from "react";
-import type { Consultant } from "../../../types/consultant/ConsultantModel";
+import type { Consultant } from "../../../types/consultant/Consultant.type";
 
 interface ConsultantProps {
   counsel: Consultant;

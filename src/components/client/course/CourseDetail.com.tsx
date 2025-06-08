@@ -2,7 +2,7 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import courseData from "../../../data/course.json";
-import type { Course } from "../../../types/course/CourseModel";
+import type { Course } from "../../../types/course/Course.type";
 import { Button, Typography, Row, Col } from "antd";
 import CourseInfoCard from "./CourseInfoCard.com";
 import CourseMediaCard from "./CourseMediaCard.com";

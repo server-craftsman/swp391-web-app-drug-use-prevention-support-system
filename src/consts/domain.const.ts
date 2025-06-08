@@ -1,1 +1,1 @@
-export const DOMAIN_API = import.meta.env.VITE_API_URL;
+export const DOMAIN_API = "https://drugpreventionsystem-bzfxb7cndxdtdjbr.eastasia-01.azurewebsites.net/api/";

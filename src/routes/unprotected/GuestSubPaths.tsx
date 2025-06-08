@@ -9,11 +9,16 @@ import Community from "../../pages/community";
 import Assessment from "../../pages/assessment";
 import CourseDetail from "../../components/client/course/CourseDetail.com"; // import component chi tiết
 //================= PUBLIC SUB PATHS =================
-const MainLayout = lazy(() => import("../../layouts/main_layout/main.layout"));
+const UnauthorizedPage = lazy(() => import("../../pages/unauthorized"));
+const MainLayout = lazy(() => import("../../layouts/main/Main.layout"));
+const AdminLayout = lazy(() => import("../../layouts/admin/Admin.layout"));
 const HomePage = lazy(() => import("../../pages/home"));
 const LoginPage = lazy(() => import("../../pages/login"));
 const RegisterPage = lazy(() => import("../../pages/register"));
 const ForgotPasswordPage = lazy(() => import("../../pages/forgot_password"));
+const OverviewPage = lazy(() => import("../../pages/admin/overview"));
+const UserManagementPage = lazy(() => import("../../pages/admin/user"));
+const SettingManagementPage = lazy(() => import("../../pages/admin/setting"));
 //======================================================
 //export public sub paths
 export const publicSubPaths: Record<string, RouteObject[]> = {
@@ -56,6 +61,25 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
       ],
     },
   ],
+  [ROUTER_URL.ADMIN.BASE]: [
+    {
+      element: <AdminLayout />,
+      children: [
+        {
+          path: ROUTER_URL.ADMIN.BASE,
+          element: <OverviewPage />,
+        },
+        {
+          path: ROUTER_URL.ADMIN.USERS,
+          element: <UserManagementPage />,
+        },
+        {
+          path: ROUTER_URL.ADMIN.SETTINGS,
+          element: <SettingManagementPage />,
+        },
+      ],
+    },
+  ],
   [ROUTER_URL.AUTH.LOGIN]: [
     {
       element: <LoginPage />,
@@ -72,6 +96,12 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
     {
       element: <ForgotPasswordPage />,
       path: ROUTER_URL.AUTH.FORGOT_PASSWORD,
+    },
+  ],
+  [ROUTER_URL.AUTH.UNAUTHOZIZED]: [
+    {
+      element: <UnauthorizedPage />,
+      path: ROUTER_URL.AUTH.UNAUTHOZIZED,
     },
   ],
 };

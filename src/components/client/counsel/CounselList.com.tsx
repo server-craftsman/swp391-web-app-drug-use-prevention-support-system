@@ -1,6 +1,6 @@
 import CounselCard from "./CounselCard.com";
 import counsultants from "../../../data/consultants.json";
-import type { Consultant } from "../../../types/consultant/ConsultantModel";
+import type { Consultant } from "../../../types/consultant/Consultant.type";
 import BookingSchedule from "./BookingSchedule.com";
 
 const typedCounsultans = counsultants as Consultant[];

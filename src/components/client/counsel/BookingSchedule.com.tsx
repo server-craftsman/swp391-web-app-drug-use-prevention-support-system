@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import dayjs from "dayjs";
 import DropdownComponent from "../../common/dropdown.com";
 import consultants from "../../../data/consultants.json";
-import type { Consultant } from "../../../types/consultant/ConsultantModel";
+import type { Consultant } from "../../../types/consultant/Consultant.type";
 
 // Danh sách thời gian cố định
 const availableTimes = [

@@ -23,6 +23,10 @@ export const formatDate = (
   }
 };
 
+export const formatCurrency = (amount: number) => {
+  return amount.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace(/\./g, ",").replace(/\s₫/, " đ");
+};
+
 export const formatDateISO = (date: Date) => {
   return date.toISOString();
 };
@@ -124,22 +128,22 @@ export const notificationMessage = (
         type === "success"
           ? "#1a237e"
           : type === "error"
-          ? "#d32f2f"
-          : type === "info"
-          ? "#1a237e"
-          : type === "warning"
-          ? "#ff9800"
-          : "#ffffff",
+            ? "#d32f2f"
+            : type === "info"
+              ? "#1a237e"
+              : type === "warning"
+                ? "#ff9800"
+                : "#ffffff",
     },
   };
 
   return type === "success"
     ? toast.success(message, options as ToastOptions<unknown>)
     : type === "error"
-    ? toast.error(message, options as ToastOptions<unknown>)
-    : type === "info"
-    ? toast.info(message, options as ToastOptions<unknown>)
-    : toast.warning(message, options as ToastOptions<unknown>);
+      ? toast.error(message, options as ToastOptions<unknown>)
+      : type === "info"
+        ? toast.info(message, options as ToastOptions<unknown>)
+        : toast.warning(message, options as ToastOptions<unknown>);
 };
 
 export const formatNumber = (number: number) => {

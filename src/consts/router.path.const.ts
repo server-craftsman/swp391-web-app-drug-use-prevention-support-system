@@ -7,6 +7,18 @@ export const ROUTER_URL = {
     VERIFY_EMAIL: "/verify-email",
     UNAUTHOZIZED: "/unauthorized",
   },
+  ADMIN: {
+    BASE: "/admin",
+    OVERVIEW: "/admin/overview",
+    USERS: "/admin/users",
+    SETTINGS: "/admin/settings",
+  },
+  CONSULTANT: {
+    BASE: "/consultant",
+    OVERVIEW: "/consultant/overview",
+    USERS: "/consultant/users",
+    SETTINGS: "/consultant/settings",
+  },
   COMMON: {
     HOME: "/",
     ABOUT: "/about",

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import BlogCard from "./BlogCard.com";
 import blogData from "../../../data/blog.json";
-import type { Blog } from "../../../types/blog/BlogModel";
+import type { Blog } from "../../../types/blog/Blog.type";
 import PaginationComponent from "../../common/pagination.com";
 const typedBlogData = blogData as Blog[];
 

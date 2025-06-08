@@ -1,5 +1,5 @@
 import React from "react";
-import type { Program } from "../../../types/program/ProgramModel";
+import type { Program } from "../../../types/program/Program.type";
 
 interface Props {
   program: Program;
