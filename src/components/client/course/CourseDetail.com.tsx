@@ -18,7 +18,7 @@ const CourseDetail: React.FC = () => {
 
   if (!course) {
     return (
-      <div style={{ textAlign: "center", marginTop: 50 }}>
+      <div style={{ textAlign: "center", marginTop: 10 }}>
         <Title level={3}>Không tìm thấy khóa học</Title>
         <Button type="primary" onClick={() => navigate(-1)}>
           Quay lại
@@ -28,19 +28,21 @@ const CourseDetail: React.FC = () => {
   }
 
   return (
-    <div style={{ maxWidth: 1100, margin: "40px auto", padding: "0 20px" }}>
-      <Row gutter={[32, 32]}>
-        {/* Bên trái - hình + mô tả */}
-        <Col xs={24} md={14}>
-          <CourseMediaCard course={course} />
-        </Col>
+    <>
+      <div style={{ maxWidth: 1100, margin: "5px auto", padding: "0 20px" }}>
+        <Row gutter={[32, 32]}>
+          {/* Bên trái - hình + mô tả */}
+          <Col xs={24} md={14}>
+            <CourseMediaCard course={course} />
+          </Col>
 
-        {/* Bên phải - tên + giá + button */}
-        <Col xs={24} md={10}>
-          <CourseInfoCard course={course} />
-        </Col>
-      </Row>
-    </div>
+          {/* Bên phải - tên + giá + button */}
+          <Col xs={24} md={10}>
+            <CourseInfoCard course={course} />
+          </Col>
+        </Row>
+      </div>
+    </>
   );
 };
 
