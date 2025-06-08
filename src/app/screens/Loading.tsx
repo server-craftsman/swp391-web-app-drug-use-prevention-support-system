@@ -18,7 +18,7 @@ const Loading: React.FC = () => {
         src="https://lottie.host/820b9650-929d-48e4-88f8-9eb3ef18eddb/sWzRIbqGz8.lottie"
         loop
         autoplay
-        style={{ opacity: 0.5 }}
+        style={{ opacity: 0.5, width: '300px', height: '300px' }}
       />
     </div>
   )
