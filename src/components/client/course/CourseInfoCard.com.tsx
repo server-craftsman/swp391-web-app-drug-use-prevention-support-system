@@ -17,7 +17,6 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course }) => {
   return (
     <Card style={{ borderRadius: 12 }}>
       <Title level={2}>{course.name}</Title>
-      <RateComponent />
       <Title level={4}>Mô tả khóa học</Title>
       <Paragraph className="text-lg">{course.content}</Paragraph>
       <Paragraph>

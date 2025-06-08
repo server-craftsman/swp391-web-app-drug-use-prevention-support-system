@@ -11,7 +11,7 @@ import { ROUTER_URL } from '../../consts/router.path.const'
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { handleLogin, logout, role, token } = useAuth();
+  const { handleLogin, role, token } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,17 +44,12 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (isSubmitting) return;
-    
     setIsSubmitting(true);
-    
     try {
       await handleLogin({ email, password } as UserResponse);
-      // Don't navigate here - the useEffect will handle it after role/token are set
     } catch (error) {
       helpers.notificationMessage("Đăng nhập thất bại", "error");
-      logout();
     } finally {
       setIsSubmitting(false);
     }
