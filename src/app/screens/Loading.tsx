@@ -5,14 +5,10 @@ const Loading: React.FC = () => {
   return (
     <div
       style={{
-      zIndex: 2147483647,
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0
+        zIndex: 2147483647,
+        position: 'fixed',
       }}
-      className="fixed inset-0 flex justify-center items-center backdrop-blur-sm bg-white/70"
+      className="fixed inset-0 h-screen w-full flex justify-center items-center backdrop-blur-sm bg-white/70"
     >
       <DotLottieReact
         src="https://lottie.host/820b9650-929d-48e4-88f8-9eb3ef18eddb/sWzRIbqGz8.lottie"
