@@ -1,21 +1,23 @@
 import { lazy } from "react";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
-import About from "../../pages/about";
-import Course from "../../pages/course";
-import Blog from "../../pages/blog";
-import Counsel from "../../pages/counsel";
-import Community from "../../pages/community";
-import Assessment from "../../pages/assessment";
+import About from "../../pages/client/about";
+import Course from "../../pages/client/course";
+import Blog from "../../pages/client/blog";
+import Counsel from "../../pages/client/counsel";
+import Community from "../../pages/client/community";
+import Assessment from "../../pages/client/assessment";
 import CourseDetail from "../../components/client/course/CourseDetail.com"; // import component chi tiết
 //================= PUBLIC SUB PATHS =================
-const UnauthorizedPage = lazy(() => import("../../pages/unauthorized"));
+const UnauthorizedPage = lazy(() => import("../../pages/auth/unauthorized"));
 const MainLayout = lazy(() => import("../../layouts/main/Main.layout"));
 const AdminLayout = lazy(() => import("../../layouts/admin/Admin.layout"));
-const HomePage = lazy(() => import("../../pages/home"));
-const LoginPage = lazy(() => import("../../pages/login"));
-const RegisterPage = lazy(() => import("../../pages/register"));
-const ForgotPasswordPage = lazy(() => import("../../pages/forgot_password"));
+const HomePage = lazy(() => import("../../pages/client/home"));
+const LoginPage = lazy(() => import("../../pages/auth/login"));
+const RegisterPage = lazy(() => import("../../pages/auth/register"));
+const ForgotPasswordPage = lazy(() => import("../../pages/auth/forgot_password"));
+const ResetPasswordPage = lazy(() => import("../../pages/auth/reset_password"));
+const ConfirmEmailPage = lazy(() => import("../../pages/auth/confirm_email"));
 const OverviewPage = lazy(() => import("../../pages/admin/overview"));
 const UserManagementPage = lazy(() => import("../../pages/admin/user"));
 const SettingManagementPage = lazy(() => import("../../pages/admin/setting"));
@@ -96,6 +98,18 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
     {
       element: <ForgotPasswordPage />,
       path: ROUTER_URL.AUTH.FORGOT_PASSWORD,
+    },
+  ],
+  [ROUTER_URL.AUTH.RESET_PASSWORD]: [
+    {
+      element: <ResetPasswordPage />,
+      path: ROUTER_URL.AUTH.RESET_PASSWORD,
+    },
+  ],
+  [ROUTER_URL.AUTH.CONFIRM_EMAIL]: [
+    {
+      element: <ConfirmEmailPage />,
+      path: ROUTER_URL.AUTH.CONFIRM_EMAIL,
     },
   ],
   [ROUTER_URL.AUTH.UNAUTHOZIZED]: [

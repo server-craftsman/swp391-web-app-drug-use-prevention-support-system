@@ -9,6 +9,7 @@ import { toggleLoading } from "../../app/store/loading.slice";
 import { HTTP_STATUS } from "../../app/enums";
 import { HttpException } from "../../app/exceptions";
 import { notificationMessage } from "../../utils/helper";
+import { uploadFileToS3, deleteFileFromS3 } from "../../utils/upload";
 // import { handleUploadFile, deleteFileFromCloudinary } from "../../utils/upload"; // Import the handleUploadFile and deleteFileFromCloudinary functions
 
 export const axiosInstance = axios.create({
@@ -174,6 +175,53 @@ export const BaseService = {
     //         if (isLoading) store.dispatch(toggleLoading(false));
     //     }
     // }
+
+    // New methods for file upload
+    uploadFile: async (file: File, isLoading: boolean = true): Promise<string | null> => {
+        if (isLoading) store.dispatch(toggleLoading(true) as any);
+
+        try {
+            if (!file) {
+                throw new Error("No file provided");
+            }
+
+            console.log("Uploading file:", file.name, file.type, file.size);
+
+            const url = await uploadFileToS3(file);
+            if (url) {
+                notificationMessage("File uploaded successfully");
+                return url;
+            } else {
+                throw new Error("Upload failed");
+            }
+        } catch (error) {
+            console.error("Upload error:", error);
+            notificationMessage(error instanceof Error ? error.message : "Upload failed", "error");
+            return null;
+        } finally {
+            if (isLoading) store.dispatch(toggleLoading(false));
+        }
+    },
+
+    deleteFile: async (fileUrl: string, isLoading: boolean = true): Promise<boolean> => {
+        if (isLoading) store.dispatch(toggleLoading(true) as any);
+
+        try {
+            const success = await deleteFileFromS3(fileUrl);
+            if (success) {
+                notificationMessage("File deleted successfully");
+                return true;
+            } else {
+                throw new Error("Delete failed");
+            }
+        } catch (error) {
+            console.error("Delete error:", error);
+            notificationMessage(error instanceof Error ? error.message : "Delete failed", "error");
+            return false;
+        } finally {
+            if (isLoading) store.dispatch(toggleLoading(false));
+        }
+    }
 };
 
 export interface PromiseState<T = unknown> extends AxiosResponse<T> {

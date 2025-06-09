@@ -147,7 +147,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         return userData;
       } catch (error) {
-        logout(); // Clear any invalid data
         throw error;
       } finally {
         setIsLoading(false);

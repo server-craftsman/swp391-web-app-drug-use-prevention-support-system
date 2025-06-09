@@ -4,6 +4,8 @@ export const API_PATH = {
         LOGOUT: "/auth/logout",
         REGISTER: "/auth/register",
         FORGOT_PASSWORD: "/auth/forgot-password",
+        CONFIRM_EMAIL: "/auth/confirm-email",
+        REQUEST_PASSWORD_RESET: "/auth/request-password-reset",
         RESET_PASSWORD: "/auth/reset-password"
     },
     USER: {

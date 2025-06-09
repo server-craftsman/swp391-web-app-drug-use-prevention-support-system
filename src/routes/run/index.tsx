@@ -78,51 +78,60 @@ const RunRoutes = () => {
   };
 
   // Create a mapping of each route type
-  const renderPublicRoutes = () => {
-    const mainLayoutRoutes = publicSubPaths[ROUTER_URL.COMMON.HOME] || [];
-    const authRoutes = [
-      ...(publicSubPaths[ROUTER_URL.AUTH.LOGIN] || []),
-      ...(publicSubPaths[ROUTER_URL.AUTH.SIGN_UP] || []),
-      ...(publicSubPaths[ROUTER_URL.AUTH.FORGOT_PASSWORD] || []),
-      ...(publicSubPaths[ROUTER_URL.AUTH.UNAUTHOZIZED] || []),
-    ];
+  // const renderPublicRoutes = () => {
+  //   // Get all main layout routes
+  //   const mainLayoutRoutes = publicSubPaths[ROUTER_URL.COMMON.HOME] || [];
+    
+  //   // Extract all auth routes directly from publicSubPaths
+  //   const authPaths = Object.keys(publicSubPaths).filter(path => 
+  //     path.startsWith('/') && path !== ROUTER_URL.COMMON.HOME && path !== ROUTER_URL.ADMIN.BASE
+  //   );
+    
+  //   return (
+  //     <>
+  //       {/* Main Layout with Home and Content Pages */}
+  //       {mainLayoutRoutes.map(route => (
+  //         <Route
+  //           key="main-layout"
+  //           element={<GuardPublicRoute component={route.element} />}
+  //         >
+  //           {route.children?.map(childRoute => (
+  //             <Route
+  //               key={childRoute.path}
+  //               path={childRoute.path}
+  //               element={childRoute.element}
+  //               index={childRoute.path === ROUTER_URL.COMMON.HOME}
+  //             />
+  //           ))}
+  //         </Route>
+  //       ))}
 
-    return (
-      <>
-        {/* Main Layout with Home and Content Pages */}
-        {mainLayoutRoutes.map(route => (
-          <Route
-            key="main-layout"
-            element={<GuardPublicRoute component={route.element} />}
-          >
-            {route.children?.map(childRoute => (
-              <Route
-                key={childRoute.path}
-                path={childRoute.path}
-                element={childRoute.element}
-                index={childRoute.path === ROUTER_URL.COMMON.HOME}
-              />
-            ))}
-          </Route>
-        ))}
-
-        {/* Auth Pages */}
-        {authRoutes.map(route => (
-          <Route
-            key={route.path}
-            path={route.path}
-            element={<GuardPublicRoute component={route.element} />}
-          />
-        ))}
-      </>
-    );
-  };
+  //       {/* Auth Pages - Dynamically render all routes from publicSubPaths */}
+  //       {authPaths.flatMap(path => 
+  //         publicSubPaths[path].map(route => (
+  //           <Route
+  //             key={route.path}
+  //             path={route.path}
+  //             element={<GuardPublicRoute component={route.element} />}
+  //           />
+  //         ))
+  //       )}
+  //     </>
+  //   );
+  // };
 
   // Render all routes
   return (
     <Routes>
       {/* Public Routes */}
-      {renderPublicRoutes()}
+      {/* {renderPublicRoutes()} */}
+      {Object.entries(publicSubPaths).map(([key, routes]) =>
+        routes.map((route) => (
+          <Route key={route.path || "index"} path={route.path} element={key === ROUTER_URL.COMMON.HOME ? <GuardPublicRoute component={route.element} /> : route.element}>
+            {route.children?.map((childRoute) => <Route key={childRoute.path} path={childRoute.path} element={childRoute.element} />)}
+          </Route>
+        ))
+      )}
 
       {/* Protected Routes */}
       {renderProtectedRoutes()}

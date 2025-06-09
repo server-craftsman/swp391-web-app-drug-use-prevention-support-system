@@ -1,20 +1,21 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { FacebookFilled, TwitterOutlined, GoogleOutlined } from '@ant-design/icons'
-import Background from '../../assets/cover.jpg'
+import { FacebookFilled, TwitterOutlined, GoogleOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
+import Background from '../../../assets/cover.jpg'
 import { useState, useEffect } from 'react'
-import { UserRole } from '../../app/enums'
-import { helpers } from '../../utils'
-import { useAuth } from '../../contexts/Auth.context'
-import type { UserResponse } from '../../types/user/User.res.type'
-import { ROUTER_URL } from '../../consts/router.path.const'
+import { UserRole } from '../../../app/enums'
+import { helpers } from '../../../utils'
+import { useAuth } from '../../../contexts/Auth.context'
+import type { UserResponse } from '../../../types/user/User.res.type'
+import { ROUTER_URL } from '../../../consts/router.path.const'
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { handleLogin, logout, role, token } = useAuth();
+  const { handleLogin, role, token } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Only redirect if already logged in and on the login page
   useEffect(() => {
@@ -44,17 +45,12 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (isSubmitting) return;
-    
     setIsSubmitting(true);
-    
     try {
       await handleLogin({ email, password } as UserResponse);
-      // Don't navigate here - the useEffect will handle it after role/token are set
     } catch (error) {
       helpers.notificationMessage("Đăng nhập thất bại", "error");
-      logout();
     } finally {
       setIsSubmitting(false);
     }
@@ -96,9 +92,9 @@ const LoginPage = () => {
               />
             </div>
 
-            <div className="mb-6 group">
+            <div className="mb-6 group relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Mật khẩu"
                 className="w-full bg-gray-100/80 border-0 rounded px-4 py-4 text-gray-700 focus:outline-none transition-all duration-300 focus:shadow-md group-hover:bg-gray-100"
                 required
@@ -106,6 +102,13 @@ const LoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isSubmitting}
               />
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors duration-300"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+              </button>
             </div>
 
             <div className="flex items-center justify-between mb-10">
