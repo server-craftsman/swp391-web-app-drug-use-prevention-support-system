@@ -4,6 +4,7 @@ import AddToCartButton from "../../common/addToCartButton.com";
 import { useNavigate } from "react-router-dom";
 import type { Course } from "../../../types/course/Course.type";
 import { formatCurrency } from "../../../utils/helper";
+import RateComponent from "../../common/rate.com";
 
 const { Title, Paragraph, Text } = Typography;
 
