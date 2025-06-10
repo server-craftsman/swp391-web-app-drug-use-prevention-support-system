@@ -1,6 +1,6 @@
 import React from "react";
 import { Rate } from "antd";
 
-const App: React.FC = () => <Rate disabled defaultValue={4} />;
+const RateComponent: React.FC = () => <Rate disabled defaultValue={4} />;
 
-export default App;
+export default RateComponent;
