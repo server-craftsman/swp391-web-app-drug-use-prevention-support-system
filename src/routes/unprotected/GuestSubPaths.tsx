@@ -15,7 +15,9 @@ const AdminLayout = lazy(() => import("../../layouts/admin/Admin.layout"));
 const HomePage = lazy(() => import("../../pages/client/home"));
 const LoginPage = lazy(() => import("../../pages/auth/login"));
 const RegisterPage = lazy(() => import("../../pages/auth/register"));
-const ForgotPasswordPage = lazy(() => import("../../pages/auth/forgot_password"));
+const ForgotPasswordPage = lazy(
+  () => import("../../pages/auth/forgot_password")
+);
 const ResetPasswordPage = lazy(() => import("../../pages/auth/reset_password"));
 const ConfirmEmailPage = lazy(() => import("../../pages/auth/confirm_email"));
 const OverviewPage = lazy(() => import("../../pages/admin/overview"));
