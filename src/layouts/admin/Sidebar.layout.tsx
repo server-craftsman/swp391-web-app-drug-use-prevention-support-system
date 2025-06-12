@@ -21,6 +21,11 @@ const navItems = [
     icon: <UserOutlined />,
   },
   { name: "Cài Đặt", to: ROUTER_URL.ADMIN.SETTINGS, icon: <SettingOutlined /> },
+  {
+    name: "Quản Lý Blog",
+    to: ROUTER_URL.ADMIN.MANAGER_BLOG,
+    icon: <SettingOutlined />,
+  },
 ];
 
 const SidebarLayout: React.FC = () => {

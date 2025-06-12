@@ -3,3 +3,7 @@ export interface BlogRequest {
   pageSize: number;
   filterByContent?: string; // optional
 }
+export interface CreateBlogRequest {
+  content: string;
+  blogImgUrl: string;
+}

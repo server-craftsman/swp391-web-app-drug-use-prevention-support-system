@@ -23,5 +23,6 @@ export const API_PATH = {
   },
   BLOG: {
     GET_ALL_BLOGS: "/blog",
+    CREATE_BLOG: "/blog/create",
   },
 };
