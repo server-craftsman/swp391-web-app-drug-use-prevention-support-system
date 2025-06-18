@@ -1,0 +1,46 @@
+[
+  {
+    "id": "assist_1",
+    "category": "tobacco",
+    "text": "Trong 3 tháng qua, bạn đã sử dụng thuốc lá (điếu, xì gà, thuốc lào) bao nhiêu lần?",
+    "type": "single-choice",
+    "options": [
+      "Không bao giờ",
+      "Một hoặc hai lần",
+      "Hàng tháng",
+      "Hàng tuần",
+      "Hàng ngày"
+    ]
+  },
+  {
+    "id": "assist_2",
+    "category": "alcohol",
+    "text": "Trong 3 tháng qua, bạn đã sử dụng rượu/bia bao nhiêu lần?",
+    "type": "single-choice",
+    "options": [
+      "Không bao giờ",
+      "Một hoặc hai lần",
+      "Hàng tháng",
+      "Hàng tuần",
+      "Hàng ngày"
+    ]
+  },
+  {
+    "id": "assist_3",
+    "category": "cannabis",
+    "text": "Bạn đã từng sử dụng cần sa (cỏ, marijuana, hashish)?",
+    "type": "single-choice",
+    "options": [
+      "Chưa bao giờ",
+      "Có, nhưng không trong 3 tháng qua",
+      "Có, trong 3 tháng qua"
+    ]
+  },
+  {
+    "id": "assist_4",
+    "category": "impact",
+    "text": "Việc sử dụng chất kích thích đã từng ảnh hưởng đến công việc, học tập hoặc các mối quan hệ của bạn?",
+    "type": "single-choice",
+    "options": ["Không bao giờ", "Hiếm khi", "Thỉnh thoảng", "Thường xuyên"]
+  }
+]

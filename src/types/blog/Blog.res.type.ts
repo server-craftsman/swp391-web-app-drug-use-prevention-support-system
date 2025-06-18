@@ -7,3 +7,15 @@ export interface Blog {
   updatedAt: string; // ISO datetime string
   isDeleted: boolean;
 }
+
+export interface BlogPageInfo {
+  pageNum: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+export interface BlogListResponse {
+    pageData: Blog[];
+    pageInfo: BlogPageInfo;
+}
