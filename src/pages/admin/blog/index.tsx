@@ -1,9 +1,9 @@
-import CreateBlogForm from "../../../components/client/blog/CreateBlog.com";
+import AdminBlogManager from "../../../components/admin/blog/AdminBlogManager";
 
 const BlogMManagement = () => {
   return (
     <>
-      <CreateBlogForm />
+      <AdminBlogManager />
     </>
   );
 };
