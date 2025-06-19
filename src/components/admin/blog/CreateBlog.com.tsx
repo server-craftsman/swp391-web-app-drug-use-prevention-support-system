@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useCreateBlog } from "../../../hooks/useBlog";
 import { BaseService } from "../../../app/api/base.service";
 
-const CreateBlogForm = () => {
+interface CreateBlogFormProps {
+  onSuccess?: () => void;
+}
+
+const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
   const { mutate: createBlog, isPending } = useCreateBlog();
   const [content, setContent] = useState("");
   const [blogImgUrl, setBlogImgUrl] = useState("");
@@ -43,7 +47,22 @@ const CreateBlogForm = () => {
       }
     }
 
-    createBlog({ content, blogImgUrl: imgUrl });
+    createBlog(
+      { content, blogImgUrl: imgUrl },
+      {
+        onSuccess: () => {
+          alert("Tạo blog thành công!");
+          setContent("");
+          setBlogImgUrl("");
+          setFile(null);
+          setPreviewImage("");
+          if (onSuccess) onSuccess();
+        },
+        onError: () => {
+          alert("Tạo blog thất bại!");
+        },
+      }
+    );
   };
 
   return (
