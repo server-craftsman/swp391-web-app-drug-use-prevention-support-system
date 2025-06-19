@@ -9,38 +9,47 @@ interface BlogCardProps {
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => (
   <Card
     hoverable
-    className="w-full max-w-3xl flex p-4 items-start shadow-md rounded-xl m-4"
+    className="w-full max-w-xl mx-auto my-6 rounded-2xl shadow-md p-0 border border-gray-100"
+    bodyStyle={{ padding: 0 }}
   >
-    <div className="grid grid-cols-12 gap-4 w-full">
-      <div className="col-span-6 min-w-[200px] h-[250px] overflow-hidden rounded-md bg-gray-100 flex items-center justify-center">
+    {/* Header: Avatar + User + Date */}
+    <div className="flex items-center gap-3 px-5 pt-5 pb-2">
+      <Avatar size={44}>{blog.userId?.charAt(0).toUpperCase() || "U"}</Avatar>
+      <div>
+        <div className="font-semibold text-base">
+          {blog.userId ? `User: ${blog.userId}` : "Không rõ tác giả"}
+        </div>
+        <div className="text-xs text-gray-500">
+          {blog.createdAt
+            ? new Date(blog.createdAt).toLocaleString("vi-VN")
+            : ""}
+        </div>
+      </div>
+    </div>
+
+    {/* Ảnh blog */}
+    {blog.blogImgUrl && (
+      <div
+        className="w-full bg-gray-100 flex items-center justify-center overflow-hidden"
+        style={{ maxHeight: 320 }}
+      >
         <img
-          src={blog.blogImgUrl || "/no-image.png"}
+          src={blog.blogImgUrl}
           alt="Blog"
-          className="w-full h-full object-cover block"
+          className="w-full object-cover"
+          style={{ maxHeight: 320 }}
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).src = "/no-image.png";
           }}
         />
       </div>
-      <div className="col-span-6 flex flex-col gap-1">
-        <div className="flex items-start gap-2">
-          <Avatar>{blog.userId?.charAt(0).toUpperCase() || "U"}</Avatar>
-          <div>
-            <p className="font-semibold">
-              {blog.userId ? `User: ${blog.userId}` : "Không rõ tác giả"}
-            </p>
-            <p className="text-sm text-gray-500">
-              {blog.createdAt
-                ? new Date(blog.createdAt).toLocaleDateString("vi-VN")
-                : ""}
-            </p>
-          </div>
-        </div>
+    )}
 
-        <p className="text-gray-600 text-sm mt-2 line-clamp-5">
-          {blog.content || "Không có nội dung"}
-        </p>
-      </div>
+    {/* Nội dung */}
+    <div className="px-5 py-4">
+      <p className="text-gray-800 text-base whitespace-pre-line break-words">
+        {blog.content || "Không có nội dung"}
+      </p>
     </div>
   </Card>
 );

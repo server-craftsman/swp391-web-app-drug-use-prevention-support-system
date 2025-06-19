@@ -24,5 +24,7 @@ export const API_PATH = {
   BLOG: {
     GET_ALL_BLOGS: "/blog",
     CREATE_BLOG: "/blog/create",
+    DELETE_BLOG: (id: string) => `/blog/${id}`,
+    UPDATE_BLOG: (id: string) => `/blog/${id}`,
   },
 };

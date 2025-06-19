@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import { useCreateBlog } from "../../../hooks/useBlog";
+import { useUpdateBlog } from "../../../hooks/useBlog";
 import { BaseService } from "../../../app/api/base.service";
+import type { Blog } from "../../../types/blog/Blog.res.type";
 
-interface CreateBlogFormProps {
+interface UpdateBlogFormProps {
+  blog: Blog;
   onSuccess?: () => void;
 }
 
-const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
-  const { mutate: createBlog, isPending } = useCreateBlog();
-  const [content, setContent] = useState("");
-  const [blogImgUrl, setBlogImgUrl] = useState("");
+const UpdateBlogForm: React.FC<UpdateBlogFormProps> = ({ blog, onSuccess }) => {
+  const { mutate: updateBlog, isPending } = useUpdateBlog();
+  const [content, setContent] = useState(blog.content);
+  const [blogImgUrl, setBlogImgUrl] = useState(blog.blogImgUrl);
   const [file, setFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string>("");
+  const [previewImage, setPreviewImage] = useState<string>(blog.blogImgUrl);
 
   // Xử lý chọn file và preview ảnh
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,7 +23,7 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
       setPreviewImage(URL.createObjectURL(selected));
     } else {
       setFile(null);
-      setPreviewImage("");
+      setPreviewImage(blogImgUrl);
     }
   };
 
@@ -35,7 +37,7 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
 
     let imgUrl = blogImgUrl;
 
-    // Nếu có file, upload lên server
+    // Nếu có file mới, upload lên server
     if (file) {
       const uploadedUrl = await BaseService.uploadFile(file);
       if (uploadedUrl) {
@@ -47,19 +49,15 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
       }
     }
 
-    createBlog(
-      { content, blogImgUrl: imgUrl },
+    updateBlog(
+      { id: blog.id, content, blogImgUrl: imgUrl },
       {
         onSuccess: () => {
-          alert("Tạo blog thành công!");
-          setContent("");
-          setBlogImgUrl("");
-          setFile(null);
-          setPreviewImage("");
+          alert("Cập nhật blog thành công!");
           if (onSuccess) onSuccess();
         },
         onError: () => {
-          alert("Tạo blog thất bại!");
+          alert("Cập nhật blog thất bại!");
         },
       }
     );
@@ -70,8 +68,8 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
       onSubmit={handleSubmit}
       className="max-w-lg mx-auto p-8 bg-white rounded-xl shadow-lg space-y-6 border border-gray-100"
     >
-      <h2 className="text-2xl font-bold text-[#20558A] mb-2 text-center">
-        Tạo blog mới
+      <h2 className="text-2xl font-bold text-blue-900 mb-2 text-center">
+        Cập nhật blog
       </h2>
 
       <div>
@@ -119,7 +117,7 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
+        className="w-full bg-gradient-to-r from-blue-700 to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
       >
         {isPending ? (
           <span className="flex items-center justify-center gap-2">
@@ -142,14 +140,14 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
                 d="M4 12a8 8 0 018-8v8z"
               ></path>
             </svg>
-            Đang tạo...
+            Đang cập nhật...
           </span>
         ) : (
-          "Tạo blog"
+          "Cập nhật blog"
         )}
       </button>
     </form>
   );
 };
 
-export default CreateBlogForm;
+export default UpdateBlogForm;
