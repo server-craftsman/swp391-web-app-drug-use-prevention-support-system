@@ -11,6 +11,10 @@ export interface DeleteBlogRequest {
   id: string;
 }
 export interface UpdateBlogRequest {
+  id: string;
   content: string;
   blogImgUrl: string;
+}
+export interface DeleteBlogRequest {
+  id: string;
 }

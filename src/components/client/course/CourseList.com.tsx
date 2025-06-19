@@ -3,7 +3,7 @@ import CourseCard from "./CourseCard.com";
 import courseData from "../../../data/course.json";
 import type { Course } from "../../../types/course/Course.type";
 import DropdownComponent from "../../common/dropdown.com";
-import PaginationComponent from "../../common/pagination.com";
+// import PaginationComponent from "../../common/pagination.com";
 import "antd/dist/reset.css";
 
 const typedCourseData = courseData as Course[];
@@ -45,7 +45,7 @@ export default function CourseList() {
 
   // Phân trang
   const itemsPerPage = 12;
-  const totalPages = Math.ceil(sortedCourses.length / itemsPerPage);
+  // const totalPages = Math.ceil(sortedCourses.length / itemsPerPage);
   const paginatedCourses = sortedCourses.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -93,12 +93,12 @@ export default function CourseList() {
           </div>
         ))}
       </div>
-
+      {/* 
       <PaginationComponent
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
-      />
+      /> */}
     </>
   );
 }
