@@ -17,7 +17,7 @@ const AdminBlogManager = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [current, setCurrent] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
+  const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
 
   const fetchBlogs = async () => {
@@ -184,7 +184,6 @@ const AdminBlogManager = () => {
         footer={null}
         title="Cập nhật blog"
         width={600}
-        destroyOnClose
       >
         {selectedBlog && (
           <UpdateBlogForm blog={selectedBlog} onSuccess={handleBlogUpdated} />
