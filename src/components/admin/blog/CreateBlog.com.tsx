@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useCreateBlog } from "../../../hooks/useBlog";
 import { BaseService } from "../../../app/api/base.service";
 
@@ -12,6 +12,7 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
   const [blogImgUrl, setBlogImgUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Xử lý chọn file và preview ảnh
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +57,8 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
           setBlogImgUrl("");
           setFile(null);
           setPreviewImage("");
+          // Reset input file
+          if (fileInputRef.current) fileInputRef.current.value = "";
           if (onSuccess) onSuccess();
         },
         onError: () => {
@@ -94,6 +97,7 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
         </label>
         <div className="flex items-center gap-4 flex-wrap">
           <input
+            ref={fileInputRef}
             type="file"
             accept="image/*"
             onChange={handleFileChange}
