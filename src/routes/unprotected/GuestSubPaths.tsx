@@ -8,6 +8,7 @@ import Counsel from "../../pages/client/counsel";
 import Community from "../../pages/client/community";
 import Assessment from "../../pages/client/assessment";
 import CourseDetail from "../../components/client/course/CourseDetail.com"; // import component chi tiết
+import BlogMManagement from "../../pages/admin/blog";
 //================= PUBLIC SUB PATHS =================
 const UnauthorizedPage = lazy(() => import("../../pages/auth/unauthorized"));
 const MainLayout = lazy(() => import("../../layouts/main/Main.layout"));
@@ -15,7 +16,9 @@ const AdminLayout = lazy(() => import("../../layouts/admin/Admin.layout"));
 const HomePage = lazy(() => import("../../pages/client/home"));
 const LoginPage = lazy(() => import("../../pages/auth/login"));
 const RegisterPage = lazy(() => import("../../pages/auth/register"));
-const ForgotPasswordPage = lazy(() => import("../../pages/auth/forgot_password"));
+const ForgotPasswordPage = lazy(
+  () => import("../../pages/auth/forgot_password")
+);
 const ResetPasswordPage = lazy(() => import("../../pages/auth/reset_password"));
 const ConfirmEmailPage = lazy(() => import("../../pages/auth/confirm_email"));
 const OverviewPage = lazy(() => import("../../pages/admin/overview"));
@@ -78,6 +81,10 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
         {
           path: ROUTER_URL.ADMIN.SETTINGS,
           element: <SettingManagementPage />,
+        },
+        {
+          path: ROUTER_URL.ADMIN.MANAGER_BLOG,
+          element: <BlogMManagement />,
         },
       ],
     },

@@ -1,7 +1,7 @@
 import React from "react";
-import { Card } from "antd";
-import type { Blog } from "../../../types/blog/Blog.type";
-import { Avatar } from "antd";
+import { Card, Avatar } from "antd";
+import type { Blog } from "../../../types/blog/Blog.res.type";
+
 interface BlogCardProps {
   blog: Blog;
 }
@@ -9,37 +9,47 @@ interface BlogCardProps {
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => (
   <Card
     hoverable
-    className="w-full max-w-3xl flex p-4 items-start shadow-md rounded-xl m-4"
+    className="w-full max-w-xl mx-auto my-6 rounded-2xl shadow-md p-0 border border-gray-100"
+    bodyStyle={{ padding: 0 }}
   >
-    <div className="grid grid-cols-12 gap-4 w-full">
-      <div className="col-span-6 min-w-[200px] h-[250px] overflow-hidden rounded-md">
+    {/* Header: Avatar + User + Date */}
+    <div className="flex items-center gap-3 px-5 pt-5 pb-2">
+      <Avatar size={44}>{blog.userId?.charAt(0).toUpperCase() || "U"}</Avatar>
+      <div>
+        <div className="font-semibold text-base">
+          {blog.userId ? `User: ${blog.userId}` : "Không rõ tác giả"}
+        </div>
+        <div className="text-xs text-gray-500">
+          {blog.createdAt
+            ? new Date(blog.createdAt).toLocaleString("vi-VN")
+            : ""}
+        </div>
+      </div>
+    </div>
+
+    {/* Ảnh blog */}
+    {blog.blogImgUrl && (
+      <div
+        className="w-full bg-gray-100 flex items-center justify-center overflow-hidden"
+        style={{ maxHeight: 320 }}
+      >
         <img
-          src={blog.imageUrl}
-          alt={blog.title}
-          className="w-full h-full object-cover block"
+          src={blog.blogImgUrl}
+          alt="Blog"
+          className="w-full object-cover"
+          style={{ maxHeight: 320 }}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = "/no-image.png";
+          }}
         />
       </div>
-      <div className="col-span-6 flex flex-col gap-1">
-        <div className="flex items-start gap-2">
-          <Avatar>{blog.author?.charAt(0) || "A"}</Avatar>
-          <div>
-            <p className="font-semibold">{blog.author}</p>
-            <p className="text-sm text-gray-500">
-              {new Date(blog.createdAt).toISOString().split("T")[0]}
-            </p>
-          </div>
-        </div>
+    )}
 
-        <h3 className="text-lg font-bold mt-1">{blog.title}</h3>
-
-        <p className="text-gray-600 text-sm">{blog.summary || blog.content}</p>
-
-        <div className="mt-2">
-          <span className="bg-blue-900 text-white text-xs font-semibold px-3 py-1 rounded">
-            {blog.targetAudience}
-          </span>
-        </div>
-      </div>
+    {/* Nội dung */}
+    <div className="px-5 py-4">
+      <p className="text-gray-800 text-base whitespace-pre-line break-words">
+        {blog.content || "Không có nội dung"}
+      </p>
     </div>
   </Card>
 );

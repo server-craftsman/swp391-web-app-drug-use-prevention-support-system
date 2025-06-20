@@ -2,10 +2,18 @@ import React from "react";
 import { Card } from "antd";
 import TabsComponent from "../../common/tabs.com";
 import type { Course } from "../../../types/course/Course.type";
+import userData from "../../../data/user.json";
+import type { User } from "../../../types/user/User";
 
 interface CourseMediaCardProps {
   course: Course;
 }
+
+const users = userData as User[];
+const getAuthorName = (userId: number | string) => {
+  const user = users.find((u) => u.id === userId || u.id === String(userId));
+  return user ? `${user.firstName} ${user.lastName}` : "Không rõ";
+};
 
 const CourseMediaCard: React.FC<CourseMediaCardProps> = ({ course }) => (
   <Card
@@ -50,7 +58,10 @@ const CourseMediaCard: React.FC<CourseMediaCardProps> = ({ course }) => (
       </div>
     }
   >
-    <TabsComponent />
+    <div style={{ marginBottom: 16, fontWeight: 500 }}>
+      Tác giả: {getAuthorName(course.userId)}
+    </div>
+    <TabsComponent course={course} author={getAuthorName(course.userId)} />
   </Card>
 );
 

@@ -33,8 +33,12 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
         }
       >
         <div className="flex flex-col h-48">
-          <h3 className="text-lg font-semibold mb-2 text-ellipsis line-clamp-1 overflow-hidden">{course.name}</h3>
-          <Paragraph className="text-sm text-gray-500 line-clamp-2 mb-auto text-ellipsis overflow-hidden">{course.content}</Paragraph>
+          <h3 className="text-lg font-semibold mb-2 text-ellipsis line-clamp-1 overflow-hidden">
+            {course.name}
+          </h3>
+          <Paragraph className="text-sm text-gray-500 line-clamp-2 mb-auto text-ellipsis overflow-hidden">
+            {course.content}
+          </Paragraph>
           <div className="mt-2">
             <div className="flex items-center gap-1">
               <span className="text-2xl font-bold">Giá:</span>

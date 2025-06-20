@@ -1,0 +1,30 @@
+[
+  {
+    "id": "crafft_1",
+    "category": "car",
+    "text": "Bạn đã từng lên xe khi người lái đã uống rượu, bia hoặc dùng chất gây nghiện?",
+    "type": "yes-no",
+    "options": ["Có", "Không"]
+  },
+  {
+    "id": "crafft_2",
+    "category": "relax",
+    "text": "Bạn có sử dụng chất gây nghiện để thư giãn, cảm thấy tốt hơn hoặc phù hợp với nhóm bạn?",
+    "type": "yes-no",
+    "options": ["Có", "Không"]
+  },
+  {
+    "id": "crafft_3",
+    "category": "alone",
+    "text": "Bạn có bao giờ sử dụng chất gây nghiện khi đang ở một mình?",
+    "type": "yes-no",
+    "options": ["Có", "Không"]
+  },
+  {
+    "id": "crafft_4",
+    "category": "forget",
+    "text": "Bạn có bao giờ quên những gì đã làm sau khi sử dụng rượu, thuốc, hoặc chất khác?",
+    "type": "yes-no",
+    "options": ["Có", "Không"]
+  }
+]

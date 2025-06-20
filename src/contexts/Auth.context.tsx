@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import type { ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
 import { UserRole } from "../app/enums";
@@ -16,9 +22,14 @@ interface AuthContextType {
   token: string | null;
   setToken: React.Dispatch<React.SetStateAction<string | null>>;
   userInfo: ResponseSuccess<UserResponse>["data"] | null;
-  setUserInfo: React.Dispatch<React.SetStateAction<ResponseSuccess<UserResponse>["data"] | null>>;
+  setUserInfo: React.Dispatch<
+    React.SetStateAction<ResponseSuccess<UserResponse>["data"] | null>
+  >;
   logout: () => void;
-  handleLogin: (loginData: { email: string; password: string }) => Promise<UserResponse>;
+  handleLogin: (loginData: {
+    email: string;
+    password: string;
+  }) => Promise<UserResponse>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -30,7 +41,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [role, setRole] = useState<UserRole | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<ResponseSuccess<UserResponse>["data"] | null>(null);
+  const [userInfo, setUserInfo] = useState<
+    ResponseSuccess<UserResponse>["data"] | null
+  >(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load initial state from localStorage
@@ -40,14 +53,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Get stored values
         const storedToken = localStorage.getItem("token");
         const storedUserInfo = localStorage.getItem("userInfo");
-        
+
         // Set token if it exists
         if (storedToken) {
           setToken(storedToken);
           try {
             // Verify and set role from token
             const decoded = jwtDecode(storedToken) as { role?: UserRole };
-            if (decoded.role && Object.values(UserRole).includes(decoded.role)) {
+            if (
+              decoded.role &&
+              Object.values(UserRole).includes(decoded.role)
+            ) {
               setRole(decoded.role);
             } else {
               // Invalid role in token
@@ -59,7 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             clearAuthData();
           }
         }
-        
+
         // Set user info if it exists
         if (storedUserInfo) {
           setUserInfo(JSON.parse(storedUserInfo));
@@ -127,7 +143,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userData = response.data.data as UserResponse;
 
         const token = userData.token;
-        if (!token) throw new HttpException("No token provided", HTTP_STATUS.UNAUTHORIZED);
+        if (!token)
+          throw new HttpException(
+            "No token provided",
+            HTTP_STATUS.UNAUTHORIZED
+          );
 
         const decoded = jwtDecode(token) as { role?: UserRole };
 
@@ -178,7 +198,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new HttpException("useAuth must be used within an AuthProvider", HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    throw new HttpException(
+      "useAuth must be used within an AuthProvider",
+      HTTP_STATUS.INTERNAL_SERVER_ERROR
+    );
   }
   return context;
 };
