@@ -2,10 +2,14 @@ import React, { useState, useEffect } from "react";
 import type { Course } from "../../../types/course/Course.res.type";
 import { useUpdateCourse } from "../../../hooks/useCourse";
 import { BaseService } from "../../../app/api/base.service";
+import { CategoryService } from "../../../services/category/category.service";
+import type { Category } from "../../../types/category/Category.res.type";
+import { message } from "antd";
+import DropdownComponent from "../../common/dropdown.com"; // Giả sử bạn đã có sẵn component này
 
 interface UpdateCourseFormProps {
   course: Course;
-  onSuccess?: () => void; // <-- thêm onSuccess vào đây
+  onSuccess?: () => void;
 }
 
 const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
@@ -22,12 +26,36 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
     course.imageUrl || ""
   );
 
+  const [selectedCategoryId, setSelectedCategoryId] = useState(
+    course.categoryId
+  );
+  const [selectedAudience, setSelectedAudience] = useState(
+    course.targetAudience
+  );
+
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await CategoryService.getAllCategories();
+        setCategories(res.data?.data || []);
+      } catch {
+        message.error("Không thể tải danh mục!");
+      } finally {
+      }
+    };
+    fetchCategories();
+  }, []);
+
   useEffect(() => {
     setTitle(course.name);
     setContent(course.content || "");
     setImageUrl(course.imageUrl || "");
     setPreviewImage(course.imageUrl || "");
     setFile(null);
+    setSelectedCategoryId(course.categoryId);
+    setSelectedAudience(course.targetAudience);
   }, [course]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +73,12 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
     e.preventDefault();
 
     if (!title.trim() || !content.trim()) {
-      alert("Vui lòng điền đầy đủ tên và nội dung khóa học.");
+      message.warning("Vui lòng điền đầy đủ tên và nội dung khóa học.");
+      return;
+    }
+
+    if (!selectedCategoryId) {
+      message.warning("Vui lòng chọn danh mục.");
       return;
     }
 
@@ -57,12 +90,11 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         finalImageUrl = uploadedUrl;
         setImageUrl(uploadedUrl);
       } else {
-        alert("Upload ảnh thất bại.");
+        message.error("Upload ảnh thất bại.");
         return;
       }
     }
 
-    // Ép kiểu status cho đúng enum
     const status = course.status as "draft" | "published" | "archived";
 
     updateCourse(
@@ -71,9 +103,9 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         name: title,
         content,
         imageUrl: finalImageUrl,
-        categoryId: course.categoryId,
+        categoryId: selectedCategoryId,
         status,
-        targetAudience: course.targetAudience,
+        targetAudience: selectedAudience,
         videoUrl: course.videoUrl,
         price: course.price,
         discount: course.discount,
@@ -82,10 +114,11 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       },
       {
         onSuccess: () => {
-          if (onSuccess) onSuccess(); // gọi callback thành công
+          message.success("Cập nhật thành công!");
+          if (onSuccess) onSuccess();
         },
         onError: () => {
-          alert("Cập nhật khóa học thất bại.");
+          message.error("Cập nhật khóa học thất bại.");
         },
       }
     );
@@ -115,7 +148,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
 
       <div>
         <label className="block mb-2 font-semibold text-gray-700">
-          Nội dung khóa học
+          Nội dung
         </label>
         <textarea
           value={content}
@@ -123,6 +156,37 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
           rows={5}
           className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400"
           required
+        />
+      </div>
+
+      <div>
+        <label className="block mb-2 font-semibold text-gray-700">
+          Danh mục
+        </label>
+        <DropdownComponent
+          items={categories.map((cat) => ({
+            key: cat.id,
+            label: cat.name,
+          }))}
+          value={selectedCategoryId}
+          onChange={setSelectedCategoryId}
+          placeholder="Chọn danh mục"
+        />
+      </div>
+
+      <div>
+        <label className="block mb-2 font-semibold text-gray-700">
+          Đối tượng
+        </label>
+        <DropdownComponent
+          items={[
+            { key: "student", label: "Học sinh" },
+            { key: "teacher", label: "Giáo viên" },
+            { key: "parent", label: "Phụ huynh" },
+          ]}
+          value={selectedAudience}
+          onChange={setSelectedAudience}
+          placeholder="Chọn đối tượng"
         />
       </div>
 
@@ -149,7 +213,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
           type="text"
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
-          className="mt-3 border border-gray-300 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+          className="mt-3 border border-gray-300 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="Hoặc dán URL ảnh"
         />
       </div>
@@ -159,32 +223,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         disabled={isPending}
         className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3 rounded-lg hover:from-blue-700 hover:to-blue-600 disabled:opacity-60 transition"
       >
-        {isPending ? (
-          <span className="flex items-center justify-center gap-2">
-            <svg
-              className="animate-spin h-5 w-5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v8z"
-              ></path>
-            </svg>
-            Đang cập nhật...
-          </span>
-        ) : (
-          "Cập nhật khóa học"
-        )}
+        {isPending ? "Đang cập nhật..." : "Cập nhật khóa học"}
       </button>
     </form>
   );
