@@ -14,6 +14,7 @@ export const ROUTER_URL = {
     USERS: "/admin/users",
     SETTINGS: "/admin/settings",
     MANAGER_BLOG: "/admin/manager-blog",
+    MANAGER_COURSE: "/admin/manager-course",
   },
   CONSULTANT: {
     BASE: "/consultant",
