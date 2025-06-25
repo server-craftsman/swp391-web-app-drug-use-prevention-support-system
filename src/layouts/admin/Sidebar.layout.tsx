@@ -26,6 +26,11 @@ const navItems = [
     to: ROUTER_URL.ADMIN.MANAGER_BLOG,
     icon: <SettingOutlined />,
   },
+  {
+    name: "Quản Lý Khóa Học",
+    to: ROUTER_URL.ADMIN.MANAGER_COURSE,
+    icon: <SettingOutlined />,
+  },
 ];
 
 const SidebarLayout: React.FC = () => {

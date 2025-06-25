@@ -1,5 +1,5 @@
 import React from "react";
-import type { Consultant } from "../../../types/consultant/Consultant.type";
+import type { Consultant } from "../../../types/consultant/consultant.res.type";
 
 interface ConsultantProps {
   counsel: Consultant;
@@ -13,7 +13,7 @@ const CounselCard: React.FC<ConsultantProps> = ({ counsel }) => {
     >
       <div className="flex justify-center md:justify-start">
         <img
-          src={counsel.avatar}
+          src={counsel.imageUrl || "/no-avatar.png"}
           alt="Consultant"
           className="rounded-full w-24 h-24 object-cover shadow-md border-4 border-[#4f35e2]"
         />
@@ -21,16 +21,16 @@ const CounselCard: React.FC<ConsultantProps> = ({ counsel }) => {
 
       <div className="text-center md:text-left">
         <h3 className="text-2xl font-bold text-[#20558A] mb-2 tracking-wide">
-          {counsel.fullName}
+          {counsel.name || "Chuyên viên tư vấn"}
         </h3>
-        <p className="text-[#20558A] text-base font-semibold mb-1">
-          {counsel.jobTitle}
+        <p className="text-gray-700 text-sm mb-1 flex items-center gap-2">
+          <span>📧</span> {counsel.email || "Chưa cập nhật email"}
         </p>
         <p className="text-gray-700 text-sm mb-1 flex items-center gap-2">
-          <span>📧</span> {counsel.email}
+          <span>📞</span> {counsel.phone || "Chưa cập nhật số điện thoại"}
         </p>
         <p className="text-gray-700 text-sm">
-          <span>🎓</span> Bằng cấp: {counsel.qualifications.join(", ")}
+          {counsel.description || "Chưa có mô tả về chuyên viên này."}
         </p>
       </div>
     </div>
