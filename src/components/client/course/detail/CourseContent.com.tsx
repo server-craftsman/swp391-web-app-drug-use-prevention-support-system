@@ -1,0 +1,98 @@
+import React from "react";
+import { Typography, Card, Button, Collapse } from "antd";
+import { DownOutlined, PlayCircleOutlined } from "@ant-design/icons";
+
+const { Title, Text } = Typography;
+const { Panel } = Collapse;
+
+interface Lecture {
+  title: string;
+  duration: string;
+  preview: boolean;
+  completed: boolean;
+}
+
+interface CourseSection {
+  title: string;
+  duration: string;
+  lessons: number;
+  expanded: boolean;
+  lectures: Lecture[];
+}
+
+interface CourseContentProps {
+  content: CourseSection[];
+}
+
+const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
+  const totalLessons = content.reduce((acc, section) => acc + section.lessons, 0);
+
+  return (
+    <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+        <Title level={3} className="text-gray-900 mb-0">Nội dung khóa học</Title>
+        <div className="text-gray-600 text-sm">
+          <Text className="mr-4">
+            {content.length} phần • {totalLessons} bài giảng • 4 giờ 57 phút
+          </Text>
+          <Button type="link" size="small" className="text-purple-600 p-0">
+            Mở rộng tất cả
+          </Button>
+        </div>
+      </div>
+
+      <Collapse 
+        ghost
+        expandIconPosition="end"
+        expandIcon={({ isActive }) => (
+          <DownOutlined 
+            rotate={isActive ? 180 : 0} 
+            className="text-gray-500"
+          />
+        )}
+      >
+        {content.map((section, index) => (
+          <Panel 
+            key={index} 
+            header={
+              <div className="flex items-center justify-between w-full pr-4">
+                <Text className="font-semibold text-gray-900">
+                  {section.title}
+                </Text>
+                <Text className="text-gray-600 text-sm">
+                  {section.lessons} bài • {section.duration}
+                </Text>
+              </div>
+            }
+            className="border-b border-gray-200 last:border-b-0"
+          >
+            {section.lectures && section.lectures.length > 0 ? (
+              <div className="space-y-1 pb-4">
+                {section.lectures.map((lecture, lectureIndex) => (
+                  <div key={lectureIndex} className="flex items-center justify-between py-2 px-4 hover:bg-gray-50 rounded transition-colors">
+                    <div className="flex items-center space-x-3">
+                      <PlayCircleOutlined className="text-gray-500 text-sm" />
+                      <Text className="text-gray-700 text-sm">{lecture.title}</Text>
+                      {lecture.preview && (
+                        <Button type="link" size="small" className="text-purple-600 p-0 h-auto text-xs">
+                          Xem trước
+                        </Button>
+                      )}
+                    </div>
+                    <Text className="text-gray-600 text-sm">{lecture.duration}</Text>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-gray-600 text-sm py-4 px-4">
+                {section.lessons} bài giảng sẽ được cập nhật sớm
+              </div>
+            )}
+          </Panel>
+        ))}
+      </Collapse>
+    </Card>
+  );
+};
+
+export default CourseContent; 

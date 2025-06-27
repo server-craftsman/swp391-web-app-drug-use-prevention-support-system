@@ -11,6 +11,7 @@ export interface Course {
   price: number;
   discount: number;
   slug: string;
+  createdAt: string;
 }
 
 export interface CoursePageInfo {
