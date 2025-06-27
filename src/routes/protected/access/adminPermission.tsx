@@ -1,37 +1,57 @@
 import { lazy } from "react";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
-import BlogMManagement from "../../../pages/admin/blog";
+
+// Admin pages
+import BlogManagement from "../../../pages/admin/blog";
 import CourseManagement from "../../../pages/admin/course";
+import UserManagement from "../../../pages/admin/user";
+import StaffConsultantManagement from "../../../pages/admin/staff";
+import ManagerManagement from "../../../pages/admin/manager";
 
-// import page
+// Lazy load admin pages
+const AdminLayout = lazy(() => import("../../../layouts/admin/Admin.layout"));
 const OverviewPage = lazy(() => import("../../../pages/admin/overview"));
-const UserManagementPage = lazy(() => import("../../../pages/admin/user"));
-const SettingManagementPage = lazy(
-  () => import("../../../pages/admin/setting")
-);
+const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 
-export const AdminRoutes: Record<string, RouteObject[]> = {
-  [ROUTER_URL.ADMIN.BASE]: [
-    {
-      element: <OverviewPage />,
-      index: true,
-    },
-    {
-      element: <UserManagementPage />,
-      path: ROUTER_URL.ADMIN.USERS,
-    },
-    {
-      element: <SettingManagementPage />,
-      path: ROUTER_URL.ADMIN.SETTINGS,
-    },
-    {
-      element: <BlogMManagement />,
-      path: ROUTER_URL.ADMIN.MANAGER_BLOG,
-    },
-    {
-      element: <CourseManagement />,
-      path: ROUTER_URL.ADMIN.MANAGER_COURSE,
-    },
-  ],
-};
+// Admin routes with layout protection
+export const AdminRoutes: RouteObject[] = [
+  {
+    path: ROUTER_URL.ADMIN.BASE,
+    element: <AdminLayout />,
+    children: [
+      {
+        index: true,
+        element: <OverviewPage />,
+      },
+      {
+        path: ROUTER_URL.ADMIN.USERS,
+        element: <UserManagement />,
+      },
+      {
+        path: ROUTER_URL.ADMIN.SETTINGS,
+        element: <SettingsPage />,
+      },
+      {
+        path: ROUTER_URL.ADMIN.MANAGER_BLOG,
+        element: <BlogManagement />,
+      },
+      {
+        path: ROUTER_URL.ADMIN.MANAGER_COURSE,
+        element: <CourseManagement />,
+      },
+      {
+        path: ROUTER_URL.ADMIN.MANAGER_USER,
+        element: <UserManagement />,
+      },
+      {
+        path: ROUTER_URL.ADMIN.STAFF_CONSULTANTS,
+        element: <StaffConsultantManagement />,
+      },
+      {
+        path: ROUTER_URL.ADMIN.MANAGERS,
+        element: <ManagerManagement />,
+      },
+    ],
+  },
+];

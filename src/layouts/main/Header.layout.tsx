@@ -10,6 +10,13 @@ import {
   SettingOutlined,
   DashboardOutlined,
   ShoppingCartOutlined,
+  TeamOutlined,
+  BookOutlined,
+  CalendarOutlined,
+  FileTextOutlined,
+  EditOutlined,
+  LineChartOutlined,
+  HeartOutlined,
 } from "@ant-design/icons";
 import { UserRole } from "../../app/enums";
 import { ROUTER_URL } from "../../consts/router.path.const";
@@ -45,57 +52,6 @@ const HeaderLayout = () => {
     logout();
   };
 
-  const renderDashboardMenuItem = () => {
-    if (role === UserRole.ADMIN) {
-      return (
-        <Menu.Item
-          key="dashboard"
-          icon={<DashboardOutlined />}
-          onClick={() => navigate(ROUTER_URL.ADMIN.BASE)}
-        >
-          Quản trị
-        </Menu.Item>
-      );
-    }
-    return null;
-  };
-
-  // Using Cult UI styling for the dropdown menu
-  const userMenu = (
-    <Menu className="rounded-md shadow-md border border-gray-100 w-56 py-1 bg-white">
-      <div className="px-4 py-3 border-b border-gray-100">
-        <p className="text-sm text-gray-500">Đã đăng nhập với</p>
-        <p className="text-sm font-medium truncate">{userInfo?.email}</p>
-      </div>
-      {renderDashboardMenuItem()}
-      <Menu.Item
-        key="profile"
-        icon={<UserOutlined className="text-gray-600" />}
-        className={cn("hover:bg-gray-50 transition-colors")}
-        onClick={() => navigate("/profile")}
-      >
-        <span className="text-gray-700">Hồ sơ cá nhân</span>
-      </Menu.Item>
-      <Menu.Item
-        key="settings"
-        icon={<SettingOutlined className="text-gray-600" />}
-        className={cn("hover:bg-gray-50 transition-colors")}
-        onClick={() => navigate("/settings")}
-      >
-        <span className="text-gray-700">Cài đặt</span>
-      </Menu.Item>
-      <Menu.Divider className="my-1 border-gray-100" />
-      <Menu.Item
-        key="logout"
-        icon={<LogoutOutlined className="text-red-500" />}
-        className={cn("hover:bg-red-50 transition-colors")}
-        onClick={handleLogout}
-      >
-        <span className="text-red-500">Đăng xuất</span>
-      </Menu.Item>
-    </Menu>
-  );
-
   // Helper function to get the user's full name
   const getUserFullName = () => {
     if (!userInfo) return "User";
@@ -106,6 +62,317 @@ const HeaderLayout = () => {
 
     return userInfo.email;
   };
+
+  // Role-based dashboard menu items
+  const getRoleDashboardItems = () => {
+    const items = [];
+
+    switch (role) {
+      case UserRole.ADMIN:
+        items.push(
+          {
+            key: "admin-dashboard",
+            icon: <DashboardOutlined className="text-red-600" />,
+            label: (
+              <span className="text-gray-700">Quản trị hệ thống</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.ADMIN.BASE),
+          },
+          {
+            key: "admin-users",
+            icon: <TeamOutlined className="text-red-600" />,
+            label: (
+              <span className="text-gray-700">Quản lý người dùng</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.ADMIN.USERS),
+          }
+        );
+        break;
+
+      case UserRole.MANAGER:
+        items.push(
+          {
+            key: "manager-dashboard",
+            icon: <DashboardOutlined className="text-purple-600" />,
+            label: (
+              <span className="text-gray-700">Bảng điều khiển quản lý</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.MANAGER.BASE),
+          },
+          {
+            key: "manager-analytics",
+            icon: <LineChartOutlined className="text-purple-600" />,
+            label: (
+              <span className="text-gray-700">Phân tích dữ liệu</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.MANAGER.ANALYTICS),
+          },
+          {
+            key: "manager-staff",
+            icon: <TeamOutlined className="text-purple-600" />,
+            label: (
+              <span className="text-gray-700">Quản lý nhân sự</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.MANAGER.STAFF),
+          }
+        );
+        break;
+
+      case UserRole.STAFF:
+        items.push(
+          {
+            key: "staff-dashboard",
+            icon: <DashboardOutlined className="text-green-600" />,
+            label: (
+              <span className="text-gray-700">Bảng điều khiển nhân viên</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.STAFF.BASE),
+          },
+          {
+            key: "staff-courses",
+            icon: <BookOutlined className="text-green-600" />,
+            label: (
+              <span className="text-gray-700">Quản lý khóa học</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.STAFF.COURSES),
+          },
+          {
+            key: "staff-content",
+            icon: <EditOutlined className="text-green-600" />,
+            label: (
+              <span className="text-gray-700">Quản lý nội dung</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.STAFF.CONTENT),
+          }
+        );
+        break;
+
+      case UserRole.CONSULTANT:
+        items.push(
+          {
+            key: "consultant-dashboard",
+            icon: <DashboardOutlined className="text-blue-600" />,
+            label: (
+              <span className="text-gray-700">Bảng điều khiển tư vấn</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.CONSULTANT.BASE),
+          },
+          {
+            key: "consultant-overview",
+            icon: <CalendarOutlined className="text-blue-600" />,
+            label: (
+              <span className="text-gray-700">Tổng quan</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.CONSULTANT.OVERVIEW),
+          },
+          {
+            key: "consultant-users",
+            icon: <TeamOutlined className="text-blue-600" />,
+            label: (
+              <span className="text-gray-700">Quản lý người dùng</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.CONSULTANT.USERS),
+          }
+        );
+        break;
+
+      case UserRole.CUSTOMER:
+        items.push(
+          {
+            key: "customer-dashboard",
+            icon: <DashboardOutlined className="text-primary" />,
+            label: (
+              <span className="text-gray-700">Trang cá nhân</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.CUSTOMER.BASE),
+          },
+          {
+            key: "my-courses",
+            icon: <BookOutlined className="text-primary" />,
+            label: (
+              <span className="text-gray-700">Khóa học của tôi</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.CLIENT.COURSE),
+          },
+          {
+            key: "my-assessments",
+            icon: <FileTextOutlined className="text-primary" />,
+            label: (
+              <span className="text-gray-700">Đánh giá của tôi</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.CLIENT.ASSESSMENT),
+          }
+        );
+        break;
+
+      default:
+        break;
+    }
+
+    return items;
+  };
+
+  // Get role display name
+  const getRoleDisplayName = () => {
+    switch (role) {
+      case UserRole.ADMIN:
+        return "Quản trị viên";
+      case UserRole.MANAGER:
+        return "Quản lý";
+      case UserRole.STAFF:
+        return "Nhân viên";
+      case UserRole.CONSULTANT:
+        return "Tư vấn viên";
+      case UserRole.CUSTOMER:
+        return "Khách hàng";
+      default:
+        return "Người dùng";
+    }
+  };
+
+  // Get role color
+  const getRoleColor = () => {
+    switch (role) {
+      case UserRole.ADMIN:
+        return "text-red-600";
+      case UserRole.MANAGER:
+        return "text-purple-600";
+      case UserRole.STAFF:
+        return "text-green-600";
+      case UserRole.CONSULTANT:
+        return "text-blue-600";
+      case UserRole.CUSTOMER:
+        return "text-primary";
+      default:
+        return "text-gray-600";
+    }
+  };
+
+  // Role-based user menu with enhanced structure
+  const userMenu = (
+    <Menu className="rounded-md shadow-md border border-gray-100 w-64 py-1 bg-white">
+      {/* User Info Header */}
+      <div className="px-4 py-3 border-b border-gray-100">
+        <div className="flex items-center space-x-3">
+          <Avatar
+            src={userInfo?.profilePicUrl}
+            icon={!userInfo?.profilePicUrl && <UserOutlined />}
+            size="large"
+            className="bg-primary"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {getUserFullName()}
+            </p>
+            <p className={cn("text-xs font-medium", getRoleColor())}>
+              {getRoleDisplayName()}
+            </p>
+            <p className="text-xs text-gray-500 truncate">{userInfo?.email}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Role-specific Dashboard Items */}
+      {getRoleDashboardItems().length > 0 && (
+        <>
+          <div className="px-3 py-2">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Bảng điều khiển
+            </p>
+          </div>
+          {getRoleDashboardItems().map((item) => (
+            <Menu.Item
+              key={item.key}
+              icon={item.icon}
+              className={cn("hover:bg-gray-50 transition-colors mx-2 rounded")}
+              onClick={item.onClick}
+            >
+              {item.label}
+            </Menu.Item>
+          ))}
+          <Menu.Divider className="my-1 border-gray-100" />
+        </>
+      )}
+
+      {/* Common Customer Features */}
+      {role && (
+        <>
+          <div className="px-3 py-2">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Tài khoản
+            </p>
+          </div>
+          {/* <Menu.Item
+            key="profile"
+            icon={<UserOutlined className="text-gray-600" />}
+            className={cn("hover:bg-gray-50 transition-colors mx-2 rounded")}
+            onClick={() => navigate("/profile")}
+          >
+            <span className="text-gray-700">Hồ sơ cá nhân</span>
+          </Menu.Item> */}
+          <Menu.Item
+            key="settings"
+            icon={<SettingOutlined className="text-gray-600" />}
+            className={cn("hover:bg-gray-50 transition-colors mx-2 rounded")}
+            onClick={() => {
+              // Navigate to role-specific settings
+              switch (role) {
+                case UserRole.ADMIN:
+                  navigate(ROUTER_URL.ADMIN.SETTINGS);
+                  break;
+                case UserRole.MANAGER:
+                  navigate(ROUTER_URL.MANAGER.SETTINGS);
+                  break;
+                case UserRole.STAFF:
+                  navigate(ROUTER_URL.STAFF.SETTINGS);
+                  break;
+                case UserRole.CONSULTANT:
+                  navigate(ROUTER_URL.CONSULTANT.SETTINGS);
+                  break;
+                case UserRole.CUSTOMER:
+                  navigate(ROUTER_URL.CUSTOMER.SETTINGS);
+                  break;
+                default:
+                  navigate("/settings");
+                  break;
+              }
+            }}
+          >
+            <span className="text-gray-700">Cài đặt</span>
+          </Menu.Item>
+
+          {/* Show customer-specific items for all roles */}
+          <Menu.Item
+            key="favorites"
+            icon={<HeartOutlined className="text-gray-600" />}
+            className={cn("hover:bg-gray-50 transition-colors mx-2 rounded")}
+            onClick={() => navigate("/favorites")}
+          >
+            <span className="text-gray-700">Yêu thích</span>
+          </Menu.Item>
+          <Menu.Item
+            key="cart"
+            icon={<ShoppingCartOutlined className="text-gray-600" />}
+            className={cn("hover:bg-gray-50 transition-colors mx-2 rounded")}
+            onClick={() => navigate(ROUTER_URL.CLIENT.CART)}
+          >
+            <span className="text-gray-700">Giỏ hàng</span>
+          </Menu.Item>
+          <Menu.Divider className="my-1 border-gray-100" />
+        </>
+      )}
+
+      {/* Logout */}
+      <Menu.Item
+        key="logout"
+        icon={<LogoutOutlined className="text-red-500" />}
+        className={cn("hover:bg-red-50 transition-colors mx-2 rounded")}
+        onClick={handleLogout}
+      >
+        <span className="text-red-500">Đăng xuất</span>
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <header className="sticky top-0 z-50 transition-all duration-500">
@@ -129,7 +396,7 @@ const HeaderLayout = () => {
           {/* Cart Icon */}
           <Badge count={cartCount} size="small" color="#f50">
             <Link
-              to="/cart"
+              to={ROUTER_URL.CLIENT.CART}
               className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md transition-colors"
               title="Giỏ hàng"
             >

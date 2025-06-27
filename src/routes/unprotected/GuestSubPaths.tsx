@@ -1,34 +1,33 @@
 import { lazy } from "react";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
+
+// Client pages that should be public
 import About from "../../pages/client/about";
 import Course from "../../pages/client/course";
 import Blog from "../../pages/client/blog";
 import Counsel from "../../pages/client/counsel";
 import Community from "../../pages/client/community";
 import Assessment from "../../pages/client/assessment";
-import CourseDetail from "../../components/client/course/CourseDetail.com"; // import component chi tiết
-import BlogMManagement from "../../pages/admin/blog";
-import Cart from "../../pages/client/cart";
-import UserManagment from "../../pages/admin/user";
+import CourseDetail from "../../components/client/course/CourseDetail.com";
+
 //================= PUBLIC SUB PATHS =================
 const UnauthorizedPage = lazy(() => import("../../pages/auth/unauthorized"));
 const MainLayout = lazy(() => import("../../layouts/main/Main.layout"));
-const AdminLayout = lazy(() => import("../../layouts/admin/Admin.layout"));
 const HomePage = lazy(() => import("../../pages/client/home"));
 const LoginPage = lazy(() => import("../../pages/auth/login"));
 const RegisterPage = lazy(() => import("../../pages/auth/register"));
 const ForgotPasswordPage = lazy(
   () => import("../../pages/auth/forgot_password")
 );
+const CartPage = lazy(() => import("../../pages/client/cart"));
 const ResetPasswordPage = lazy(() => import("../../pages/auth/reset_password"));
 const ConfirmEmailPage = lazy(() => import("../../pages/auth/confirm_email"));
-const OverviewPage = lazy(() => import("../../pages/admin/overview"));
-const UserManagementPage = lazy(() => import("../../pages/admin/user"));
-const SettingManagementPage = lazy(() => import("../../pages/admin/setting"));
 //======================================================
-//export public sub paths
+
+// Export public sub paths - Only truly public routes here
 export const publicSubPaths: Record<string, RouteObject[]> = {
+  // Main public routes with layout
   [ROUTER_URL.COMMON.HOME]: [
     {
       element: <MainLayout />,
@@ -42,11 +41,15 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
           element: <About />,
         },
         {
+          path: ROUTER_URL.CLIENT.CART,
+          element: <CartPage />,
+        },
+        {
           path: ROUTER_URL.CLIENT.COURSE,
           element: <Course />,
         },
         {
-          path: ROUTER_URL.CLIENT.COURSE_DETAIL, // thêm route động
+          path: ROUTER_URL.CLIENT.COURSE_DETAIL,
           element: <CourseDetail />,
         },
         {
@@ -65,40 +68,11 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
           path: ROUTER_URL.CLIENT.ASSESSMENT,
           element: <Assessment />,
         },
-        {
-          path: ROUTER_URL.CLIENT.CART,
-          element: <Cart />,
-        },
       ],
     },
   ],
-  [ROUTER_URL.ADMIN.BASE]: [
-    {
-      element: <AdminLayout />,
-      children: [
-        {
-          path: ROUTER_URL.ADMIN.BASE,
-          element: <OverviewPage />,
-        },
-        {
-          path: ROUTER_URL.ADMIN.USERS,
-          element: <UserManagementPage />,
-        },
-        {
-          path: ROUTER_URL.ADMIN.SETTINGS,
-          element: <SettingManagementPage />,
-        },
-        {
-          path: ROUTER_URL.ADMIN.MANAGER_BLOG,
-          element: <BlogMManagement />,
-        },
-        {
-          path: ROUTER_URL.ADMIN.MANAGER_USER,
-          element: <UserManagment />,
-        },
-      ],
-    },
-  ],
+
+  // Authentication routes (no layout needed)
   [ROUTER_URL.AUTH.LOGIN]: [
     {
       element: <LoginPage />,

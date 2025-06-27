@@ -2,8 +2,12 @@ import { Suspense, type JSX } from "react";
 import { Navigate } from "react-router-dom";
 import type { RouteObject } from 'react-router-dom';
 import { UserRole } from "../../app/enums";
-import { AdminRoutes } from "../protected/access/adminPermission";
-import Loading from "../../app/screens/Loading";
+import { AdminRoutes } from "./access/adminPermission";
+import { CustomerRoutes } from "./access/customerPermission";
+import { ConsultantRoutes } from "./access/consultantPermission";
+import { StaffRoutes } from "./access/staffPermission";
+import { ManagerRoutes } from "./access/managerPermission";
+// import Loading from "../../app/screens/Loading";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { useAuth } from "../../contexts/Auth.context";
 import GuardProtectedRoute from "./GuardProtectedRoute";
@@ -11,14 +15,12 @@ import GuardProtectedRoute from "./GuardProtectedRoute";
 const useProtectedRoutes = (): RouteObject[] => {
   const { role, isLoading } = useAuth();
 
-  let roleBasedRoutes: RouteObject[] = [];
-
   // Handle loading state
   if (isLoading) {
     return [
       {
         path: "*",
-        element: <Suspense fallback={<Loading />}><Loading /></Suspense>
+        element: <Suspense></Suspense>
       }
     ];
   }
@@ -33,51 +35,148 @@ const useProtectedRoutes = (): RouteObject[] => {
     ];
   }
 
-  const wrapRoute = (route: RouteObject, allowedRoles: UserRole[]): RouteObject => {
-    const wrappedRoute: RouteObject = {
-      ...route,
-      element: (
-        <Suspense fallback={<Loading />}>
-          <GuardProtectedRoute 
-            component={route.element as JSX.Element} 
-            allowedRoles={allowedRoles}
-          />
-        </Suspense>
-      )
-    };
-
-    if (route.children) {
-      wrappedRoute.children = route.children.map(child => 
-        wrapRoute(child, allowedRoles)
-      );
-    }
-
-    return wrappedRoute;
-  };
+  // Get routes based on user role
+  let protectedRoutes: RouteObject[] = [];
 
   switch (role) {
     case UserRole.ADMIN:
-      // Ensure AdminRoutes is an array
-      if (Array.isArray(AdminRoutes)) {
-        roleBasedRoutes = AdminRoutes.map(route => wrapRoute(route, [UserRole.ADMIN]));
-      } else {
-        // If AdminRoutes is an object with route collections
-        roleBasedRoutes = Object.values(AdminRoutes)
-          .flat()
-          .map(route => wrapRoute(route, [UserRole.ADMIN]));
-      }
+      // Admin has access to admin routes and can access customer routes too
+      protectedRoutes = [
+        ...AdminRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.ADMIN]}
+              />
+            </Suspense>
+          )
+        })),
+        ...CustomerRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.ADMIN]}
+              />
+            </Suspense>
+          )
+        }))
+      ];
       break;
-    // Add other role cases as needed
+
+    case UserRole.MANAGER:
+      // Manager has access to manager routes and customer routes
+      protectedRoutes = [
+        ...ManagerRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.MANAGER]}
+              />
+            </Suspense>
+          )
+        })),
+        ...CustomerRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.MANAGER]}
+              />
+            </Suspense>
+          )
+        }))
+      ];
+      break;
+
+    case UserRole.STAFF:
+      // Staff has access to staff routes and customer routes
+      protectedRoutes = [
+        ...StaffRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.STAFF]}
+              />
+            </Suspense>
+          )
+        })),
+        ...CustomerRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.STAFF]}
+              />
+            </Suspense>
+          )
+        }))
+      ];
+      break;
+
+    case UserRole.CONSULTANT:
+      // Consultant has access to consultant routes and customer routes
+      protectedRoutes = [
+        ...ConsultantRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.CONSULTANT]}
+              />
+            </Suspense>
+          )
+        })),
+        ...CustomerRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.CONSULTANT]}
+              />
+            </Suspense>
+          )
+        }))
+      ];
+      break;
+
+    case UserRole.CUSTOMER:
+      // Customer has access to customer routes only
+      protectedRoutes = CustomerRoutes.map(route => ({
+        ...route,
+        element: (
+          <Suspense>
+            <GuardProtectedRoute
+              component={route.element as JSX.Element}
+              allowedRoles={[UserRole.CUSTOMER]}
+            />
+          </Suspense>
+        )
+      }));
+      break;
+
     default:
-      roleBasedRoutes = [
+      // Unknown role, redirect to login
+      return [
         {
           path: "*",
-          element: <Navigate to={ROUTER_URL.AUTH.UNAUTHOZIZED} replace />
+          element: <Navigate to={ROUTER_URL.AUTH.LOGIN} replace />
         }
       ];
   }
 
-  return roleBasedRoutes;
+  return protectedRoutes;
 };
 
 export default useProtectedRoutes;

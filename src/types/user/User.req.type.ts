@@ -41,3 +41,14 @@ export interface GetUsers {
   pageSize: number;
   filterByName?: string;
 }
+
+export interface UpdateUserRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  gender: string;
+  dob: string;
+  profilePicUrl: string;
+}
