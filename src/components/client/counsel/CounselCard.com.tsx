@@ -13,7 +13,7 @@ const CounselCard: React.FC<ConsultantProps> = ({ counsel }) => {
     >
       <div className="flex justify-center md:justify-start">
         <img
-          src={counsel.imageUrl || "/no-avatar.png"}
+          src={counsel.profilePicUrl || "/no-avatar.png"}
           alt="Consultant"
           className="rounded-full w-24 h-24 object-cover shadow-md border-4 border-[#4f35e2]"
         />

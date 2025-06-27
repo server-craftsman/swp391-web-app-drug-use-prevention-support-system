@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
+import AdminUserManager from "../../../components/admin/user/AdminUserManager";
 
 const UserManagment: React.FC = () => {
-  return (
-    <div>User Managment</div>
-  )
-}
+  return <AdminUserManager />;
+};
 
-export default UserManagment
+export default UserManagment;

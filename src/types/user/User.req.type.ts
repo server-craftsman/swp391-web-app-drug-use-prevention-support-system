@@ -35,3 +35,9 @@ export interface RegisterRequest {
 export interface GetUserByIdRequest {
   userId: string;
 }
+
+export interface GetUsers {
+  pageNumber: number;
+  pageSize: number;
+  filterByName?: string;
+}
