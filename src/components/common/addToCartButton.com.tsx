@@ -1,17 +1,27 @@
 import React from "react";
-import { Button, message } from "antd";
+import { Button } from "antd";
+import { useAddCartItem } from "../../hooks/useCart"; // Đường dẫn tùy bạn
+import type { AddToCartRequest } from "../../types/cart/Cart.req.type";
 
 interface AddToCartButtonProps {
-  onAdded?: () => void; // callback nếu cần
+  courseId: string;
+  onAdded?: () => void;
 }
 
-const AddToCartButton: React.FC<AddToCartButtonProps> = ({ onAdded }) => {
+const AddToCartButton: React.FC<AddToCartButtonProps> = ({
+  courseId,
+  onAdded,
+}) => {
+  const { mutate: addToCart, isPending } = useAddCartItem();
+
   const handleAddToCart = () => {
-    message.success("Đã thêm vào giỏ hàng!");
-    if (onAdded) {
-      onAdded();
-    }
-    // Có thể thêm logic lưu vào localStorage hoặc state tại đây nếu cần
+    const payload: AddToCartRequest = { courseId };
+
+    addToCart(payload, {
+      onSuccess: () => {
+        if (onAdded) onAdded();
+      },
+    });
   };
 
   return (
@@ -19,6 +29,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ onAdded }) => {
       className="bg-[#20558A]"
       size="large"
       block
+      loading={isPending}
       onClick={handleAddToCart}
     >
       🛒 Thêm vào giỏ hàng

@@ -31,6 +31,11 @@ const navItems = [
     to: ROUTER_URL.ADMIN.MANAGER_COURSE,
     icon: <SettingOutlined />,
   },
+  {
+    name: "Quản Lý Người Dùng",
+    to: ROUTER_URL.ADMIN.MANAGER_USER,
+    icon: <SettingOutlined />,
+  },
 ];
 
 const SidebarLayout: React.FC = () => {

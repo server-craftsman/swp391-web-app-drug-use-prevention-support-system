@@ -3,7 +3,13 @@ import { useState, useEffect } from "react";
 import SearchCom from "../../components/common/search.com";
 import { useAuth } from "../../contexts/Auth.context";
 import { Dropdown, Avatar, Menu } from "antd";
-import { UserOutlined, LogoutOutlined, SettingOutlined, DashboardOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  LogoutOutlined,
+  SettingOutlined,
+  DashboardOutlined,
+  ShoppingCartOutlined,
+} from "@ant-design/icons";
 import { UserRole } from "../../app/enums";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { cn } from "../../utils/cn";
@@ -13,12 +19,13 @@ const HeaderLayout = () => {
   const navigate = useNavigate();
   const { role, token, userInfo, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("/");
-  
+
   useEffect(() => {
     const pathSegments = location.pathname.split("/");
-    const mainPath = pathSegments.length > 1 && pathSegments[1] !== "" 
-      ? `/${pathSegments[1]}` 
-      : "/";
+    const mainPath =
+      pathSegments.length > 1 && pathSegments[1] !== ""
+        ? `/${pathSegments[1]}`
+        : "/";
     setActiveTab(mainPath);
   }, [location]);
 
@@ -30,6 +37,7 @@ const HeaderLayout = () => {
     { name: "Chương Trình Cộng Đồng", path: "/community" },
     { name: "Blog", path: "/blog" },
     { name: "Về Chúng Tôi", path: "/about" },
+    { name: "Giỏ Hàng", path: "/cart", isCart: true },
   ];
 
   const handleLogout = () => {
@@ -39,7 +47,11 @@ const HeaderLayout = () => {
   const renderDashboardMenuItem = () => {
     if (role === UserRole.ADMIN) {
       return (
-        <Menu.Item key="dashboard" icon={<DashboardOutlined />} onClick={() => navigate(ROUTER_URL.ADMIN.BASE)}>
+        <Menu.Item
+          key="dashboard"
+          icon={<DashboardOutlined />}
+          onClick={() => navigate(ROUTER_URL.ADMIN.BASE)}
+        >
           Quản trị
         </Menu.Item>
       );
@@ -55,33 +67,27 @@ const HeaderLayout = () => {
         <p className="text-sm font-medium truncate">{userInfo?.email}</p>
       </div>
       {renderDashboardMenuItem()}
-      <Menu.Item 
-        key="profile" 
-        icon={<UserOutlined className="text-gray-600" />} 
-        className={cn(
-          "hover:bg-gray-50 transition-colors"
-        )}
+      <Menu.Item
+        key="profile"
+        icon={<UserOutlined className="text-gray-600" />}
+        className={cn("hover:bg-gray-50 transition-colors")}
         onClick={() => navigate("/profile")}
       >
         <span className="text-gray-700">Hồ sơ cá nhân</span>
       </Menu.Item>
-      <Menu.Item 
-        key="settings" 
+      <Menu.Item
+        key="settings"
         icon={<SettingOutlined className="text-gray-600" />}
-        className={cn(
-          "hover:bg-gray-50 transition-colors"
-        )}
+        className={cn("hover:bg-gray-50 transition-colors")}
         onClick={() => navigate("/settings")}
       >
         <span className="text-gray-700">Cài đặt</span>
       </Menu.Item>
       <Menu.Divider className="my-1 border-gray-100" />
-      <Menu.Item 
-        key="logout" 
+      <Menu.Item
+        key="logout"
         icon={<LogoutOutlined className="text-red-500" />}
-        className={cn(
-          "hover:bg-red-50 transition-colors"
-        )}
+        className={cn("hover:bg-red-50 transition-colors")}
         onClick={handleLogout}
       >
         <span className="text-red-500">Đăng xuất</span>
@@ -92,11 +98,11 @@ const HeaderLayout = () => {
   // Helper function to get the user's full name
   const getUserFullName = () => {
     if (!userInfo) return "User";
-    
+
     if (userInfo.firstName && userInfo.lastName) {
       return `${userInfo.firstName} ${userInfo.lastName}`;
     }
-    
+
     return userInfo.email;
   };
 
@@ -115,16 +121,20 @@ const HeaderLayout = () => {
             <div className="text-md">Ma Túy Cộng Đồng</div>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <SearchCom />
-          
+
           {token && userInfo ? (
-            <Dropdown overlay={userMenu} trigger={["click"]} placement="bottomRight">
+            <Dropdown
+              overlay={userMenu}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
               <div className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 rounded-md">
-                <Avatar 
-                  src={userInfo.profilePicUrl} 
-                  icon={!userInfo.profilePicUrl && <UserOutlined />} 
+                <Avatar
+                  src={userInfo.profilePicUrl}
+                  icon={!userInfo.profilePicUrl && <UserOutlined />}
                   className="bg-primary"
                 />
                 <span className="font-medium">{getUserFullName()}</span>
@@ -132,34 +142,54 @@ const HeaderLayout = () => {
             </Dropdown>
           ) : (
             <div className="flex gap-2">
-              <Link to="/login" className="px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-colors">
+              <Link
+                to="/login"
+                className="px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-colors"
+              >
                 Đăng Nhập
               </Link>
-              <Link to="/register" className="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-colors">
+              <Link
+                to="/register"
+                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-colors"
+              >
                 Đăng Ký
               </Link>
             </div>
           )}
         </div>
       </div>
-      
+
       <nav className="bg-primary text-white">
-        <div className="container mx-auto">
+        <div className="container mx-auto flex items-center justify-between">
           <ul className="flex flex-wrap">
             {navItems.map((item) => (
               <li key={item.path} className="relative">
-                <Link 
-                  to={item.path} 
+                <Link
+                  to={item.path}
                   className={`inline-block py-4 px-6 font-bold transition-colors duration-300 
-                    ${activeTab === item.path ? 'bg-secondary text-white' : 'hover:bg-secondary text-white'}`}
+        ${
+          activeTab === item.path
+            ? "bg-secondary text-white"
+            : "hover:bg-secondary text-white"
+        }`}
                   onClick={() => setActiveTab(item.path)}
                 >
-                  {item.name}
+                  {item.isCart ? (
+                    <div className="flex items-center gap-1">
+                      <ShoppingCartOutlined className="text-lg" />
+                      <span className="hidden md:inline">Giỏ hàng</span>
+                    </div>
+                  ) : (
+                    item.name
+                  )}
+
                   {activeTab === item.path && (
-                    <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full w-0 h-0 
-                      border-l-[10px] border-l-transparent 
-                      border-t-[10px] border-t-[#153759]
-                      border-r-[10px] border-r-transparent"></span>
+                    <span
+                      className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full w-0 h-0 
+          border-l-[10px] border-l-transparent 
+          border-t-[10px] border-t-[#153759]
+          border-r-[10px] border-r-transparent"
+                    ></span>
                   )}
                 </Link>
               </li>

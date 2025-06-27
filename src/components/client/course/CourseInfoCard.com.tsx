@@ -31,7 +31,8 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course }) => {
   // Xử lý fallback cho các trường có thể null/undefined
   const status = (course.status || "DRAFT").toUpperCase();
   const targetAudience = course.targetAudience
-    ? targetAudienceMap[course.targetAudience.toUpperCase()] || course.targetAudience
+    ? targetAudienceMap[course.targetAudience.toUpperCase()] ||
+      course.targetAudience
     : "Không xác định";
   const price = typeof course.price === "number" ? course.price : 0;
   const discount = typeof course.discount === "number" ? course.discount : 0;
@@ -41,9 +42,7 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course }) => {
       <Title level={2}>{course.name || "Không có tên khóa học"}</Title>
       <Descriptions column={1} size="small" style={{ marginBottom: 16 }}>
         <Descriptions.Item label="Trạng thái">
-          <Tag color={statusColor[status] || "default"}>
-            {status}
-          </Tag>
+          <Tag color={statusColor[status] || "default"}>{status}</Tag>
         </Descriptions.Item>
         <Descriptions.Item label="Đối tượng">
           {targetAudience}
@@ -94,7 +93,7 @@ const CourseInfoCard: React.FC<CourseInfoCardProps> = ({ course }) => {
           )}
         </Descriptions.Item>
       </Descriptions>
-      <AddToCartButton />
+      <AddToCartButton courseId={course.id} />
       <Button style={{ marginTop: 16 }} block onClick={() => navigate(-1)}>
         ← Quay lại
       </Button>

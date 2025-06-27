@@ -3,7 +3,7 @@ export interface Consultant {
   name: string;
   email: string;
   phone: string;
-  imageUrl: string;
+  profilePicUrl: string;
   description: string;
   createdAt: string;
   updatedAt: string;

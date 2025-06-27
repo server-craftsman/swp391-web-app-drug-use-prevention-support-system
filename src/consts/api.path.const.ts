@@ -9,6 +9,7 @@ export const API_PATH = {
     RESET_PASSWORD: "/auth/reset-password",
   },
   USER: {
+    GET_USERS: "/user",
     GET_USER_PROFILE: "/user/profile",
     UPDATE_USER_PROFILE: "/user/profile/update",
     CHANGE_PASSWORD: "/user/password/change",
@@ -51,5 +52,9 @@ export const API_PATH = {
   CATEGORY: {
     GET_ALL_CATEGORIES: "/category",
     CREATE_CATEGORY: "/category/create",
+  },
+  CART: {
+    GET_CART: "/cart/myCart",
+    ADD_CART_ITEM: "/cart/addCourse",
   },
 };
