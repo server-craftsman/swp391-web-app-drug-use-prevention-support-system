@@ -5,19 +5,7 @@ import { UserService } from "../../../services/user/user.service";
 import type { GetUsers } from "../../../types/user/User.req.type";
 import CustomPagination from "../../common/Pagiation.com";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
-
-interface UserResponse {
-  id: string;
-  fullName: string;
-  email: string;
-  phoneNumber: string;
-  gender: string;
-  dob: string;
-  profilePicUrl: string;
-  role: string;
-  status?: string;
-  createdAt?: string;
-}
+import type { UserResponse } from "../../../types/user/User.res.type";
 
 const AdminUserManager = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -61,12 +49,12 @@ const AdminUserManager = () => {
 
   const handleView = (record: UserResponse) => {
     // TODO: Implement view functionality
-    message.info(`Xem chi tiết khách hàng: ${record.fullName}`);
+    message.info(`Xem chi tiết khách hàng: ${record.lastName} ${record.firstName}`);
   };
 
   const handleDelete = (record: UserResponse) => {
     // TODO: Implement delete functionality
-    message.warning(`Xóa khách hàng: ${record.fullName}`);
+    message.warning(`Xóa khách hàng: ${record.lastName} ${record.firstName}`);
   };
 
   const columns: ColumnsType<UserResponse> = [

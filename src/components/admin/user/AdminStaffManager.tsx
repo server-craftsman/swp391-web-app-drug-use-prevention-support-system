@@ -5,19 +5,8 @@ import { UserService } from "../../../services/user/user.service";
 import type { GetUsers } from "../../../types/user/User.req.type";
 import CustomPagination from "../../common/Pagiation.com";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import type { UserResponse } from "../../../types/user/User.res.type";
 
-interface UserResponse {
-    id: string;
-    fullName: string;
-    email: string;
-    phoneNumber: string;
-    gender: string;
-    dob: string;
-    profilePicUrl: string;
-    role: string;
-    status?: string;
-    createdAt?: string;
-}
 
 const AdminStaffManager = () => {
     const [users, setUsers] = useState<UserResponse[]>([]);
@@ -61,17 +50,17 @@ const AdminStaffManager = () => {
 
     const handleView = (record: UserResponse) => {
         // TODO: Implement view functionality
-        message.info(`Xem chi tiết nhân viên: ${record.fullName}`);
+        message.info(`Xem chi tiết nhân viên: ${record.lastName} ${record.firstName}`);
     };
 
     const handleEdit = (record: UserResponse) => {
         // TODO: Implement edit functionality
-        message.info(`Chỉnh sửa nhân viên: ${record.fullName}`);
+        message.info(`Chỉnh sửa nhân viên: ${record.lastName} ${record.firstName}`);
     };
 
     const handleDelete = (record: UserResponse) => {
         // TODO: Implement delete functionality
-        message.warning(`Xóa nhân viên: ${record.fullName}`);
+        message.warning(`Xóa nhân viên: ${record.lastName} ${record.firstName}`);
     };
 
     const columns: ColumnsType<UserResponse> = [
