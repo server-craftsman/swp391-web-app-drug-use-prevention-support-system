@@ -3,6 +3,7 @@ import './index.css'
 import { App } from './App.tsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './contexts/Auth.context.tsx'
+import { CartProvider } from './contexts/Cart.context.tsx'
 import { Provider } from "react-redux";
 import { store } from "./app/store/redux.ts"; // Ensure this is the correct path to your store
 
@@ -15,7 +16,9 @@ if (rootElement) {
     <Provider store={store}>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <CartProvider>
+            <App />
+          </CartProvider>
         </AuthProvider>
       </BrowserRouter>
     </Provider>

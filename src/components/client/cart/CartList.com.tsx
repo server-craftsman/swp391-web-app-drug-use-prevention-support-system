@@ -1,46 +1,26 @@
 // src/components/client/cart/CartList.com.tsx
 
-import React, { useEffect, useState } from "react";
-import { Typography, Empty, Divider, List, Button, Spin } from "antd";
+import React from "react";
+import { Typography, Empty, Divider, Button, Spin, Checkbox } from "antd";
+import { ShoppingOutlined, CreditCardOutlined, DeleteOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../../utils/helper";
-import type { CartItem } from "../../../types/cart/Cart.res.type";
-import { CartService } from "../../../services/cart/cart.service";
+import { useCart } from "../../../contexts/Cart.context";
 import CartCard from "./CartCard.com";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const ViewCartPage: React.FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      setLoading(true);
-      try {
-        const storedUserInfo = localStorage.getItem("userInfo");
-        if (!storedUserInfo) return;
-
-        const userInfo = JSON.parse(storedUserInfo);
-        const userId = userInfo?.id;
-        if (!userId) return;
-
-        const response = await CartService.getCartItems({ userId });
-        if (response?.data?.success && Array.isArray(response.data.data)) {
-          setCartItems(response.data.data);
-        } else {
-          setCartItems([]);
-        }
-      } catch (error) {
-        console.error("Lỗi lấy giỏ hàng:", error);
-        setCartItems([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCartItems();
-  }, []);
+  const navigate = useNavigate();
+  const {
+    cartItems,
+    selectedIds,
+    setSelectedIds,
+    loading,
+    removeFromCart,
+    totalPrice,
+  } = useCart();
 
   const handleSelect = (cartId: string, checked: boolean) => {
     setSelectedIds((prev) =>
@@ -48,60 +28,248 @@ const ViewCartPage: React.FC = () => {
     );
   };
 
-  const totalPrice = cartItems.reduce((acc, item) => {
-    return selectedIds.includes(item.cartId)
-      ? acc + item.price * (1 - item.discount)
-      : acc;
-  }, 0);
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(cartItems.map(item => item.cartId));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const isAllSelected = cartItems.length > 0 && selectedIds.length === cartItems.length;
+  const isIndeterminate = selectedIds.length > 0 && selectedIds.length < cartItems.length;
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Spin tip="Đang tải giỏ hàng..." />
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+        <div className="text-center">
+          <Spin size="large" />
+          <p className="mt-4 text-gray-600">Đang tải giỏ hàng...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <Title level={2}>🛒 Giỏ hàng của bạn</Title>
-
-      {cartItems.length === 0 ? (
-        <Empty description="Không có khóa học nào trong giỏ hàng" />
-      ) : (
-        <>
-          <List
-            dataSource={cartItems}
-            renderItem={(item) => (
-              <CartCard
-                item={item}
-                checked={selectedIds.includes(item.cartId)}
-                onSelect={(checked) => handleSelect(item.cartId, checked)}
-                onDelete={() => {
-                  // TODO: gọi API xóa nếu cần
-                  console.log("Xóa cartId:", item.cartId);
-                }}
-              />
-            )}
-          />
-
-          <Divider />
-
-          <div className="flex justify-between items-center">
-            <Title level={4}>Tổng cộng:</Title>
-            <Text strong className="text-xl text-primary">
-              {formatCurrency(totalPrice)}
-            </Text>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/courses')}
+                className="flex items-center text-gray-600 hover:text-primary transition-colors"
+              >
+                <ArrowLeftOutlined className="mr-2" />
+                <span className="hidden sm:inline">Tiếp tục mua sắm</span>
+              </motion.button>
+              <div className="h-6 w-px bg-gray-300 hidden sm:block" />
+              <div className="flex items-center space-x-2">
+                <ShoppingOutlined className="text-2xl text-primary" />
+                <Title level={2} className="!mb-0 !text-gray-800">
+                  Giỏ hàng của bạn
+                </Title>
+                {cartItems.length > 0 && (
+                  <span className="bg-primary text-white px-2 py-1 rounded-full text-sm">
+                    {cartItems.length}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
 
-          <div className="flex justify-end mt-4 gap-2">
-            <Button type="default">Tiếp tục mua sắm</Button>
-            <Button type="primary" disabled={selectedIds.length === 0}>
-              Thanh toán {selectedIds.length > 0 && `(${selectedIds.length})`}
-            </Button>
-          </div>
-        </>
-      )}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <AnimatePresence mode="wait">
+          {cartItems.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="text-center py-16"
+            >
+              <div className="bg-white rounded-2xl p-12 shadow-sm">
+                <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                  <ShoppingOutlined className="text-4xl text-gray-400" />
+                </div>
+                <Empty
+                  description={
+                    <div className="space-y-2">
+                      <p className="text-lg font-medium text-gray-600">Giỏ hàng trống</p>
+                      <p className="text-gray-500">Hãy khám phá các khóa học tuyệt vời của chúng tôi</p>
+                    </div>
+                  }
+                  image={null}
+                />
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="mt-8"
+                >
+                  <Button
+                    type="primary"
+                    size="large"
+                    onClick={() => navigate('/courses')}
+                    className="bg-primary hover:bg-secondary border-0 rounded-xl px-8 h-12"
+                  >
+                    Khám phá khóa học
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+            >
+              {/* Cart Items */}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                  {/* Select All Header */}
+                  <div className="px-6 py-4 border-b bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <Checkbox
+                        checked={isAllSelected}
+                        indeterminate={isIndeterminate}
+                        onChange={(e) => handleSelectAll(e.target.checked)}
+                        className="text-base font-medium"
+                      >
+                        Chọn tất cả ({cartItems.length} khóa học)
+                      </Checkbox>
+                      {selectedIds.length > 0 && (
+                        <motion.button
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="text-red-500 hover:text-red-600 transition-colors flex items-center space-x-1"
+                          onClick={() => {
+                            selectedIds.forEach(id => removeFromCart(id));
+                          }}
+                        >
+                          <DeleteOutlined />
+                          <span>Xóa đã chọn</span>
+                        </motion.button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Cart Items List */}
+                  <div className="divide-y divide-gray-100">
+                    <AnimatePresence>
+                      {cartItems.map((item, index) => (
+                        <motion.div
+                          key={item.cartId}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, x: -100 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <CartCard
+                            item={item}
+                            checked={selectedIds.includes(item.cartId)}
+                            onSelect={(checked) => handleSelect(item.cartId, checked)}
+                            onDelete={() => removeFromCart(item.cartId)}
+                          />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Summary */}
+              <div className="lg:col-span-1">
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="sticky top-6"
+                >
+                  <div className="bg-white rounded-2xl shadow-sm p-6 space-y-6">
+                    <div className="border-b pb-4">
+                      <h3 className="text-lg font-semibold text-gray-800">Tóm tắt đơn hàng</h3>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex justify-between text-gray-600">
+                        <span>Số khóa học đã chọn:</span>
+                        <span className="font-medium">{selectedIds.length}</span>
+                      </div>
+
+                      <div className="flex justify-between text-gray-600">
+                        <span>Tổng số khóa học:</span>
+                        <span className="font-medium">{cartItems.length}</span>
+                      </div>
+
+                      <Divider className="my-4" />
+
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-gray-800">Tổng cộng:</span>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">
+                            {formatCurrency(totalPrice)}
+                          </div>
+                          {selectedIds.length > 0 && (
+                            <div className="text-sm text-gray-500">
+                              Cho {selectedIds.length} khóa học
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 pt-4">
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button
+                          type="primary"
+                          size="large"
+                          disabled={selectedIds.length === 0}
+                          icon={<CreditCardOutlined />}
+                          className="w-full h-12 bg-primary hover:bg-secondary border-0 rounded-xl font-semibold text-base"
+                        >
+                          Thanh toán ngay
+                          {selectedIds.length > 0 && ` (${selectedIds.length})`}
+                        </Button>
+                      </motion.div>
+
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Button
+                          size="large"
+                          onClick={() => navigate('/courses')}
+                          className="w-full h-12 border-gray-300 rounded-xl font-medium text-base"
+                        >
+                          Tiếp tục mua sắm
+                        </Button>
+                      </motion.div>
+                    </div>
+
+                    {/* Trust Indicators */}
+                    <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                      <div className="text-sm font-medium text-gray-700">Bảo đảm an toàn:</div>
+                      <div className="space-y-1 text-xs text-gray-600">
+                        <div>✓ Thanh toán an toàn 100%</div>
+                        <div>✓ Hoàn tiền trong 30 ngày</div>
+                        <div>✓ Truy cập trọn đời</div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

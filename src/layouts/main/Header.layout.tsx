@@ -2,7 +2,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SearchCom from "../../components/common/search.com";
 import { useAuth } from "../../contexts/Auth.context";
-import { Dropdown, Avatar, Menu } from "antd";
+import { useCart } from "../../contexts/Cart.context";
+import { Dropdown, Avatar, Menu, Badge } from "antd";
 import {
   UserOutlined,
   LogoutOutlined,
@@ -18,6 +19,7 @@ const HeaderLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { role, token, userInfo, logout } = useAuth();
+  const { cartCount } = useCart();
   const [activeTab, setActiveTab] = useState("/");
 
   useEffect(() => {
@@ -37,7 +39,6 @@ const HeaderLayout = () => {
     { name: "Chương Trình Cộng Đồng", path: "/community" },
     { name: "Blog", path: "/blog" },
     { name: "Về Chúng Tôi", path: "/about" },
-    { name: "Giỏ Hàng", path: "/cart", isCart: true },
   ];
 
   const handleLogout = () => {
@@ -125,6 +126,18 @@ const HeaderLayout = () => {
         <div className="flex items-center gap-4">
           <SearchCom />
 
+          {/* Cart Icon */}
+          <Badge count={cartCount} size="small" color="#f50">
+            <Link
+              to="/cart"
+              className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md transition-colors"
+              title="Giỏ hàng"
+            >
+              <ShoppingCartOutlined className="text-xl text-gray-600 hover:text-primary transition-colors" />
+              <span className="hidden md:inline text-gray-700 font-medium"></span>
+            </Link>
+          </Badge>
+
           {token && userInfo ? (
             <Dropdown
               overlay={userMenu}
@@ -167,21 +180,13 @@ const HeaderLayout = () => {
                 <Link
                   to={item.path}
                   className={`inline-block py-4 px-6 font-bold transition-colors duration-300 
-        ${
-          activeTab === item.path
-            ? "bg-secondary text-white"
-            : "hover:bg-secondary text-white"
-        }`}
+        ${activeTab === item.path
+                      ? "bg-secondary text-white"
+                      : "hover:bg-secondary text-white"
+                    }`}
                   onClick={() => setActiveTab(item.path)}
                 >
-                  {item.isCart ? (
-                    <div className="flex items-center gap-1">
-                      <ShoppingCartOutlined className="text-lg" />
-                      <span className="hidden md:inline">Giỏ hàng</span>
-                    </div>
-                  ) : (
-                    item.name
-                  )}
+                  {item.name}
 
                   {activeTab === item.path && (
                     <span
