@@ -9,6 +9,7 @@ export const API_PATH = {
     RESET_PASSWORD: "/auth/reset-password",
   },
   USER: {
+    GET_USERS: "/user",
     GET_USER_PROFILE: "/user/profile",
     UPDATE_USER_PROFILE: "/user/profile/update",
     CHANGE_PASSWORD: "/user/password/change",
@@ -26,5 +27,34 @@ export const API_PATH = {
     CREATE_BLOG: "/blog/create",
     DELETE_BLOG: (id: string) => `/blog/${id}`,
     UPDATE_BLOG: (id: string) => `/blog/${id}`,
+  },
+  APPOINTMENT: {
+    CREATE_APPOINTMENT: "/appointment/create",
+    GET_APPOINTMENTS: "/appointment",
+    GET_APPOINTMENT_BY_ID: (id: string) => `/appointment/${id}`,
+    UPDATE_APPOINTMENT: (id: string) => `/appointment/update/${id}`,
+    DELETE_APPOINTMENT: (id: string) => `/appointment/delete/${id}`,
+  },
+  COURSE: {
+    GET_ALL_COURSES: "/Course",
+    CREATE_COURSE: "/course/create",
+    UPDATE_COURSE: (id: string) => `/course/${id}`,
+    DELETE_COURSE: (id: string) => `/course/${id}`,
+    GET_COURSE_BY_ID: (id: string) => `/Course/${id}`,
+  },
+  CONSULTANT: {
+    GET_ALL_CONSULTANTS: "/consultant",
+    CREATE_CONSULTANT: "/consultant/create",
+    UPDATE_CONSULTANT: (id: string) => `/consultant/update/${id}`,
+    DELETE_CONSULTANT: (id: string) => `/consultant/delete/${id}`,
+    GET_CONSULTANT_BY_ID: (id: string) => `/consultant/${id}`,
+  },
+  CATEGORY: {
+    GET_ALL_CATEGORIES: "/category",
+    CREATE_CATEGORY: "/category/create",
+  },
+  CART: {
+    GET_CART: "/cart/myCart",
+    ADD_CART_ITEM: "/cart/addCourse",
   },
 };

@@ -11,7 +11,7 @@ import {
   message,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import type { Course } from "../../types/course/Course.type";
+import type { Course } from "../../types/course/Course.res.type";
 
 const { Paragraph } = Typography;
 const { TextArea } = Input;

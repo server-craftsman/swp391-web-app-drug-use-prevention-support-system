@@ -6,6 +6,8 @@ export interface Blog {
   createdAt: string; // ISO datetime string
   updatedAt: string; // ISO datetime string
   isDeleted: boolean;
+  fullName: string;
+  userAvatar: string;
 }
 
 export interface BlogPageInfo {
@@ -16,6 +18,6 @@ export interface BlogPageInfo {
 }
 
 export interface BlogListResponse {
-    pageData: Blog[];
-    pageInfo: BlogPageInfo;
+  pageData: Blog[];
+  pageInfo: BlogPageInfo;
 }

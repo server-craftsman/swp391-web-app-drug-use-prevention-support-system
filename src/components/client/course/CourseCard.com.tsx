@@ -3,7 +3,7 @@ import React from "react";
 import { Card, Typography } from "antd";
 import { Link } from "react-router-dom";
 const { Paragraph } = Typography;
-import type { Course } from "../../../types/course/Course.type";
+import type { Course } from "../../../types/course/Course.res.type";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 import { helpers, cn } from "../../../utils";
 

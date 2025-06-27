@@ -9,6 +9,8 @@ import Community from "../../pages/client/community";
 import Assessment from "../../pages/client/assessment";
 import CourseDetail from "../../components/client/course/CourseDetail.com"; // import component chi tiết
 import BlogMManagement from "../../pages/admin/blog";
+import Cart from "../../pages/client/cart";
+import UserManagment from "../../pages/admin/user";
 //================= PUBLIC SUB PATHS =================
 const UnauthorizedPage = lazy(() => import("../../pages/auth/unauthorized"));
 const MainLayout = lazy(() => import("../../layouts/main/Main.layout"));
@@ -63,6 +65,10 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
           path: ROUTER_URL.CLIENT.ASSESSMENT,
           element: <Assessment />,
         },
+        {
+          path: ROUTER_URL.CLIENT.CART,
+          element: <Cart />,
+        },
       ],
     },
   ],
@@ -85,6 +91,10 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
         {
           path: ROUTER_URL.ADMIN.MANAGER_BLOG,
           element: <BlogMManagement />,
+        },
+        {
+          path: ROUTER_URL.ADMIN.MANAGER_USER,
+          element: <UserManagment />,
         },
       ],
     },

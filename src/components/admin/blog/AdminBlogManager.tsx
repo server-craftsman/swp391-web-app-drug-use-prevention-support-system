@@ -17,7 +17,7 @@ const AdminBlogManager = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [current, setCurrent] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
+  const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
 
   const fetchBlogs = async () => {
@@ -42,6 +42,7 @@ const AdminBlogManager = () => {
 
   const handleBlogCreated = () => {
     setShowModal(false);
+
     fetchBlogs();
   };
 
@@ -85,6 +86,16 @@ const AdminBlogManager = () => {
       title: "Người đăng",
       dataIndex: "userId",
       key: "userId",
+      render: (_: string, record: Blog) => (
+        <div className="flex items-center gap-2">
+          <img
+            src={record.userAvatar || "/no-avatar.png"}
+            alt={record.fullName || "Không rõ"}
+            className="w-8 h-8 rounded-full object-cover border"
+          />
+          <span>{record.fullName || "Không rõ"}</span>
+        </div>
+      ),
     },
     {
       title: "Ngày tạo",
@@ -92,17 +103,7 @@ const AdminBlogManager = () => {
       key: "createdAt",
       render: (date: string) => new Date(date).toLocaleString(),
     },
-    {
-      title: "Trạng thái",
-      dataIndex: "isDeleted",
-      key: "isDeleted",
-      render: (isDeleted: boolean) =>
-        isDeleted ? (
-          <span className="text-red-500">Đã xóa</span>
-        ) : (
-          <span className="text-green-600">Hoạt động</span>
-        ),
-    },
+
     {
       title: "Hành động",
       key: "action",
@@ -184,7 +185,6 @@ const AdminBlogManager = () => {
         footer={null}
         title="Cập nhật blog"
         width={600}
-        destroyOnClose
       >
         {selectedBlog && (
           <UpdateBlogForm blog={selectedBlog} onSuccess={handleBlogUpdated} />

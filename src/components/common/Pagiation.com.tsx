@@ -21,8 +21,6 @@ const CustomPagination: React.FC<PaginationProps> = ({
         pageSize={pageSize}
         total={total}
         onChange={onChange}
-        showSizeChanger
-        showQuickJumper
       />
     </div>
   );

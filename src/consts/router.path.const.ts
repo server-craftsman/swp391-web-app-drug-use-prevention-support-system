@@ -14,6 +14,8 @@ export const ROUTER_URL = {
     USERS: "/admin/users",
     SETTINGS: "/admin/settings",
     MANAGER_BLOG: "/admin/manager-blog",
+    MANAGER_COURSE: "/admin/manager-course",
+    MANAGER_USER: "/admin/manager-user",
   },
   CONSULTANT: {
     BASE: "/consultant",
@@ -35,5 +37,6 @@ export const ROUTER_URL = {
     COUNSEL: "/counseling",
     COMMUNITY: "/community",
     ASSESSMENT: "/assessment",
+    CART: "/cart",
   },
 };

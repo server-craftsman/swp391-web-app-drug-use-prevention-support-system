@@ -14,10 +14,22 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => (
   >
     {/* Header: Avatar + User + Date */}
     <div className="flex items-center gap-3 px-5 pt-5 pb-2">
-      <Avatar size={44}>{blog.userId?.charAt(0).toUpperCase() || "U"}</Avatar>
+      <Avatar
+        size={44}
+        src={blog.userAvatar || undefined}
+        style={{ backgroundColor: "#20558A" }}
+      >
+        {blog.fullName
+          ? blog.fullName
+              .split(" ")
+              .map((w) => w[0])
+              .join("")
+              .toUpperCase()
+          : blog.userId?.charAt(0).toUpperCase() || "U"}
+      </Avatar>
       <div>
         <div className="font-semibold text-base">
-          {blog.userId ? `User: ${blog.userId}` : "Không rõ tác giả"}
+          {blog.fullName || "Không rõ tác giả"}
         </div>
         <div className="text-xs text-gray-500">
           {blog.createdAt

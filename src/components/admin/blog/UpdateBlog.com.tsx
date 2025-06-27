@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUpdateBlog } from "../../../hooks/useBlog";
 import { BaseService } from "../../../app/api/base.service";
 import type { Blog } from "../../../types/blog/Blog.res.type";
@@ -14,6 +14,14 @@ const UpdateBlogForm: React.FC<UpdateBlogFormProps> = ({ blog, onSuccess }) => {
   const [blogImgUrl, setBlogImgUrl] = useState(blog.blogImgUrl);
   const [file, setFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string>(blog.blogImgUrl);
+
+  // Cập nhật lại state khi blog prop đổi
+  useEffect(() => {
+    setContent(blog.content);
+    setBlogImgUrl(blog.blogImgUrl);
+    setPreviewImage(blog.blogImgUrl);
+    setFile(null);
+  }, [blog]);
 
   // Xử lý chọn file và preview ảnh
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
