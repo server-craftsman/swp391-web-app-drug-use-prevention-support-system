@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../../utils/helper";
 import { useCart } from "../../../contexts/Cart.context";
 import CartCard from "./CartCard.com";
+import { ROUTER_URL } from "../../../consts/router.path.const";
 
 const { Title } = Typography;
 
@@ -60,7 +61,7 @@ const ViewCartPage: React.FC = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/courses')}
+                onClick={() => navigate(ROUTER_URL.CLIENT.COURSE)}
                 className="flex items-center text-gray-600 hover:text-primary transition-colors"
               >
                 <ArrowLeftOutlined className="mr-2" />
