@@ -59,6 +59,7 @@ export const ROUTER_URL = {
     BASE: "/manager",
     OVERVIEW: "/manager/overview",
     ANALYTICS: "/manager/analytics",
+    USERS: "/manager/staff",
     STAFF: "/manager/staff",
     CONSULTANTS: "/manager/consultants",
     PROGRAMS: "/manager/programs",
