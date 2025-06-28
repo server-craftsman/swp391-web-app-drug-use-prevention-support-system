@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import type { ApiRequestModel } from "../../types/api/ApiRequestModel";
-import { clearLocalStorage } from "../../utils/storage";
+// import { clearLocalStorage } from "../../utils/storage";
 import { DOMAIN_API } from "../../consts/domain.const";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { store } from "../../app/store/redux";
