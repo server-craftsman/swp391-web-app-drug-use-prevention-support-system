@@ -1,6 +1,5 @@
 import React from "react";
-import { useAuth } from "../../contexts/Auth.context";
-import Loading from "../../app/screens/Loading";
+// import { useAuth } from "../../contexts/Auth.context";
 
 interface GuardGuestRouteProps {
   component: React.ReactNode;
@@ -11,12 +10,12 @@ interface GuardGuestRouteProps {
  * It only shows a loading state while authentication status is being determined
  */
 const GuardGuestRoute = ({ component }: GuardGuestRouteProps) => {
-  const { isLoading } = useAuth();
-  
-  if (isLoading) {
-    return <Loading />;
-  }
-  
+  // const { isLoading } = useAuth();
+
+  // if (isLoading) {
+  //   return ;
+  // }
+
   return <>{component}</>;
 };
 

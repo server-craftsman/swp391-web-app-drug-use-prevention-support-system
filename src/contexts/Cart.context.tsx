@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import type { CartItem } from "../types/cart/Cart.res.type";
 import { CartService } from "../services/cart/cart.service";
 import { useAuth } from "./Auth.context";
-import { message } from "antd";
+import { helpers } from "../utils";
 
 interface CartContextType {
     cartItems: CartItem[];
@@ -57,7 +57,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             }
         } catch (error) {
             console.error("Lỗi lấy giỏ hàng:", error);
-            message.error("Không thể tải giỏ hàng");
+            helpers.notificationMessage("Không thể tải thông tin giỏ hàng", "error");
             setCartItems([]);
         } finally {
             setLoading(false);
@@ -67,7 +67,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     // Add item to cart
     const addToCart = async (courseId: string) => {
         if (!userInfo?.id || !token) {
-            message.warning("Vui lòng đăng nhập để thêm vào giỏ hàng");
+            helpers.notificationMessage("Vui lòng đăng nhập để thêm vào giỏ hàng", "warning");
             return;
         }
 
@@ -78,14 +78,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             });
 
             if (response?.data?.success) {
-                message.success("Đã thêm khóa học vào giỏ hàng");
+                helpers.notificationMessage("Đã thêm khóa học vào giỏ hàng", "success");
                 await fetchCartItems(); // Refresh cart items
             } else {
-                message.error("Không thể thêm vào giỏ hàng");
+                helpers.notificationMessage("Không thể thêm vào giỏ hàng", "error");
             }
         } catch (error) {
             console.error("Lỗi thêm vào giỏ hàng:", error);
-            message.error("Không thể thêm vào giỏ hàng");
+            helpers.notificationMessage("Không thể thêm vào giỏ hàng", "error");
         } finally {
             setLoading(false);
         }
@@ -98,10 +98,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             // Since removeFromCart API doesn't exist, we'll simulate it
             setCartItems(prev => prev.filter(item => item.cartId !== cartId));
             setSelectedIds(prev => prev.filter(id => id !== cartId));
-            message.success("Đã xóa khóa học khỏi giỏ hàng");
+            helpers.notificationMessage("Đã xóa khóa học khỏi giỏ hàng", "success");
         } catch (error) {
             console.error("Lỗi xóa khỏi giỏ hàng:", error);
-            message.error("Không thể xóa khỏi giỏ hàng");
+            helpers.notificationMessage("Không thể xóa khỏi giỏ hàng", "error");
         } finally {
             setLoading(false);
         }
