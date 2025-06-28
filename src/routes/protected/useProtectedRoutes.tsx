@@ -7,23 +7,12 @@ import { CustomerRoutes } from "./access/customerPermission";
 import { ConsultantRoutes } from "./access/consultantPermission";
 import { StaffRoutes } from "./access/staffPermission";
 import { ManagerRoutes } from "./access/managerPermission";
-// import Loading from "../../app/screens/Loading";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { useAuth } from "../../contexts/Auth.context";
 import GuardProtectedRoute from "./GuardProtectedRoute";
 
 const useProtectedRoutes = (): RouteObject[] => {
-  const { role, isLoading } = useAuth();
-
-  // Handle loading state
-  if (isLoading) {
-    return [
-      {
-        path: "*",
-        element: <Suspense></Suspense>
-      }
-    ];
-  }
+  const { role } = useAuth();
 
   // Handle unauthenticated state
   if (role === null) {

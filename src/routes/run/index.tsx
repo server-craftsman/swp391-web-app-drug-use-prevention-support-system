@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { lazy } from "react";
+// import { lazy } from "react";
 
 //import context
 import { useAuth } from "../../contexts/Auth.context";
@@ -15,11 +15,11 @@ import GuardPublicRoute from "../unprotected/GuardGuestRoute";
 import { publicSubPaths } from "../unprotected/GuestSubPaths";
 import useProtectedRoutes from "../protected/useProtectedRoutes";
 
-// Import loading component
-const Loading = lazy(() => import("../../app/screens/Loading"));
+// // Import loading component
+// const Loading = lazy(() => import("../../app/screens/Loading"));
 
 const RunRoutes = () => {
-  const { role, isLoading } = useAuth();
+  const { role } = useAuth();
 
   // Get protected routes based on user role
   const protectedRoutes = useProtectedRoutes();
@@ -41,14 +41,14 @@ const RunRoutes = () => {
   //   }
   // };
 
-  // Show loading while authentication is being determined
-  if (isLoading) {
-    return (
-      <Routes>
-        <Route path="*" element={<Loading />} />
-      </Routes>
-    );
-  }
+  // // Show loading while authentication is being determined
+  // if (isLoading) {
+  //   return (
+  //     <Routes>
+  //       <Route path="*" element={<div>Loading...</div>} />
+  //     </Routes>
+  //   );
+  // }
 
   return (
     <Routes>
