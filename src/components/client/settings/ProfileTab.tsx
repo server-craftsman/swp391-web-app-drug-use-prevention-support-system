@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Input, Button, Upload, Avatar, message, Select, DatePicker, Row, Col } from 'antd';
+import { Card, Form, Input, Button, Upload, Avatar, Select, DatePicker, Row, Col } from 'antd';
 import { UserOutlined, CameraOutlined, SaveOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../../contexts/Auth.context';
@@ -8,6 +8,7 @@ import { BaseService } from '../../../app/api/base.service';
 import { LocationService } from '../../../services/location.service';
 import type { Province, District, Ward } from '../../../services/location.service';
 import type { UpdateUserRequest } from '../../../types/user/User.req.type';
+import { helpers } from '../../../utils';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -43,7 +44,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
             const provincesData = await LocationService.getProvinces();
             setProvinces(provincesData);
         } catch (error) {
-            message.error('Không thể tải danh sách tỉnh thành!');
+            helpers.notificationMessage('Không thể tải danh sách tỉnh thành!', 'error');
         } finally {
             setLocationLoading(false);
         }
@@ -69,7 +70,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
                 const districtsData = await LocationService.getDistricts(provinceCode);
                 setDistricts(districtsData);
             } catch (error) {
-                message.error('Không thể tải danh sách quận huyện!');
+                helpers.notificationMessage('Không thể tải danh sách quận huyện!', 'error');
             } finally {
                 setLocationLoading(false);
             }
@@ -93,7 +94,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
                 const wardsData = await LocationService.getWards(districtCode);
                 setWards(wardsData);
             } catch (error) {
-                message.error('Không thể tải danh sách phường xã!');
+                helpers.notificationMessage('Không thể tải danh sách phường xã!', 'error');
             } finally {
                 setLocationLoading(false);
             }
@@ -112,10 +113,10 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
             const uploadedUrl = await BaseService.uploadFile(file);
             if (uploadedUrl) {
                 setAvatarUrl(uploadedUrl);
-                message.success('Ảnh đại diện đã được tải lên thành công!');
+                helpers.notificationMessage('Ảnh đại diện đã được tải lên thành công!', 'success');
             }
         } catch (error) {
-            message.error('Tải lên ảnh đại diện thất bại!');
+            helpers.notificationMessage('Tải lên ảnh đại diện thất bại!', 'error');
         } finally {
             setUploading(false);
         }
@@ -151,10 +152,10 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
                 const updatedUserInfo = { ...userInfo, ...response.data.data };
                 setUserInfo(updatedUserInfo);
                 localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
-                message.success('Cập nhật hồ sơ thành công!');
+                helpers.notificationMessage('Cập nhật hồ sơ thành công!', 'success');
             }
         } catch (error) {
-            message.error('Cập nhật hồ sơ thất bại!');
+            helpers.notificationMessage('Cập nhật hồ sơ thất bại!', 'error');
         } finally {
             setLoading(false);
         }

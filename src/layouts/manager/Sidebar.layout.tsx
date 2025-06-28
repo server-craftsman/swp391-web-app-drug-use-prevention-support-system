@@ -74,15 +74,15 @@ const SidebarLayout: React.FC = () => {
             label: <Link to={ROUTER_URL.MANAGER.ANALYTICS}>Phân tích dữ liệu</Link>,
         },
         {
-            key: ROUTER_URL.MANAGER.STAFF,
+            key: ROUTER_URL.MANAGER.USERS,
             icon: <TeamOutlined />,
-            label: <Link to={ROUTER_URL.MANAGER.STAFF}>Quản lý nhân sự</Link>,
+            label: <Link to={ROUTER_URL.MANAGER.USERS}>Quản lý nhân sự</Link>,
         },
-        {
-            key: ROUTER_URL.MANAGER.CONSULTANTS,
-            icon: <UserOutlined />,
-            label: <Link to={ROUTER_URL.MANAGER.CONSULTANTS}>Quản lý tư vấn viên</Link>,
-        },
+        // {
+        //     key: ROUTER_URL.MANAGER.CONSULTANTS,
+        //     icon: <UserOutlined />,
+        //     label: <Link to={ROUTER_URL.MANAGER.CONSULTANTS}>Quản lý tư vấn viên</Link>,
+        // },
         {
             key: ROUTER_URL.MANAGER.PROGRAMS,
             icon: <AppstoreOutlined />,
