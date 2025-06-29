@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import type { ApiRequestModel } from "../../types/api/ApiRequestModel";
-import { clearLocalStorage } from "../../utils/storage";
+// import { clearLocalStorage } from "../../utils/storage";
 import { DOMAIN_API } from "../../consts/domain.const";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { store } from "../../app/store/redux";
@@ -260,20 +260,20 @@ axiosInstance.interceptors.response.use(
         if (response) {
             switch (response.status) {
                 case HTTP_STATUS.UNAUTHORIZED:
-                    clearLocalStorage();
+                    // clearLocalStorage();
                     setTimeout(() => {
-                        window.location.href = ROUTER_URL.AUTH.LOGIN;
+                        window.location.href = ROUTER_URL.COMMON.HOME;
                     }, 3000);
                     break;
                 case HTTP_STATUS.FORBIDDEN:
                     notificationMessage("Access denied. You do not have permission to perform this action.", "error");
-                    clearLocalStorage();
+                    // clearLocalStorage();
                     setTimeout(() => {
-                        window.location.href = ROUTER_URL.AUTH.LOGIN;
+                        window.location.href = ROUTER_URL.COMMON.HOME;
                     }, 3000);
                     break;
                 case HTTP_STATUS.NOT_FOUND:
-                    notificationMessage("Requested resource not found.", "error");
+                    // notificationMessage("Requested resource not found.", "error");
                     // setTimeout(() => {
                     //   window.location.href = ROUTER_URL.LOGIN;
                     // }, 2000);
