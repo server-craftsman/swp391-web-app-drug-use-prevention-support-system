@@ -3,6 +3,7 @@ import { ROUTER_URL } from "../../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
 
 // Lazy load manager pages
+import StaffConsultantManagement from "../../../pages/admin/staff";
 const ManagerLayout = lazy(() => import("../../../layouts/manager/Manager.layout"));
 const OverviewPage = lazy(() => import("../../../pages/admin/overview")); // Temporary, use admin overview
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
@@ -18,43 +19,43 @@ export const ManagerRoutes: RouteObject[] = [
                 element: <OverviewPage />,
             },
             {
-                path: "analytics",
+                path: ROUTER_URL.MANAGER.ANALYTICS,
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
-                path: "staff",
+                path: ROUTER_URL.MANAGER.USERS,
+                element: <StaffConsultantManagement />, // Temporary placeholder
+            },
+            {
+                path: ROUTER_URL.MANAGER.CONSULTANTS,
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
-                path: "consultants",
+                path: ROUTER_URL.MANAGER.PROGRAMS,
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
-                path: "programs",
+                path: ROUTER_URL.MANAGER.COURSES,
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
-                path: "courses",
+                path: ROUTER_URL.MANAGER.REPORTS,
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
-                path: "reports",
+                path: ROUTER_URL.MANAGER.COMPLIANCE,
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
-                path: "compliance",
+                path: ROUTER_URL.MANAGER.OPERATIONS,
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
-                path: "operations",
+                path: ROUTER_URL.MANAGER.SCHEDULE,
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
-                path: "schedule",
-                element: <OverviewPage />, // Temporary placeholder
-            },
-            {
-                path: "reviews",
+                path: ROUTER_URL.MANAGER.REVIEWS,
                 element: <OverviewPage />, // Temporary placeholder
             },
             {

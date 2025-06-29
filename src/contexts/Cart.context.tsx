@@ -4,6 +4,7 @@ import type { CartItem } from "../types/cart/Cart.res.type";
 import { CartService } from "../services/cart/cart.service";
 import { useAuth } from "./Auth.context";
 import { helpers } from "../utils";
+import { HttpException } from "../app/exceptions/http.exception";
 
 interface CartContextType {
     cartItems: CartItem[];
@@ -56,6 +57,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
                 setCartItems([]);
             }
         } catch (error) {
+            /*
+             * Backend returns 404 in case the user has no existing cart. This is not really an
+             * exceptional situation from the UX perspective, so we silently treat it as an empty
+             * cart without confusing the user with an error toast or console noise.
+             */
+            if (error instanceof HttpException && error.status === 404) {
+                setCartItems([]);
+                return; // Exit early – nothing else to handle
+            }
+
             console.error("Lỗi lấy giỏ hàng:", error);
             helpers.notificationMessage("Không thể tải thông tin giỏ hàng", "error");
             setCartItems([]);
