@@ -4,8 +4,8 @@ import type { CourseRequest } from "../../../types/course/Course.req.type";
 import type { Course } from "../../../types/course/Course.res.type";
 import { Table, Button, message, Image, Modal, Tooltip, Tag } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import CreateCourseForm from "./CreateCourse.com";
-import UpdateCourseForm from "./UpdateCourse.com"; // import form update
+import CreateCourseForm from "./CreateCourseForm.com";
+import UpdateCourseForm from "./UpdateCourseForm.com"; // import form update
 import DeleteCourse from "./DeleteCourse.com";
 import CustomPagination from "../../common/Pagiation.com";
 
