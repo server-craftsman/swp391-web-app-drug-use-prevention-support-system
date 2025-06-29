@@ -5,13 +5,6 @@ import type { CreateCourseRequest } from "../../../types/course/Course.req.type"
 import type { Category } from "../../../types/category/Category.res.type";
 import { message } from "antd";
 import { CategoryService } from "../../../services/category/category.service";
-import DropdownComponent from "../../common/dropdown.com";
-
-const audienceItems = [
-  { label: "Học sinh", key: "student" },
-  { label: "Giáo viên", key: "teacher" },
-  { label: "Phụ huynh", key: "parent" },
-];
 
 const defaultState: CreateCourseRequest = {
   name: "",
@@ -94,6 +87,11 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       return;
     }
 
+    if (!form.targetAudience) {
+      message.warning("Vui lòng chọn đối tượng!");
+      return;
+    }
+
     let imageUrl = form.imageUrl;
 
     if (file) {
@@ -118,18 +116,13 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       {
         onSuccess: () => {
           message.success("Tạo khóa học thành công!");
-
-          // Đóng modal và gọi lại hàm fetchCourses ở component cha
-          if (onSuccess) onSuccess();
-
-          // Reset form
+          // reset form
           setForm(defaultState);
           setFile(null);
           setPreviewImage("");
           if (fileInputRef.current) fileInputRef.current.value = "";
-        },
-        onError: (error: any) => {
-          message.error(error?.message || "Tạo khóa học thất bại!");
+          // đóng form gọi callback
+          if (onSuccess) onSuccess();
         },
       }
     );
@@ -155,7 +148,6 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
           className="border border-gray-300 px-4 py-2 rounded-lg w-full"
           placeholder="Nhập tên khóa học"
           required
-          disabled={isPending}
         />
       </div>
 
@@ -171,7 +163,6 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
           rows={5}
           placeholder="Nhập nội dung khóa học"
           required
-          disabled={isPending}
         />
       </div>
 
@@ -185,7 +176,7 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
           onChange={handleChange}
           className="border border-gray-300 px-4 py-2 rounded-lg w-full"
           required
-          disabled={catLoading || isPending}
+          disabled={catLoading}
         >
           <option value="">-- Chọn danh mục --</option>
           {categories.map((cat) => (
@@ -207,7 +198,6 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
             accept="image/*"
             onChange={handleFileChange}
             className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            disabled={isPending}
           />
           {previewImage && (
             <img
@@ -217,15 +207,6 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
             />
           )}
         </div>
-        <input
-          type="text"
-          name="imageUrl"
-          value={form.imageUrl}
-          onChange={handleChange}
-          className="mt-3 border border-gray-300 px-4 py-2 rounded-lg w-full"
-          placeholder="Hoặc dán URL ảnh"
-          disabled={isPending}
-        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -241,23 +222,21 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
             onChange={handleChange}
             className="border border-gray-300 px-4 py-2 rounded-lg w-full"
             required
-            disabled={isPending}
           />
         </div>
         <div>
           <label className="block mb-2 font-semibold text-gray-700">
-            Giảm giá (0 - 1)
+            Giảm giá (0 - 100)
           </label>
           <input
             name="discount"
             type="number"
             step={0.01}
             min={0}
-            max={1}
+            max={100}
             value={form.discount}
             onChange={handleChange}
             className="border border-gray-300 px-4 py-2 rounded-lg w-full"
-            disabled={isPending}
           />
         </div>
       </div>
@@ -266,40 +245,18 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
         <label className="block mb-2 font-semibold text-gray-700">
           Đối tượng
         </label>
-        <DropdownComponent
-          items={audienceItems}
+        <select
+          name="targetAudience"
           value={form.targetAudience}
-          onChange={(key) =>
-            setForm((prev) => ({ ...prev, targetAudience: key }))
-          }
-          placeholder="Chọn đối tượng"
-        />
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Video URL
-        </label>
-        <input
-          name="videoUrl"
-          value={form.videoUrl}
           onChange={handleChange}
           className="border border-gray-300 px-4 py-2 rounded-lg w-full"
-          placeholder="https://example.com/video.mp4"
-          disabled={isPending}
-        />
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">Slug</label>
-        <input
-          name="slug"
-          value={form.slug}
-          onChange={handleChange}
-          className="border border-gray-300 px-4 py-2 rounded-lg w-full"
-          placeholder="course-slug"
-          disabled={isPending}
-        />
+          required
+        >
+          <option value="">-- Chọn đối tượng --</option>
+          <option value="student">Học sinh</option>
+          <option value="teacher">Giáo viên</option>
+          <option value="parent">Phụ huynh</option>
+        </select>
       </div>
 
       <button
