@@ -7,7 +7,7 @@ import StaffConsultantManagement from "../../../pages/admin/staff";
 const ManagerLayout = lazy(() => import("../../../layouts/manager/Manager.layout"));
 const OverviewPage = lazy(() => import("../../../pages/admin/overview")); // Temporary, use admin overview
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
-
+const ProgramManagementPage = lazy(() => import("../../../pages/manager/program"));
 // Manager routes with layout protection
 export const ManagerRoutes: RouteObject[] = [
     {
@@ -32,7 +32,7 @@ export const ManagerRoutes: RouteObject[] = [
             },
             {
                 path: ROUTER_URL.MANAGER.PROGRAMS,
-                element: <OverviewPage />, // Temporary placeholder
+                element: <ProgramManagementPage />, // Temporary placeholder
             },
             {
                 path: ROUTER_URL.MANAGER.COURSES,
