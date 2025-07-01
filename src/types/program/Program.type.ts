@@ -1,10 +1,17 @@
+import { ProgramType } from "../../app/enums/programType.enum";
+
 export interface Program {
-  id: number;
-  name: string;
-  description: string;
+  success?: boolean;
+  message?: string;
+  id?: string;
+  name?: string;
+  description?: string;
+  type?: ProgramType;
+  programImgUrl?: string;
   location: string;
-  type: "FULL_TIME" | "PART_TIME" | "CONTRACT";
   startDate: string;
   endDate: string;
-  programImgUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
 }

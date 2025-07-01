@@ -57,4 +57,11 @@ export const API_PATH = {
     GET_CART: "/cart/myCart",
     ADD_CART_ITEM: "/cart/addCourse",
   },
+  PROGRAM: {
+    GET_ALL_PROGRAMS: "/program",
+    CREATE_PROGRAM: "/program/create",
+    UPDATE_PROGRAM: (id: string) => `/program/${id}`,
+    DELETE_PROGRAM: (id: string) => `/program/${id}`,
+    GET_PROGRAM_BY_ID: (id: string) => `/program/${id}`,
+  },
 };

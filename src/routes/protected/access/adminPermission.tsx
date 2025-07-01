@@ -13,6 +13,7 @@ import ManagerManagement from "../../../pages/admin/manager";
 const AdminLayout = lazy(() => import("../../../layouts/admin/Admin.layout"));
 const OverviewPage = lazy(() => import("../../../pages/admin/overview"));
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
+const ProgramManagementPage = lazy(() => import("../../../pages/manager/program"));
 
 // Admin routes with layout protection
 export const AdminRoutes: RouteObject[] = [
@@ -51,6 +52,10 @@ export const AdminRoutes: RouteObject[] = [
       {
         path: ROUTER_URL.ADMIN.MANAGERS,
         element: <ManagerManagement />,
+      },
+      {
+        path: ROUTER_URL.ADMIN.COMMUNITY_PROGRAMS,
+        element: <ProgramManagementPage />,
       },
     ],
   },
