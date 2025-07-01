@@ -9,8 +9,8 @@ export interface CreateCourseRequest {
   content: string;
   status: "draft" | "published" | "archived";
   targetAudience: string;
-  videoUrl: string;
-  imageUrl: string;
+  videoUrls: string[];
+  imageUrls: string[];
   price: number;
   discount: number;
   createdAt: string;
@@ -25,12 +25,13 @@ export interface UpdateCourseRequest {
   content: string;
   status: "draft" | "published" | "archived";
   targetAudience: string;
-  videoUrl: string;
-  imageUrl: string;
+  videoUrls: string[];
+  imageUrls: string[];
   price: number;
   discount: number;
   updatedAt: string;
   slug: string;
+  userId: string;
 }
 export interface DeleteCourseRequest {
   id: string;

@@ -14,6 +14,7 @@ export const API_PATH = {
     UPDATE_USER_PROFILE: "/user/profile",
     CHANGE_PASSWORD: "/user/password/change",
     GET_USER_BY_ID: (id: string) => `/user/${id}`,
+    DELETE_USER: (id: string) => `/user/${id}`,
   },
   PRODUCT: {
     GET_ALL_PRODUCTS: "/products",
@@ -56,5 +57,21 @@ export const API_PATH = {
   CART: {
     GET_CART: "/cart/myCart",
     ADD_CART_ITEM: "/cart/addCourse",
+  },
+  SESSION: {
+    GET_ALL_SESSIONS: "/session/all",
+    CREATE_SESSION: "/session",
+    UPDATE_SESSION: (id: string) => `/session/${id}`,
+    DELETE_SESSION: (id: string) => `/session/${id}`,
+    GET_SESSION_BY_COURSE_ID: (courseId: string) =>
+      `/session/course/${courseId}`,
+  },
+  LESSON: {
+    GET_ALL_LESSONS: "/lesson/paged",
+    CREATE_LESSON: "/lesson",
+    UPDATE_LESSON: (id: string) => `/lesson/${id}`,
+    DELETE_LESSON: (id: string) => `/lesson/${id}`,
+    GET_LESSON_BY_SESSION_ID: (sessionId: string) =>
+      `/lesson/session/${sessionId}`,
   },
 };

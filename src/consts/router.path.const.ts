@@ -28,6 +28,8 @@ export const ROUTER_URL = {
     ALERTS: "/admin/alerts",
     MESSAGES: "/admin/messages",
     SECURITY: "/admin/security",
+    MANAGER_SESSION: "/admin/manager-course",
+    MANAGER_LESSON: "/admin/manager-lesson",
   },
   CONSULTANT: {
     BASE: "/consultant",
@@ -99,5 +101,5 @@ export const ROUTER_URL = {
     APPOINTMENTS: "/appointments",
     FAVORITES: "/favorites",
     SETTINGS: "/settings",
-  }
+  },
 };

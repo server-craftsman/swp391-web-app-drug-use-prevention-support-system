@@ -2,10 +2,6 @@ import React, { useState, useEffect } from "react";
 import type { Course } from "../../../types/course/Course.res.type";
 import { useUpdateCourse } from "../../../hooks/useCourse";
 import { BaseService } from "../../../app/api/base.service";
-import { CategoryService } from "../../../services/category/category.service";
-import type { Category } from "../../../types/category/Category.res.type";
-import { message } from "antd";
-import DropdownComponent from "../../common/dropdown.com"; // Giả sử bạn đã có sẵn component này
 
 interface UpdateCourseFormProps {
   course: Course;
@@ -20,42 +16,18 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
 
   const [title, setTitle] = useState(course.name);
   const [content, setContent] = useState(course.content || "");
-  const [imageUrl, setImageUrl] = useState(course.imageUrl || "");
+  const [imageUrls, setImageUrls] = useState<string[]>(course.imageUrls || []);
   const [file, setFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string>(
-    course.imageUrl || ""
+    course.imageUrls?.[0] || ""
   );
-
-  const [selectedCategoryId, setSelectedCategoryId] = useState(
-    course.categoryId
-  );
-  const [selectedAudience, setSelectedAudience] = useState(
-    course.targetAudience
-  );
-
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await CategoryService.getAllCategories();
-        setCategories(res.data?.data || []);
-      } catch {
-        message.error("Không thể tải danh mục!");
-      } finally {
-      }
-    };
-    fetchCategories();
-  }, []);
 
   useEffect(() => {
     setTitle(course.name);
     setContent(course.content || "");
-    setImageUrl(course.imageUrl || "");
-    setPreviewImage(course.imageUrl || "");
+    setImageUrls(course.imageUrls || []);
+    setPreviewImage(course.imageUrls?.[0] || "");
     setFile(null);
-    setSelectedCategoryId(course.categoryId);
-    setSelectedAudience(course.targetAudience);
   }, [course]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,7 +37,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       setPreviewImage(URL.createObjectURL(selected));
     } else {
       setFile(null);
-      setPreviewImage(imageUrl);
+      setPreviewImage(imageUrls?.[0] || "");
     }
   };
 
@@ -73,24 +45,19 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
     e.preventDefault();
 
     if (!title.trim() || !content.trim()) {
-      message.warning("Vui lòng điền đầy đủ tên và nội dung khóa học.");
+      alert("Vui lòng điền đầy đủ tên và nội dung khóa học.");
       return;
     }
 
-    if (!selectedCategoryId) {
-      message.warning("Vui lòng chọn danh mục.");
-      return;
-    }
-
-    let finalImageUrl = imageUrl;
+    let updatedImageUrls = imageUrls;
 
     if (file) {
       const uploadedUrl = await BaseService.uploadFile(file);
       if (uploadedUrl) {
-        finalImageUrl = uploadedUrl;
-        setImageUrl(uploadedUrl);
+        updatedImageUrls = [uploadedUrl];
+        setImageUrls(updatedImageUrls);
       } else {
-        message.error("Upload ảnh thất bại.");
+        alert("Upload ảnh thất bại.");
         return;
       }
     }
@@ -102,11 +69,12 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         id: course.id,
         name: title,
         content,
-        imageUrl: finalImageUrl,
-        categoryId: selectedCategoryId,
+        imageUrls: updatedImageUrls,
+        videoUrls: course.videoUrls || [],
+        categoryId: course.categoryId,
         status,
-        targetAudience: selectedAudience,
-        videoUrl: course.videoUrl,
+        userId: course.userId,
+        targetAudience: course.targetAudience,
         price: course.price,
         discount: course.discount,
         slug: course.slug,
@@ -114,14 +82,19 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       },
       {
         onSuccess: () => {
-          message.success("Cập nhật thành công!");
           if (onSuccess) onSuccess();
         },
         onError: () => {
-          message.error("Cập nhật khóa học thất bại.");
+          alert("Cập nhật khóa học thất bại.");
         },
       }
     );
+  };
+
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setImageUrls(url ? [url] : []);
+    setPreviewImage(url);
   };
 
   return (
@@ -148,7 +121,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
 
       <div>
         <label className="block mb-2 font-semibold text-gray-700">
-          Nội dung
+          Nội dung khóa học
         </label>
         <textarea
           value={content}
@@ -156,37 +129,6 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
           rows={5}
           className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400"
           required
-        />
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Danh mục
-        </label>
-        <DropdownComponent
-          items={categories.map((cat) => ({
-            key: cat.id,
-            label: cat.name,
-          }))}
-          value={selectedCategoryId}
-          onChange={setSelectedCategoryId}
-          placeholder="Chọn danh mục"
-        />
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Đối tượng
-        </label>
-        <DropdownComponent
-          items={[
-            { key: "student", label: "Học sinh" },
-            { key: "teacher", label: "Giáo viên" },
-            { key: "parent", label: "Phụ huynh" },
-          ]}
-          value={selectedAudience}
-          onChange={setSelectedAudience}
-          placeholder="Chọn đối tượng"
         />
       </div>
 
@@ -211,9 +153,9 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         </div>
         <input
           type="text"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          className="mt-3 border border-gray-300 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={imageUrls[0] || ""}
+          onChange={handleImageUrlChange}
+          className="mt-3 border border-gray-300 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
           placeholder="Hoặc dán URL ảnh"
         />
       </div>
@@ -223,7 +165,32 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         disabled={isPending}
         className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3 rounded-lg hover:from-blue-700 hover:to-blue-600 disabled:opacity-60 transition"
       >
-        {isPending ? "Đang cập nhật..." : "Cập nhật khóa học"}
+        {isPending ? (
+          <span className="flex items-center justify-center gap-2">
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8z"
+              ></path>
+            </svg>
+            Đang cập nhật...
+          </span>
+        ) : (
+          "Cập nhật khóa học"
+        )}
       </button>
     </form>
   );
