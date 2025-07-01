@@ -5,19 +5,19 @@ import "react-toastify/dist/ReactToastify.css";
 
 export const formatDate = (
   date: Date,
-  format: string = DATE_FORMAT.YYYYMMDD
+  format: string = DATE_FORMAT.DDMMYYYY
 ) => {
   const d = new Date(date);
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   switch (format) {
-    case DATE_FORMAT.YYYYMMDD:
-      return `${year}-${month}-${day}`;
     case DATE_FORMAT.DDMMYYYY:
       return `${day}-${month}-${year}`;
     case DATE_FORMAT.MMDDYYYY:
       return `${month}-${day}-${year}`;
+    case DATE_FORMAT.YYYYMMDD:
+      return `${year}-${month}-${day}`;
     default:
       return `${year}-${month}-${day}`;
   }
