@@ -6,6 +6,7 @@ import { useAuth } from "./Auth.context";
 import { helpers } from "../utils";
 import { HttpException } from "../app/exceptions/http.exception";
 import { HTTP_STATUS } from "../app/enums/http.enum";
+import { clearLocalStorage } from "../../utils/storage";
 
 interface CartContextType {
     cartItems: CartItem[];
@@ -67,12 +68,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
                 // 401: Token expired / invalid → clear cart and rely on global interceptor to redirect
                 if (error.status === HTTP_STATUS.UNAUTHORIZED) {
+                    clearLocalStorage();
                     clearCart();
                     return;
                 }
             }
 
-            console.error("Lỗi lấy giỏ hàng:", error);
             helpers.notificationMessage("Không thể tải thông tin giỏ hàng", "error");
             setCartItems([]);
         } finally {
