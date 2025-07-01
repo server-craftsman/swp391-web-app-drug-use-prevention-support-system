@@ -1,7 +1,12 @@
 import React from "react";
 import { Card, Typography, Button, Divider } from "antd";
 import { motion } from "framer-motion";
-import { ClockCircleOutlined, StarFilled, HeartOutlined, ShareAltOutlined } from "@ant-design/icons";
+import {
+  ClockCircleOutlined,
+  StarFilled,
+  HeartOutlined,
+  ShareAltOutlined,
+} from "@ant-design/icons";
 import type { Course } from "../../../../types/course/Course.res.type";
 import { formatCurrency } from "../../../../utils/helper";
 import AddToCartButton from "../../../common/addToCartButton.com";
@@ -19,7 +24,7 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
   // Format creation date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN');
+    return date.toLocaleDateString("vi-VN");
   };
 
   // Sample course highlights for demo
@@ -27,7 +32,7 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
     "12 giờ video theo yêu cầu",
     "Truy cập trên thiết bị di động và TV",
     "Quyền truy cập đầy đủ suốt đời",
-    "Giấy chứng nhận hoàn thành"
+    "Giấy chứng nhận hoàn thành",
   ];
 
   return (
@@ -42,14 +47,13 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
         className="shadow-2xl border-0 overflow-hidden pointer-events-auto"
         style={{
           borderRadius: 16,
-          background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)"
+          background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
         }}
-        bodyStyle={{ padding: 0 }}
       >
         {/* Header Image */}
         <div className="relative h-48 overflow-hidden">
           <img
-            src={course.imageUrl}
+            src={course.imageUrls?.[0] || "/no-image.png"}
             alt={course.name}
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -85,7 +89,10 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
             </Text>
             <ul className="space-y-1">
               {courseHighlights.map((highlight, index) => (
-                <li key={index} className="flex items-start text-sm text-gray-600">
+                <li
+                  key={index}
+                  className="flex items-start text-sm text-gray-600"
+                >
                   <span className="text-green-500 mr-2 mt-1">✓</span>
                   {highlight}
                 </li>
@@ -103,9 +110,7 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
                 <Text className="font-medium">4.8</Text>
                 <Text className="text-gray-500 text-sm ml-1">(2,345)</Text>
               </div>
-              <Text className="text-gray-500 text-sm">
-                1,234 học viên
-              </Text>
+              <Text className="text-gray-500 text-sm">1,234 học viên</Text>
             </div>
           </div>
 
@@ -155,4 +160,4 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
   );
 };
 
-export default CourseCardHover; 
+export default CourseCardHover;

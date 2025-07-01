@@ -1,13 +1,14 @@
-import { Form, Input, Button, message } from "antd";
+import { Form, Input, Button, message, Select } from "antd";
 import { useCreateSession } from "../../../hooks/useSession";
 import type { CreateSessionRequest } from "../../../types/session/Session.req.type";
+import type { Course } from "../../../types/course/Course.res.type";
 
 interface CreateSessionFormProps {
-  courseId: string; // Bắt buộc truyền vào
+  courses: Course[];
   onSuccess: () => void;
 }
 
-const CreateSessionForm = ({ courseId, onSuccess }: CreateSessionFormProps) => {
+const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
   const [form] = Form.useForm();
   const createSessionMutation = useCreateSession();
 
@@ -18,16 +19,16 @@ const CreateSessionForm = ({ courseId, onSuccess }: CreateSessionFormProps) => {
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
-        userId = user.id || ""; // lấy id từ localStorage
+        userId = user.id || "";
       } catch (e) {
         console.error("Lỗi khi parse dữ liệu user từ localStorage:", e);
       }
     }
 
     const payload: CreateSessionRequest = {
-      courseId,
+      courseId: values.courseId,
       name: values.name,
-      userId, // gán userId đã lấy được
+      userId,
       slug: "",
       content: values.content,
       positionOrder: values.positionOrder,
@@ -44,8 +45,26 @@ const CreateSessionForm = ({ courseId, onSuccess }: CreateSessionFormProps) => {
       },
     });
   };
+
   return (
     <Form form={form} layout="vertical" onFinish={onFinish}>
+      <h2 className="text-2xl font-bold text-[#20558A] mb-2 text-center">
+        Tạo Buổi Học Mới
+      </h2>
+      <Form.Item
+        label="Khóa học"
+        name="courseId"
+        rules={[{ required: true, message: "Vui lòng chọn khóa học" }]}
+      >
+        <Select placeholder="Chọn khóa học">
+          {courses.map((course) => (
+            <Select.Option key={course.id} value={course.id}>
+              {course.name}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+
       <Form.Item
         label="Tên phiên học"
         name="name"
@@ -76,6 +95,7 @@ const CreateSessionForm = ({ courseId, onSuccess }: CreateSessionFormProps) => {
           htmlType="submit"
           loading={createSessionMutation.isPending}
           block
+          className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
         >
           Tạo phiên học
         </Button>

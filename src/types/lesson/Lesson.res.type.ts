@@ -10,6 +10,10 @@ export interface Lesson {
   sessionId: string;
   courseId: string;
   userAvatar: string;
+  fullName: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
 }
 export interface LessonPageInfo {
   pageNum: number;

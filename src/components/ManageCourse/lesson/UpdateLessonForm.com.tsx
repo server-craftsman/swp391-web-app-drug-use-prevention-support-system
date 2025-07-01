@@ -1,215 +1,291 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Form, Input, Select, Button, message } from "antd";
+import type { Course } from "../../../types/course/Course.res.type";
+import type { Session } from "../../../types/session/Session.res.type";
+import type { Lesson } from "../../../types/lesson/Lesson.res.type";
 import { useUpdateLesson } from "../../../hooks/useLesson";
 import { BaseService } from "../../../app/api/base.service";
-import type { Lesson } from "../../../types/lesson/Lesson.res.type";
+import { SessionService } from "../../../services/session/session.service";
+
+const { Option } = Select;
 
 interface UpdateLessonFormProps {
   lesson: Lesson;
+  courses: Course[];
   onSuccess: () => void;
 }
 
-const UpdateLessonForm: React.FC<UpdateLessonFormProps> = ({
+const UpdateLessonForm = ({
   lesson,
+  courses,
   onSuccess,
-}) => {
+}: UpdateLessonFormProps) => {
+  const [form] = Form.useForm();
   const { mutate: updateLesson, isPending } = useUpdateLesson();
 
-  const [title, setTitle] = useState(lesson.name);
-  const [content, setContent] = useState(lesson.content || "");
-  const [lessonType, setLessonType] = useState(lesson.lessonType || "");
-  const [imageUrl, setImageUrl] = useState(lesson.imageUrl || "");
-  const [file, setFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string>(
-    lesson.imageUrl || ""
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
+    null
   );
-  const [fullTime, setFullTime] = useState<number>(lesson.fullTime || 1);
-  const [positionOrder, setPositionOrder] = useState<number>(
-    lesson.positionOrder || 0
+  const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
+
+  const [lessonType, setLessonType] = useState<"text" | "image" | "video">(
+    "text"
   );
+
+  const [fileImage, setFileImage] = useState<File | null>(null);
+  const [previewImageUrl, setPreviewImageUrl] = useState("");
+
+  const [fileVideo, setFileVideo] = useState<File | null>(null);
+  const [previewVideoUrl, setPreviewVideoUrl] = useState("");
 
   useEffect(() => {
-    setTitle(lesson.name);
-    setContent(lesson.content || "");
-    setLessonType(lesson.lessonType || "");
-    setImageUrl(lesson.imageUrl || "");
-    setPreviewImage(lesson.imageUrl || "");
-    setFile(null);
-    setFullTime(lesson.fullTime || 1);
-    setPositionOrder(lesson.positionOrder || 0);
-  }, [lesson]);
+    if (!lesson) return;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    form.setFieldsValue({
+      name: lesson.name,
+      content: lesson.content,
+      positionOrder: lesson.positionOrder,
+    });
+
+    setLessonType(lesson.lessonType as any);
+    setPreviewImageUrl(lesson.imageUrl || "");
+    setPreviewVideoUrl(lesson.videoUrl || "");
+    setSelectedCourseId(lesson.courseId);
+    setSelectedSessionId(lesson.sessionId);
+  }, [lesson, form]);
+
+  useEffect(() => {
+    if (!selectedCourseId) {
+      setFilteredSessions([]);
+      setSelectedSessionId(null);
+      return;
+    }
+
+    SessionService.getSessionByCourseId({ CourseId: selectedCourseId })
+      .then((res) => {
+        const data = res.data || [];
+        setFilteredSessions(data.data);
+        setSelectedSessionId(
+          selectedCourseId === lesson.courseId ? lesson.sessionId : null
+        );
+      })
+      .catch(() => {
+        message.error("Không thể tải danh sách phiên học.");
+        setFilteredSessions([]);
+      });
+  }, [selectedCourseId, lesson]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (selected) {
-      setFile(selected);
-      setPreviewImage(URL.createObjectURL(selected));
+      setFileImage(selected);
+      setPreviewImageUrl(URL.createObjectURL(selected));
     } else {
-      setFile(null);
-      setPreviewImage(imageUrl);
+      setFileImage(null);
+      setPreviewImageUrl(lesson.imageUrl || "");
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (selected) {
+      setFileVideo(selected);
+      setPreviewVideoUrl(URL.createObjectURL(selected));
+    } else {
+      setFileVideo(null);
+      setPreviewVideoUrl(lesson.videoUrl || "");
+    }
+  };
 
-    if (!title.trim() || !lessonType.trim()) {
-      alert("Vui lòng điền đầy đủ tên bài học và loại bài học.");
+  const handleSubmit = async (values: any) => {
+    if (!selectedCourseId || !selectedSessionId) {
+      message.error("Vui lòng chọn khóa học và phiên học.");
       return;
     }
-    if (fullTime < 1) {
-      alert("Thời lượng phải lớn hơn hoặc bằng 1.");
-      return;
-    }
 
-    let finalImageUrl = imageUrl;
+    // Xử lý file upload tương ứng với lessonType
+    let uploadedImageUrl = previewImageUrl;
+    let uploadedVideoUrl = previewVideoUrl;
 
-    if (file) {
-      const uploadedUrl = await BaseService.uploadFile(file);
-      if (uploadedUrl) {
-        finalImageUrl = uploadedUrl;
-        setImageUrl(uploadedUrl);
-      } else {
-        alert("Upload ảnh thất bại.");
+    if (lessonType === "image" && fileImage) {
+      try {
+        const url = await BaseService.uploadFile(fileImage);
+        if (!url) throw new Error();
+        uploadedImageUrl = url;
+      } catch {
+        message.error("Tải ảnh thất bại.");
         return;
       }
     }
 
-    const payload = {
-      id: lesson.id,
-      name: title,
-      content,
-      lessonType,
-      imageUrl: finalImageUrl,
-      videoUrl: "",
-      fullTime,
-      positionOrder,
-      sessionId: lesson.sessionId,
-      courseId: lesson.courseId,
-    };
+    if (lessonType === "video" && fileVideo) {
+      try {
+        const url = await BaseService.uploadFile(fileVideo);
+        if (!url) throw new Error();
+        uploadedVideoUrl = url;
+      } catch {
+        message.error("Tải video thất bại.");
+        return;
+      }
+    }
 
-    updateLesson(payload, {
-      onSuccess: () => {
-        onSuccess();
+    // Kiểm tra required đúng theo type
+    if (lessonType === "image" && !uploadedImageUrl) {
+      return message.error("Vui lòng upload ảnh.");
+    }
+
+    if (lessonType === "video" && !uploadedVideoUrl) {
+      return message.error("Vui lòng upload video.");
+    }
+
+    if (lessonType === "text" && !values.content?.trim()) {
+      return message.error("Vui lòng nhập nội dung mô tả.");
+    }
+
+    updateLesson(
+      {
+        id: lesson.id,
+        name: values.name,
+        content: values.content,
+        positionOrder: values.positionOrder,
+        fullTime: 0,
+        courseId: selectedCourseId,
+        sessionId: selectedSessionId,
+        lessonType,
+        imageUrl: lessonType === "image" ? uploadedImageUrl : "",
+        videoUrl: lessonType === "video" ? uploadedVideoUrl : "",
       },
-      onError: () => {
-        alert("Cập nhật bài học thất bại.");
-      },
-    });
+      {
+        onSuccess: () => {
+          message.success("Cập nhật thành công!");
+          onSuccess();
+        },
+        onError: () => {
+          message.error("Cập nhật thất bại.");
+        },
+      }
+    );
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md border space-y-6"
-    >
-      <h2 className="text-2xl font-bold text-blue-800 text-center">
-        Cập nhật bài học
+    <Form form={form} layout="vertical" onFinish={handleSubmit}>
+      <h2 className="text-2xl font-bold text-[#20558A] mb-2 text-center">
+        Cập Nhập Bài Học
       </h2>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Tên bài học
-        </label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Nội dung
-        </label>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={4}
-          className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400"
-        />
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Loại bài học
-        </label>
-        <select
-          value={lessonType}
-          onChange={(e) => setLessonType(e.target.value)}
-          className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400"
-          required
+      <Form.Item label="Khóa học" required>
+        <Select
+          value={selectedCourseId || undefined}
+          onChange={setSelectedCourseId}
         >
-          <option value="">Chọn loại</option>
-          <option value="video">Video</option>
-          <option value="document">Tài liệu</option>
-          <option value="quiz">Trắc nghiệm</option>
-        </select>
-      </div>
+          {courses.map((c) => (
+            <Option key={c.id} value={c.id}>
+              {c.name}
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
 
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Ảnh minh họa
-        </label>
-        <div className="flex items-center gap-4 flex-wrap">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-          {previewImage && (
-            <img
-              src={previewImage}
-              alt="Preview"
-              className="w-32 h-32 object-cover rounded-lg border shadow"
-            />
-          )}
-        </div>
-        <input
-          type="text"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          className="mt-3 border border-gray-300 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-          placeholder="Hoặc dán URL ảnh"
-        />
-      </div>
+      <Form.Item label="Phiên học" required>
+        <Select
+          value={selectedSessionId || undefined}
+          onChange={setSelectedSessionId}
+          disabled={!selectedCourseId}
+        >
+          {filteredSessions.map((s) => (
+            <Option key={s.id} value={s.id}>
+              {s.name}
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
 
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Thời lượng (phút)
-        </label>
-        <input
-          type="number"
-          min={1}
-          value={fullTime}
-          onChange={(e) => setFullTime(Number(e.target.value))}
-          className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400"
-          required
-        />
-      </div>
+      <Form.Item label="Loại bài học" required>
+        <Select value={lessonType} onChange={setLessonType}>
+          <Option value="text">Text</Option>
+          <Option value="image">Image</Option>
+          <Option value="video">Video</Option>
+        </Select>
+      </Form.Item>
 
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">Thứ tự</label>
-        <input
-          type="number"
-          min={0}
-          value={positionOrder}
-          onChange={(e) => setPositionOrder(Number(e.target.value))}
-          className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400"
-          required
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3 rounded-lg hover:from-blue-700 hover:to-blue-600 disabled:opacity-60 transition"
+      <Form.Item
+        name="name"
+        label="Tên bài học"
+        rules={[{ required: true, message: "Vui lòng nhập tên bài học" }]}
       >
-        {isPending ? "Đang cập nhật..." : "Cập nhật bài học"}
-      </button>
-    </form>
+        <Input />
+      </Form.Item>
+
+      <Form.Item
+        name="content"
+        label="Mô tả"
+        rules={[{ required: false }]} // required thủ công theo type
+      >
+        <Input.TextArea rows={4} />
+      </Form.Item>
+
+      {/* Upload ảnh luôn hiển thị */}
+      <Form.Item label="Upload ảnh">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+        {previewImageUrl && (
+          <img
+            src={previewImageUrl}
+            alt="preview"
+            className="mt-2 w-32 h-20 object-cover rounded border"
+          />
+        )}
+      </Form.Item>
+
+      {/* Upload video luôn hiển thị */}
+      <Form.Item label="Upload video">
+        <input
+          type="file"
+          accept="video/*"
+          onChange={handleVideoChange}
+          className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+        {previewVideoUrl && (
+          <video
+            controls
+            src={previewVideoUrl}
+            className="mt-2 w-64 h-36 rounded border"
+          />
+        )}
+      </Form.Item>
+
+      <Form.Item
+        name="positionOrder"
+        label="Thứ tự hiển thị"
+        rules={[
+          { required: true, message: "Vui lòng nhập thứ tự" },
+          {
+            type: "number",
+            min: 0,
+            transform: (val) => (val ? Number(val) : 0),
+            message: "Thứ tự phải >= 0",
+          },
+        ]}
+      >
+        <Input type="number" min={0} />
+      </Form.Item>
+
+      <Form.Item>
+        <Button
+          type="primary"
+          htmlType="submit"
+          loading={isPending}
+          block
+          className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
+        >
+          Cập nhật bài học
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

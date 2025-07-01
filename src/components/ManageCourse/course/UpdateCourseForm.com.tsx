@@ -5,7 +5,7 @@ import { BaseService } from "../../../app/api/base.service";
 
 interface UpdateCourseFormProps {
   course: Course;
-  onSuccess?: () => void; // <-- thêm onSuccess vào đây
+  onSuccess?: () => void;
 }
 
 const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
@@ -16,17 +16,17 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
 
   const [title, setTitle] = useState(course.name);
   const [content, setContent] = useState(course.content || "");
-  const [imageUrl, setImageUrl] = useState(course.imageUrl || "");
+  const [imageUrls, setImageUrls] = useState<string[]>(course.imageUrls || []);
   const [file, setFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string>(
-    course.imageUrl || ""
+    course.imageUrls?.[0] || ""
   );
 
   useEffect(() => {
     setTitle(course.name);
     setContent(course.content || "");
-    setImageUrl(course.imageUrl || "");
-    setPreviewImage(course.imageUrl || "");
+    setImageUrls(course.imageUrls || []);
+    setPreviewImage(course.imageUrls?.[0] || "");
     setFile(null);
   }, [course]);
 
@@ -37,7 +37,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       setPreviewImage(URL.createObjectURL(selected));
     } else {
       setFile(null);
-      setPreviewImage(imageUrl);
+      setPreviewImage(imageUrls?.[0] || "");
     }
   };
 
@@ -49,20 +49,19 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       return;
     }
 
-    let finalImageUrl = imageUrl;
+    let updatedImageUrls = imageUrls;
 
     if (file) {
       const uploadedUrl = await BaseService.uploadFile(file);
       if (uploadedUrl) {
-        finalImageUrl = uploadedUrl;
-        setImageUrl(uploadedUrl);
+        updatedImageUrls = [uploadedUrl];
+        setImageUrls(updatedImageUrls);
       } else {
         alert("Upload ảnh thất bại.");
         return;
       }
     }
 
-    // Ép kiểu status cho đúng enum
     const status = course.status as "draft" | "published" | "archived";
 
     updateCourse(
@@ -70,11 +69,12 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         id: course.id,
         name: title,
         content,
-        imageUrl: finalImageUrl,
+        imageUrls: updatedImageUrls,
+        videoUrls: course.videoUrls || [],
         categoryId: course.categoryId,
         status,
+        userId: course.userId,
         targetAudience: course.targetAudience,
-        videoUrl: course.videoUrl,
         price: course.price,
         discount: course.discount,
         slug: course.slug,
@@ -82,13 +82,19 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       },
       {
         onSuccess: () => {
-          if (onSuccess) onSuccess(); // gọi callback thành công
+          if (onSuccess) onSuccess();
         },
         onError: () => {
           alert("Cập nhật khóa học thất bại.");
         },
       }
     );
+  };
+
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setImageUrls(url ? [url] : []);
+    setPreviewImage(url);
   };
 
   return (
@@ -147,8 +153,8 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         </div>
         <input
           type="text"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
+          value={imageUrls[0] || ""}
+          onChange={handleImageUrlChange}
           className="mt-3 border border-gray-300 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
           placeholder="Hoặc dán URL ảnh"
         />

@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { Table, Image, message, Button, Space, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { UserService } from "../../../services/user/user.service";
-import type { GetUsers } from "../../../types/user/User.req.type";
 import CustomPagination from "../../common/Pagiation.com";
 import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import type { UserResponse } from "../../../types/user/User.res.type";
+import AdminDeleteUser from "./AdminDeleteUser"; // <-- thêm import
 
 const AdminUserManager = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -14,22 +14,32 @@ const AdminUserManager = () => {
   const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
+
   const fetchCustomers = async () => {
     setLoading(true);
-    const params: GetUsers = {
-      pageNumber: current,
-      pageSize: pageSize,
-    };
-
     try {
-      const res = await UserService.getAllUsers(params);
+      const res = await UserService.getAllUsers({
+        pageNumber: 1,
+        pageSize: 1000,
+      });
       const data = res.data as any;
-      // Filter for customer role on the frontend
-      const customerUsers = Array.isArray(data?.data)
-        ? data.data.filter((user: UserResponse) => user.role === "Customer")
-        : [];
-      setUsers(customerUsers);
-      setTotal(customerUsers.length);
+
+      if (!Array.isArray(data?.data)) {
+        throw new Error("Invalid data format from API");
+      }
+
+      const allCustomers = data.data.filter(
+        (user: UserResponse) => user.role?.toLowerCase() === "customer"
+      );
+
+      const startIdx = (current - 1) * pageSize;
+      const endIdx = current * pageSize;
+      const paginatedCustomers = allCustomers.slice(startIdx, endIdx);
+
+      setUsers(paginatedCustomers);
+      setTotal(allCustomers.length);
     } catch (err) {
       message.error("Lỗi khi lấy danh sách khách hàng!");
       setUsers([]);
@@ -48,13 +58,12 @@ const AdminUserManager = () => {
   };
 
   const handleView = (record: UserResponse) => {
-    // TODO: Implement view functionality
-    message.info(`Xem chi tiết khách hàng: ${record.lastName} ${record.firstName}`);
+    message.info(`Xem chi tiết khách hàng: ${record.lastName}`);
   };
 
   const handleDelete = (record: UserResponse) => {
-    // TODO: Implement delete functionality
-    message.warning(`Xóa khách hàng: ${record.lastName} ${record.firstName}`);
+    setSelectedUser(record);
+    setDeleteModalOpen(true);
   };
 
   const columns: ColumnsType<UserResponse> = [
@@ -90,9 +99,7 @@ const AdminUserManager = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      render: (text: string) => (
-        <span className="text-blue-600">{text}</span>
-      ),
+      render: (text: string) => <span className="text-blue-600">{text}</span>,
     },
     {
       title: "Số điện thoại",
@@ -103,19 +110,20 @@ const AdminUserManager = () => {
       title: "Giới tính",
       dataIndex: "gender",
       key: "gender",
-      render: (gender: string) => (
-        <Tag color={gender === "MALE" ? "blue" : "pink"}>
-          {gender === "MALE" ? "Nam" : "Nữ"}
-        </Tag>
-      ),
+      render: (gender: string) => {
+        const g = gender?.toLowerCase();
+        return (
+          <Tag color={g === "male" ? "blue" : "pink"}>
+            {g === "male" ? "Nam" : "Nữ"}
+          </Tag>
+        );
+      },
     },
     {
       title: "Vai trò",
       dataIndex: "role",
       key: "role",
-      render: () => (
-        <Tag color="orange">Khách hàng</Tag>
-      ),
+      render: () => <Tag color="orange">Khách hàng</Tag>,
     },
     {
       title: "Ngày sinh",
@@ -142,7 +150,7 @@ const AdminUserManager = () => {
             icon={<DeleteOutlined />}
             size="small"
             onClick={() => handleDelete(record)}
-            title="Xóa"
+            title="Xoá"
           />
         </Space>
       ),
@@ -153,8 +161,12 @@ const AdminUserManager = () => {
     <div className="p-6 bg-white rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Quản lý Khách hàng</h2>
-          <p className="text-gray-600 mt-1">Quản lý danh sách khách hàng trong hệ thống</p>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Quản lý Khách hàng
+          </h2>
+          <p className="text-gray-600 mt-1">
+            Quản lý danh sách khách hàng trong hệ thống
+          </p>
         </div>
         <Button type="primary" size="large">
           Thêm khách hàng mới
@@ -180,6 +192,14 @@ const AdminUserManager = () => {
         pageSize={pageSize}
         total={total}
         onChange={handlePageChange}
+      />
+
+      {/* Modal xoá */}
+      <AdminDeleteUser
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        user={selectedUser}
+        onDeleted={() => fetchCustomers()}
       />
     </div>
   );
