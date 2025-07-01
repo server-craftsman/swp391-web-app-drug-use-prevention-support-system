@@ -1,3 +1,5 @@
+import type { CourseStatus } from "../../app/enums/courseStatus.enum";
+
 export interface CourseRequest {
   PageNumber: number;
   PageSize: number;
@@ -7,7 +9,7 @@ export interface CreateCourseRequest {
   name: string;
   categoryId: string;
   content: string;
-  status: "draft" | "published" | "archived";
+  status: CourseStatus;
   targetAudience: string;
   videoUrls: string[];
   imageUrls: string[];
@@ -23,7 +25,7 @@ export interface UpdateCourseRequest {
   name: string;
   categoryId: string;
   content: string;
-  status: "draft" | "published" | "archived";
+  status: CourseStatus;
   targetAudience: string;
   videoUrls: string[];
   imageUrls: string[];

@@ -121,6 +121,14 @@ const AdminCourseManager = () => {
       ),
     },
     {
+      title: "Giá",
+      dataIndex: "price",
+      key: "price",
+      render: (price: number) => (
+        <div className="text-right">{price?.toLocaleString("vi-VN")}₫</div>
+      ),
+    },
+    {
       title: "Hành động",
       key: "action",
       render: (_: any, record: Course) => (
@@ -181,7 +189,6 @@ const AdminCourseManager = () => {
         open={showCreateModal}
         onCancel={() => setShowCreateModal(false)}
         footer={null}
-        title="Tạo khóa học mới"
         width={600}
       >
         <CreateCourseForm onSuccess={handleCourseCreated} />
@@ -191,7 +198,6 @@ const AdminCourseManager = () => {
         open={showUpdateModal}
         onCancel={() => setShowUpdateModal(false)}
         footer={null}
-        title="Cập nhật khóa học"
         width={600}
       >
         {editingCourse && (

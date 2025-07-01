@@ -1,10 +1,12 @@
+import type { CourseStatus } from "../../app/enums/courseStatus.enum";
+
 export interface Course {
   id: string;
   name: string;
   userId: string;
   categoryId: string;
   content: string;
-  status: string;
+  status: CourseStatus;
   targetAudience: string;
   imageUrls: string[];
   videoUrls: string[];

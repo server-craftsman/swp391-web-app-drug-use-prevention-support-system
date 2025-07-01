@@ -66,7 +66,7 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
       </Form.Item>
 
       <Form.Item
-        label="Tên phiên học"
+        label="Tên Buổi Học"
         name="name"
         rules={[{ required: true, message: "Vui lòng nhập tên phiên học" }]}
       >

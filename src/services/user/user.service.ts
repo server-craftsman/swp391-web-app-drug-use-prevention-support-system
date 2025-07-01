@@ -5,6 +5,7 @@ import type {
   GetUsers,
   UpdateUserRequest,
   DeleteUserRequest,
+  CreateUserRequest,
 } from "../../types/user/User.req.type";
 import type { UserResponse } from "../../types/user/User.res.type";
 import { API_PATH } from "../../consts/api.path.const";
@@ -32,6 +33,12 @@ export const UserService = {
   deleteUser(params: DeleteUserRequest) {
     return BaseService.remove<ResponseSuccess<void>>({
       url: API_PATH.USER.DELETE_USER(params.userId),
+      payload: params,
+    });
+  },
+  createUser(params: CreateUserRequest) {
+    return BaseService.post<ResponseSuccess<UserResponse>>({
+      url: API_PATH.USER.CREATE_USER,
       payload: params,
     });
   },

@@ -15,6 +15,7 @@ export const API_PATH = {
     CHANGE_PASSWORD: "/user/password/change",
     GET_USER_BY_ID: (id: string) => `/user/${id}`,
     DELETE_USER: (id: string) => `/user/${id}`,
+    CREATE_USER: "/user/create",
   },
   PRODUCT: {
     GET_ALL_PRODUCTS: "/products",

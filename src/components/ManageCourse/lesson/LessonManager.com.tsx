@@ -15,6 +15,7 @@ import { LessonService } from "../../../services/lesson/lesson.service";
 import CreateLessonForm from "./CreateLessonForm.com";
 import UpdateLessonForm from "./UpdateLessonForm.com";
 import DeleteLesson from "./DeleteLesson.com";
+import { formatDate } from "../../../utils/helper";
 
 const formatStatusTag = (value: string) => {
   return (
@@ -160,7 +161,7 @@ const LessonManager = () => {
       dataIndex: "createdAt",
       key: "createdAt",
       render: (date: string) => (
-        <Tag color="cyan">{new Date(date).toLocaleString()}</Tag>
+        <Tag color="cyan">{formatDate(new Date(date))}</Tag>
       ),
     },
     {

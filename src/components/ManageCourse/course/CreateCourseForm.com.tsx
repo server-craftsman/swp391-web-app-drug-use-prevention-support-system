@@ -5,12 +5,13 @@ import type { CreateCourseRequest } from "../../../types/course/Course.req.type"
 import type { Category } from "../../../types/category/Category.res.type";
 import { message } from "antd";
 import { CategoryService } from "../../../services/category/category.service";
+import { CourseStatus } from "../../../app/enums/courseStatus.enum";
 
 const defaultState: CreateCourseRequest = {
   name: "",
   categoryId: "",
   content: "",
-  status: "draft",
+  status: CourseStatus.DRAFT,
   targetAudience: "",
   videoUrls: [],
   imageUrls: [],

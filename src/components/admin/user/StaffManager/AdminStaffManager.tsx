@@ -1,47 +1,46 @@
 import { useEffect, useState } from "react";
-import { Table, Image, message, Button, Space, Tag } from "antd";
+import { Table, Image, message, Button, Space, Tag, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { UserService } from "../../../services/user/user.service";
-import CustomPagination from "../../common/Pagiation.com";
-import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
-import type { UserResponse } from "../../../types/user/User.res.type";
-import AdminDeleteUser from "./AdminDeleteUser"; // <-- thêm import
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import { UserService } from "../../../../services/user/user.service";
+import type { GetUsers } from "../../../../types/user/User.req.type";
+import type { UserResponse } from "../../../../types/user/User.res.type";
+import CustomPagination from "../../../common/Pagiation.com";
+import AdminCreateStaffForm from "./AdminCreateStaff";
+import AdminDeleteStaff from "./AdminDeleteStaff"; // ✅ import
 
-const AdminUserManager = () => {
+const AdminStaffManager = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
+  const [openModal, setOpenModal] = useState(false); // ✅ create modal
+  const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null); // ✅ for delete
+  const [openDeleteModal, setOpenDeleteModal] = useState(false); // ✅ delete modal
 
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
-
-  const fetchCustomers = async () => {
+  const fetchStaff = async () => {
     setLoading(true);
+    const params: GetUsers = {
+      pageNumber: current,
+      pageSize: pageSize,
+    };
+
     try {
-      const res = await UserService.getAllUsers({
-        pageNumber: 1,
-        pageSize: 1000,
-      });
+      const res = await UserService.getAllUsers(params);
       const data = res.data as any;
-
-      if (!Array.isArray(data?.data)) {
-        throw new Error("Invalid data format from API");
-      }
-
-      const allCustomers = data.data.filter(
-        (user: UserResponse) => user.role?.toLowerCase() === "customer"
-      );
-
-      const startIdx = (current - 1) * pageSize;
-      const endIdx = current * pageSize;
-      const paginatedCustomers = allCustomers.slice(startIdx, endIdx);
-
-      setUsers(paginatedCustomers);
-      setTotal(allCustomers.length);
+      const staffUsers = Array.isArray(data?.data)
+        ? data.data.filter((user: UserResponse) => user.role === "Staff")
+        : [];
+      setUsers(staffUsers);
+      setTotal(staffUsers.length);
     } catch (err) {
-      message.error("Lỗi khi lấy danh sách khách hàng!");
+      message.error("Lỗi khi lấy danh sách nhân viên!");
       setUsers([]);
     } finally {
       setLoading(false);
@@ -49,7 +48,7 @@ const AdminUserManager = () => {
   };
 
   useEffect(() => {
-    fetchCustomers();
+    fetchStaff();
   }, [current, pageSize]);
 
   const handlePageChange = (page: number, size: number) => {
@@ -58,12 +57,18 @@ const AdminUserManager = () => {
   };
 
   const handleView = (record: UserResponse) => {
-    message.info(`Xem chi tiết khách hàng: ${record.lastName}`);
+    message.info(
+      `Xem chi tiết nhân viên: ${record.lastName} ${record.firstName}`
+    );
+  };
+
+  const handleEdit = (record: UserResponse) => {
+    message.info(`Chỉnh sửa nhân viên: ${record.lastName} ${record.firstName}`);
   };
 
   const handleDelete = (record: UserResponse) => {
     setSelectedUser(record);
-    setDeleteModalOpen(true);
+    setOpenDeleteModal(true);
   };
 
   const columns: ColumnsType<UserResponse> = [
@@ -110,20 +115,17 @@ const AdminUserManager = () => {
       title: "Giới tính",
       dataIndex: "gender",
       key: "gender",
-      render: (gender: string) => {
-        const g = gender?.toLowerCase();
-        return (
-          <Tag color={g === "male" ? "blue" : "pink"}>
-            {g === "male" ? "Nam" : "Nữ"}
-          </Tag>
-        );
-      },
+      render: (gender: string) => (
+        <Tag color={gender === "MALE" ? "blue" : "pink"}>
+          {gender === "MALE" ? "Nam" : "Nữ"}
+        </Tag>
+      ),
     },
     {
       title: "Vai trò",
       dataIndex: "role",
       key: "role",
-      render: () => <Tag color="orange">Khách hàng</Tag>,
+      render: () => <Tag color="green">Nhân viên</Tag>,
     },
     {
       title: "Ngày sinh",
@@ -145,6 +147,13 @@ const AdminUserManager = () => {
             title="Xem chi tiết"
           />
           <Button
+            type="default"
+            icon={<EditOutlined />}
+            size="small"
+            onClick={() => handleEdit(record)}
+            title="Chỉnh sửa"
+          />
+          <Button
             type="primary"
             danger
             icon={<DeleteOutlined />}
@@ -162,19 +171,24 @@ const AdminUserManager = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
-            Quản lý Khách hàng
+            Quản lý Nhân viên
           </h2>
           <p className="text-gray-600 mt-1">
-            Quản lý danh sách khách hàng trong hệ thống
+            Quản lý đội ngũ nhân viên hệ thống
           </p>
         </div>
-        <Button type="primary" size="large">
-          Thêm khách hàng mới
+        <Button
+          type="primary"
+          size="large"
+          icon={<PlusOutlined />}
+          onClick={() => setOpenModal(true)}
+        >
+          Thêm nhân viên mới
         </Button>
       </div>
 
       <div className="mb-4">
-        <Tag color="orange">Tổng cộng: {total} khách hàng</Tag>
+        <Tag color="blue">Tổng cộng: {total} nhân viên</Tag>
       </div>
 
       <Table
@@ -194,15 +208,35 @@ const AdminUserManager = () => {
         onChange={handlePageChange}
       />
 
-      {/* Modal xoá */}
-      <AdminDeleteUser
-        open={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
+      {/* Modal tạo nhân viên */}
+      <Modal
+        open={openModal}
+        onCancel={() => setOpenModal(false)}
+        footer={null}
+        title="Tạo nhân viên mới"
+        destroyOnClose
+        width={700}
+      >
+        <AdminCreateStaffForm
+          onSuccess={() => {
+            setOpenModal(false);
+            fetchStaff();
+          }}
+        />
+      </Modal>
+
+      {/* Modal xác nhận xoá */}
+      <AdminDeleteStaff
+        open={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
         user={selectedUser}
-        onDeleted={() => fetchCustomers()}
+        onDeleted={() => {
+          setOpenDeleteModal(false);
+          fetchStaff();
+        }}
       />
     </div>
   );
 };
 
-export default AdminUserManager;
+export default AdminStaffManager;
