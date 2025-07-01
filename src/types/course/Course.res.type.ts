@@ -6,8 +6,8 @@ export interface Course {
   content: string;
   status: string;
   targetAudience: string;
-  imageUrl: string;
-  videoUrl: string;
+  imageUrls: string[];
+  videoUrls: string[];
   price: number;
   discount: number;
   slug: string;
