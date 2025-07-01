@@ -17,6 +17,7 @@ export interface UpdateSessionRequest {
   slug: string;
   content: string;
   positionOrder: string;
+  courseId: string;
 }
 export interface DeleteSessionRequest {
   id: string;

@@ -62,7 +62,7 @@ const AdminCourseManager = () => {
   const columns = [
     {
       title: "Ảnh",
-      dataIndex: "imageUrl",
+      dataIndex: "imageUrls",
       key: "imageUrl",
       render: (url: string) =>
         url ? (

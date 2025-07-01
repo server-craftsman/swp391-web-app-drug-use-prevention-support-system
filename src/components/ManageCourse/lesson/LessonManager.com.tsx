@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Modal, Tooltip, message, Select } from "antd";
+import { Table, Button, Modal, Tooltip, message, Tag } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
+import { Link } from "react-router-dom";
 
 import type { Course } from "../../../types/course/Course.res.type";
 import type { Session } from "../../../types/session/Session.res.type";
@@ -15,66 +16,75 @@ import CreateLessonForm from "./CreateLessonForm.com";
 import UpdateLessonForm from "./UpdateLessonForm.com";
 import DeleteLesson from "./DeleteLesson.com";
 
-const { Option } = Select;
+const formatStatusTag = (value: string) => {
+  return (
+    <Tag style={{ backgroundColor: "#1890ff", color: "#fff", border: 0 }}>
+      {value.toUpperCase()}
+    </Tag>
+  );
+};
 
 const LessonManager = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [lessons, setLessons] = useState<
+    (Lesson & {
+      courseName?: string;
+      courseId?: string;
+      sessionName?: string;
+    })[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
-  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
-    null
-  );
 
   useEffect(() => {
-    fetchCourses();
+    const loadAll = async () => {
+      try {
+        const [courseRes, sessionRes] = await Promise.all([
+          CourseService.getAllCourses({ PageNumber: 1, PageSize: 100 }),
+          SessionService.getAllSessions({ PageNumber: 1, PageSize: 100 }),
+        ]);
+
+        const courseData = courseRes.data || [];
+        const sessionData = sessionRes.data || [];
+
+        setCourses(courseData.data);
+        setSessions(sessionData.data);
+        await fetchLessons(courseData.data, sessionData.data);
+      } catch {
+        message.error("Lỗi khi tải dữ liệu");
+      }
+    };
+
+    loadAll();
   }, []);
 
-  useEffect(() => {
-    if (selectedCourseId) fetchSessions(selectedCourseId);
-  }, [selectedCourseId]);
-
-  useEffect(() => {
-    if (selectedSessionId) fetchLessons(selectedSessionId);
-  }, [selectedSessionId]);
-
-  const fetchCourses = async () => {
-    try {
-      const res = await CourseService.getAllCourses({
-        PageNumber: 1,
-        PageSize: 100,
-      });
-      const data = res.data?.data || [];
-      setCourses(data);
-    } catch {
-      message.error("Lỗi khi tải danh sách khóa học");
-    }
-  };
-
-  const fetchSessions = async (courseId: string) => {
-    try {
-      const res = await SessionService.getSessionByCourseId({
-        CourseId: courseId,
-      });
-      const data = res.data || [];
-      setSessions(data.data);
-    } catch {
-      message.error("Lỗi khi tải danh sách phiên học");
-    }
-  };
-
-  const fetchLessons = async (sessionId: string) => {
+  const fetchLessons = async (
+    coursesData: Course[] = courses,
+    sessionsData: Session[] = sessions
+  ) => {
     setLoading(true);
     try {
-      const res = await LessonService.getLessonBySessionId({
-        SessionId: sessionId,
+      const res = await LessonService.getAllLessons({
+        PageNumber: 1,
+        PageSize: 1000,
       });
-      const data = res.data || [];
-      setLessons(data.data);
+      const rawLessons: Lesson[] = res.data?.data || [];
+
+      const lessonsWithNames = rawLessons.map((lesson) => {
+        const course = coursesData.find((c) => c.id === lesson.courseId);
+        const session = sessionsData.find((s) => s.id === lesson.sessionId);
+        return {
+          ...lesson,
+          courseName: course?.name || "-",
+          courseId: course?.id || "",
+          sessionName: session?.name || "-",
+        };
+      });
+
+      setLessons(lessonsWithNames);
     } catch {
       message.error("Lỗi khi tải danh sách bài học");
     } finally {
@@ -84,12 +94,12 @@ const LessonManager = () => {
 
   const handleCreated = () => {
     setShowCreateModal(false);
-    if (selectedSessionId) fetchLessons(selectedSessionId);
+    fetchLessons();
   };
 
   const handleUpdated = () => {
     setShowUpdateModal(false);
-    if (selectedSessionId) fetchLessons(selectedSessionId);
+    fetchLessons();
   };
 
   const openUpdateModal = (lesson: Lesson) => {
@@ -97,12 +107,41 @@ const LessonManager = () => {
     setShowUpdateModal(true);
   };
 
-  const columns: ColumnsType<Lesson> = [
+  const columns: ColumnsType<
+    Lesson & { courseName?: string; courseId?: string; sessionName?: string }
+  > = [
     {
       title: "Tên bài học",
       dataIndex: "name",
       key: "name",
       render: (text) => <strong>{text}</strong>,
+    },
+    {
+      title: "Khóa học",
+      dataIndex: "courseName",
+      key: "courseName",
+      render: (_, record) =>
+        record.courseId ? (
+          <Link
+            to={`/courses/${record.courseId}`}
+            className="text-blue-600 hover:underline"
+          >
+            {record.courseName}
+          </Link>
+        ) : (
+          "-"
+        ),
+    },
+    {
+      title: "Phiên học",
+      dataIndex: "sessionName",
+      key: "sessionName",
+    },
+    {
+      title: "Loại bài học",
+      dataIndex: "lessonType",
+      key: "lessonType",
+      render: (value: string) => formatStatusTag(value),
     },
     {
       title: "Nội dung",
@@ -117,29 +156,12 @@ const LessonManager = () => {
       ),
     },
     {
-      title: "Ảnh minh họa",
-      dataIndex: "imageUrl",
-      key: "imageUrl",
-      render: (url) =>
-        url ? (
-          <img
-            src={url}
-            alt="Ảnh minh họa"
-            style={{
-              width: 60,
-              height: 40,
-              objectFit: "cover",
-              borderRadius: 4,
-            }}
-          />
-        ) : (
-          <span>Chưa có ảnh</span>
-        ),
-    },
-    {
-      title: "Thứ tự",
-      dataIndex: "positionOrder",
-      key: "positionOrder",
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (date: string) => (
+        <Tag color="cyan">{new Date(date).toLocaleString()}</Tag>
+      ),
     },
     {
       title: "Hành động",
@@ -149,6 +171,8 @@ const LessonManager = () => {
           <Tooltip title="Cập nhật">
             <Button
               icon={<EditOutlined />}
+              shape="circle"
+              type="default"
               size="small"
               onClick={() => openUpdateModal(record)}
             />
@@ -156,11 +180,13 @@ const LessonManager = () => {
           <Tooltip title="Xóa">
             <DeleteLesson
               lessonId={record.id}
-              onDeleted={() => fetchLessons(selectedSessionId!)}
+              onDeleted={() => fetchLessons()}
               buttonProps={{
                 icon: <DeleteOutlined />,
-                size: "small",
+                shape: "circle",
                 danger: true,
+                size: "small",
+                style: { borderColor: "#ff4d4f", color: "#ff4d4f" },
               }}
             />
           </Tooltip>
@@ -173,48 +199,11 @@ const LessonManager = () => {
     <div className="p-6 bg-white rounded shadow">
       <div className="flex justify-between items-center gap-4 mb-4">
         <h2 className="text-2xl font-bold">Quản lý Bài học</h2>
-        <div>
-          <span>Khóa Học : </span>
-          <Select
-            style={{ width: 220 }}
-            placeholder="Chọn khóa học"
-            onChange={(id) => {
-              setSelectedCourseId(id);
-              setSelectedSessionId(null);
-              setLessons([]);
-            }}
-            value={selectedCourseId || undefined}
-          >
-            {courses.map((c) => (
-              <Option key={c.id} value={c.id}>
-                {c.name}
-              </Option>
-            ))}
-          </Select>
-        </div>
-        <div>
-          <span>Buổi Học : </span>
-          <Select
-            style={{ width: 220 }}
-            placeholder="Chọn phiên học"
-            disabled={!selectedCourseId}
-            onChange={(id) => setSelectedSessionId(id)}
-            value={selectedSessionId || undefined}
-          >
-            {sessions.map((s) => (
-              <Option key={s.id} value={s.id}>
-                {s.name}
-              </Option>
-            ))}
-          </Select>
-        </div>
-
         <Button
           className="bg-[#20558A] hover-primary"
           icon={<PlusOutlined />}
           type="primary"
           onClick={() => setShowCreateModal(true)}
-          disabled={!selectedCourseId || !selectedSessionId}
         >
           Thêm bài học
         </Button>
@@ -233,27 +222,23 @@ const LessonManager = () => {
         open={showCreateModal}
         onCancel={() => setShowCreateModal(false)}
         footer={null}
-        title="Tạo bài học mới"
         width={600}
       >
-        {selectedCourseId && selectedSessionId && (
-          <CreateLessonForm
-            courseId={selectedCourseId}
-            sessionId={selectedSessionId}
-            onSuccess={handleCreated}
-          />
-        )}
+        <CreateLessonForm courses={courses} onSuccess={handleCreated} />
       </Modal>
 
       <Modal
         open={showUpdateModal}
         onCancel={() => setShowUpdateModal(false)}
         footer={null}
-        title="Cập nhật bài học"
         width={600}
       >
         {editingLesson && (
-          <UpdateLessonForm lesson={editingLesson} onSuccess={handleUpdated} />
+          <UpdateLessonForm
+            lesson={editingLesson}
+            onSuccess={handleUpdated}
+            courses={courses}
+          />
         )}
       </Modal>
     </div>

@@ -12,8 +12,8 @@ const defaultState: CreateCourseRequest = {
   content: "",
   status: "draft",
   targetAudience: "",
-  videoUrl: "",
-  imageUrl: "",
+  videoUrls: [],
+  imageUrls: [],
   price: 0,
   discount: 0,
   createdAt: "",
@@ -32,7 +32,6 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
   const [previewImage, setPreviewImage] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Danh sách category
   const [categories, setCategories] = useState<Category[]>([]);
   const [catLoading, setCatLoading] = useState(false);
 
@@ -92,12 +91,12 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       return;
     }
 
-    let imageUrl = form.imageUrl;
+    let imageUrlsList = form.imageUrls;
 
     if (file) {
       const uploadedUrl = await BaseService.uploadFile(file);
       if (uploadedUrl) {
-        imageUrl = uploadedUrl;
+        imageUrlsList = [uploadedUrl];
       } else {
         message.error("Upload ảnh thất bại!");
         return;
@@ -106,26 +105,27 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
 
     const now = new Date().toISOString();
 
-    createCourse(
-      {
-        ...form,
-        imageUrl,
-        createdAt: form.createdAt || now,
-        updatedAt: form.updatedAt || now,
+    const payload: CreateCourseRequest = {
+      ...form,
+      imageUrls: imageUrlsList,
+      videoUrls: form.videoUrls || [],
+      createdAt: form.createdAt || now,
+      updatedAt: form.updatedAt || now,
+      slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-"),
+    };
+
+    console.log("Payload gửi lên:", payload); // debug
+
+    createCourse(payload, {
+      onSuccess: () => {
+        message.success("Tạo khóa học thành công!");
+        setForm(defaultState);
+        setFile(null);
+        setPreviewImage("");
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        if (onSuccess) onSuccess();
       },
-      {
-        onSuccess: () => {
-          message.success("Tạo khóa học thành công!");
-          // reset form
-          setForm(defaultState);
-          setFile(null);
-          setPreviewImage("");
-          if (fileInputRef.current) fileInputRef.current.value = "";
-          // đóng form gọi callback
-          if (onSuccess) onSuccess();
-        },
-      }
-    );
+    });
   };
 
   return (

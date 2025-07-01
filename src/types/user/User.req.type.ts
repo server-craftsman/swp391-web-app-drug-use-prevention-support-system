@@ -52,3 +52,17 @@ export interface UpdateUserRequest {
   dob: string;
   profilePicUrl: string;
 }
+export interface DeleteUserRequest {
+  userId: string;
+}
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  address: string;
+  gender: string;
+  dob: string;
+  profilePicUrl: string;
+  role: UserRole;
+}
