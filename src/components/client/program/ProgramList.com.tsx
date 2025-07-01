@@ -5,7 +5,7 @@ import ProgramCard from "./ProgramCard.com";
 import programData from "../../../data/program.json";
 import type { Program } from "../../../types/program/Program.type";
 
-const typedPrograms = programData as Program[];
+const typedPrograms = programData as unknown as Program[];
 
 const CustomPrevArrow = ({ onClick }: any) => (
   <div

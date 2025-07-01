@@ -41,7 +41,7 @@ const ProgramCard: React.FC<Props> = ({ program }) => {
             {formatDate(program.startDate)} → {formatDate(program.endDate)}
           </div>
           <div className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-semibold">
-            {program.type.replace("_", " ")}
+            {program.type?.replace("_", " ")}
           </div>
         </div>
       </div>

@@ -1,7 +1,6 @@
 import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import type { ApiRequestModel } from "../../types/api/ApiRequestModel";
-// import { clearLocalStorage } from "../../utils/storage";
 import { DOMAIN_API } from "../../consts/domain.const";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { store } from "../../app/store/redux";
@@ -10,6 +9,7 @@ import { HTTP_STATUS } from "../../app/enums";
 import { HttpException } from "../../app/exceptions";
 import { notificationMessage } from "../../utils/helper";
 import { uploadFileToS3, deleteFileFromS3 } from "../../utils/upload";
+import { clearLocalStorage } from "../../utils/storage";
 // import { handleUploadFile, deleteFileFromCloudinary } from "../../utils/upload"; // Import the handleUploadFile and deleteFileFromCloudinary functions
 
 export const axiosInstance = axios.create({
@@ -260,13 +260,13 @@ axiosInstance.interceptors.response.use(
         if (response) {
             switch (response.status) {
                 case HTTP_STATUS.UNAUTHORIZED:
-                    // clearLocalStorage();
+                    clearLocalStorage();
                     setTimeout(() => {
                         window.location.href = ROUTER_URL.COMMON.HOME;
                     }, 3000);
                     break;
                 case HTTP_STATUS.FORBIDDEN:
-                    notificationMessage("Access denied. You do not have permission to perform this action.", "error");
+                    notificationMessage("Bạn không có quyền thực hiện hành động này.", "error");
                     // clearLocalStorage();
                     setTimeout(() => {
                         window.location.href = ROUTER_URL.COMMON.HOME;
@@ -279,13 +279,13 @@ axiosInstance.interceptors.response.use(
                     // }, 2000);
                     break;
                 case HTTP_STATUS.INTERNAL_SERVER_ERROR:
-                    notificationMessage("Internal server error. Please try again later.", "error");
+                    notificationMessage("Lỗi máy chủ. Vui lòng thử lại sau.", "error");
                     break;
                 default:
-                    notificationMessage(response.data?.message || "An error occurred. Please try again.", "error");
+                    notificationMessage(response.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại.", "error");
             }
         } else {
-            notificationMessage(err.message || "An error occurred. Please try again.", "error");
+            notificationMessage(err.message || "Đã xảy ra lỗi. Vui lòng thử lại.", "error");
         }
         return Promise.reject(new HttpException(err.message, response?.status || HTTP_STATUS.INTERNAL_SERVER_ERROR));
     }

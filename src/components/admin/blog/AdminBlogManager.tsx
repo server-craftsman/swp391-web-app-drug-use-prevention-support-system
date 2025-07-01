@@ -9,6 +9,7 @@ import DeleteBlog from "./DeleteBlog.com"; // Thêm dòng này
 import UpdateBlogForm from "./UpdateBlog.com";
 import CustomPagination from "../../common/Pagiation.com"; // Đảm bảo đúng đường dẫn
 import { Tooltip } from "antd";
+import { helpers } from "../../../utils";
 
 const AdminBlogManager = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -101,7 +102,7 @@ const AdminBlogManager = () => {
       title: "Ngày tạo",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (date: string) => new Date(date).toLocaleString(),
+      render: (date: string) => helpers.formatDate(new Date(date)),
     },
 
     {
