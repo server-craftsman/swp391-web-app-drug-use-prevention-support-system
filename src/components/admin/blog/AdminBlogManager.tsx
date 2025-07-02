@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { BlogService } from "../../../services/blog/blog.service";
 import type { BlogRequest } from "../../../types/blog/Blog.req.type";
 import type { Blog } from "../../../types/blog/Blog.res.type";
-import { Table, Button, message, Image, Modal } from "antd";
+import { Table, Button, message, Image, Modal, Tooltip } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import CreateBlogForm from "./CreateBlog.com";
-import DeleteBlog from "./DeleteBlog.com"; // Thêm dòng này
+import DeleteBlog from "./DeleteBlog.com";
 import UpdateBlogForm from "./UpdateBlog.com";
-import CustomPagination from "../../common/Pagiation.com"; // Đảm bảo đúng đường dẫn
-import { Tooltip } from "antd";
+import CustomPagination from "../../common/Pagiation.com";
+import CustomSearch from "../../common/CustomSearch.com";
 import { helpers } from "../../../utils";
 
 const AdminBlogManager = () => {
@@ -20,15 +20,20 @@ const AdminBlogManager = () => {
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   const fetchBlogs = async () => {
     setLoading(true);
-    const params: BlogRequest = { pageNumber: current, pageSize };
+    const params: BlogRequest = {
+      pageNumber: current,
+      pageSize: pageSize,
+      filterByContent: searchKeyword, // gửi từ khóa tìm kiếm theo name
+    };
     try {
       const res = await BlogService.getAllBlogs(params);
       const data = res.data as any;
       setBlogs(Array.isArray(data?.data) ? data.data : []);
-      setTotal(data?.totalCount || 0); // <-- Lấy đúng trường totalCount
+      setTotal(data?.totalCount || 0);
     } catch (err) {
       setBlogs([]);
       message.error("Lỗi khi lấy danh sách blog!");
@@ -39,11 +44,10 @@ const AdminBlogManager = () => {
 
   useEffect(() => {
     fetchBlogs();
-  }, [current, pageSize]);
+  }, [current, pageSize, searchKeyword]);
 
   const handleBlogCreated = () => {
     setShowModal(false);
-
     fetchBlogs();
   };
 
@@ -104,7 +108,6 @@ const AdminBlogManager = () => {
       key: "createdAt",
       render: (date: string) => helpers.formatDate(new Date(date)),
     },
-
     {
       title: "Hành động",
       key: "action",
@@ -145,11 +148,8 @@ const AdminBlogManager = () => {
     },
   ];
 
-  console.log(blogs);
-  console.log("total:", total, "pageSize:", pageSize);
   return (
     <div className="p-6 bg-white rounded shadow relative">
-      <h2 className="text-2xl font-bold mb-4">Quản lý Blog</h2>
       <Button
         type="primary"
         className="absolute top-6 right-6 bg-[#20558A]"
@@ -157,20 +157,34 @@ const AdminBlogManager = () => {
       >
         Tạo blog mới
       </Button>
+
+      {/* Thanh tìm kiếm */}
+      <CustomSearch
+        onSearch={(keyword) => {
+          setCurrent(1);
+          setSearchKeyword(keyword);
+        }}
+        className="mb-4"
+        placeholder="Tìm kiếm theo tiêu đề blog"
+        inputWidth="w-96"
+      />
+
       <Table
         columns={columns}
         dataSource={blogs}
         rowKey="id"
         loading={loading}
-        pagination={false} // Tắt phân trang mặc định của Table
+        pagination={false}
         bordered
       />
+
       <CustomPagination
         current={current}
         pageSize={pageSize}
-        total={total} // total = 18
+        total={total}
         onChange={handlePageChange}
       />
+
       <Modal
         open={showModal}
         onCancel={() => setShowModal(false)}
@@ -180,6 +194,7 @@ const AdminBlogManager = () => {
       >
         <CreateBlogForm onSuccess={handleBlogCreated} />
       </Modal>
+
       <Modal
         open={showUpdateModal}
         onCancel={() => setShowUpdateModal(false)}

@@ -1,9 +1,10 @@
 import type { CourseStatus } from "../../app/enums/courseStatus.enum";
 
 export interface CourseRequest {
-  PageNumber: number;
-  PageSize: number;
-  FilterByName?: string;
+  pageNumber: number;
+  pageSize: number;
+  filterByName?: string;
+  keyword?: string;
 }
 export interface CreateCourseRequest {
   name: string;

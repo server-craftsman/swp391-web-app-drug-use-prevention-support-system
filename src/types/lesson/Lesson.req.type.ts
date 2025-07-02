@@ -1,7 +1,7 @@
 export interface LessonRequest {
-  PageNumber: number;
-  PageSize: number;
-  FilterByName?: string;
+  pageNumber: number;
+  pageSize: number;
+  filterByName?: string;
 }
 export interface CreateLessonRequest {
   name: string;

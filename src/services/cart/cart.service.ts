@@ -3,6 +3,7 @@ import type { ResponseSuccess } from "../../app/interface";
 import { API_PATH } from "../../consts/api.path.const";
 import type {
   AddToCartRequest,
+  DeleteCartItemRequest,
   ViewCartRequest,
 } from "../../types/cart/Cart.req.type";
 import type { CartItem } from "../../types/cart/Cart.res.type";
@@ -17,6 +18,12 @@ export const CartService = {
   addCartItem(params: AddToCartRequest) {
     return BaseService.post<ResponseSuccess<CartItem>>({
       url: API_PATH.CART.ADD_CART_ITEM,
+      payload: params,
+    });
+  },
+  deleteCartItem(params: DeleteCartItemRequest) {
+    return BaseService.remove<ResponseSuccess<void>>({
+      url: API_PATH.CART.DELETE_CART_ITEM(params.cartItemId),
       payload: params,
     });
   },

@@ -1,14 +1,20 @@
-// src/components/client/cart/CartList.com.tsx
-
+// ViewCartPage.tsx
 import React from "react";
-import { Typography, Empty, Divider, Button, Spin, Checkbox } from "antd";
-import { ShoppingOutlined, CreditCardOutlined, DeleteOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { Typography, Empty, Divider, Button, Spin } from "antd";
+import {
+  ShoppingOutlined,
+  CreditCardOutlined,
+  ArrowLeftOutlined,
+} from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "../../../utils/helper";
+import { helpers } from "../../../utils";
 import { useCart } from "../../../contexts/Cart.context";
 import CartCard from "./CartCard.com";
 import { ROUTER_URL } from "../../../consts/router.path.const";
+import DeleteCartItem from "./DeleteCartItem.com";
+import { useCreateOrder } from "../../../hooks/useOrder";
 
 const { Title } = Typography;
 
@@ -16,12 +22,14 @@ const ViewCartPage: React.FC = () => {
   const navigate = useNavigate();
   const {
     cartItems,
-    selectedIds,
-    setSelectedIds,
     loading,
     removeFromCart,
     totalPrice,
+    selectedIds,
+    setSelectedIds,
   } = useCart();
+
+  const createOrderMutation = useCreateOrder();
 
   const handleSelect = (cartId: string, checked: boolean) => {
     setSelectedIds((prev) =>
@@ -29,16 +37,40 @@ const ViewCartPage: React.FC = () => {
     );
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(cartItems.map(item => item.cartId));
-    } else {
-      setSelectedIds([]);
-    }
-  };
+  const isChecked = (cartId: string) => selectedIds.includes(cartId);
 
-  const isAllSelected = cartItems.length > 0 && selectedIds.length === cartItems.length;
-  const isIndeterminate = selectedIds.length > 0 && selectedIds.length < cartItems.length;
+  const handleCreateOrder = () => {
+    if (selectedIds.length === 0) {
+      return helpers.notificationMessage(
+        "Vui lòng chọn ít nhất một sản phẩm để thanh toán",
+        "warning"
+      );
+    }
+
+    createOrderMutation.mutate(
+      { selectedCartItemIds: selectedIds },
+      {
+        onSuccess: (res) => {
+          if (res?.data?.data.orderId) {
+            navigate("/payment", {
+              state: { orderId: res.data.data.orderId },
+            });
+          } else {
+            helpers.notificationMessage(
+              "Tạo đơn hàng thất bại. Vui lòng thử lại.",
+              "error"
+            );
+          }
+        },
+        onError: () => {
+          helpers.notificationMessage(
+            "Đã xảy ra lỗi khi tạo đơn hàng.",
+            "error"
+          );
+        },
+      }
+    );
+  };
 
   if (loading) {
     return (
@@ -50,7 +82,6 @@ const ViewCartPage: React.FC = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -100,8 +131,12 @@ const ViewCartPage: React.FC = () => {
                 <Empty
                   description={
                     <div className="space-y-2">
-                      <p className="text-lg font-medium text-gray-600">Giỏ hàng trống</p>
-                      <p className="text-gray-500">Hãy khám phá các khóa học tuyệt vời của chúng tôi</p>
+                      <p className="text-lg font-medium text-gray-600">
+                        Giỏ hàng trống
+                      </p>
+                      <p className="text-gray-500">
+                        Hãy khám phá các khóa học tuyệt vời của chúng tôi
+                      </p>
                     </div>
                   }
                   image={null}
@@ -114,7 +149,7 @@ const ViewCartPage: React.FC = () => {
                   <Button
                     type="primary"
                     size="large"
-                    onClick={() => navigate('/courses')}
+                    onClick={() => navigate("/courses")}
                     className="bg-primary hover:bg-secondary border-0 rounded-xl px-8 h-12"
                   >
                     Khám phá khóa học
@@ -131,36 +166,12 @@ const ViewCartPage: React.FC = () => {
               {/* Cart Items */}
               <div className="lg:col-span-2">
                 <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                  {/* Select All Header */}
                   <div className="px-6 py-4 border-b bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <Checkbox
-                        checked={isAllSelected}
-                        indeterminate={isIndeterminate}
-                        onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="text-base font-medium"
-                      >
-                        Chọn tất cả ({cartItems.length} khóa học)
-                      </Checkbox>
-                      {selectedIds.length > 0 && (
-                        <motion.button
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="text-red-500 hover:text-red-600 transition-colors flex items-center space-x-1"
-                          onClick={() => {
-                            selectedIds.forEach(id => removeFromCart(id));
-                          }}
-                        >
-                          <DeleteOutlined />
-                          <span>Xóa đã chọn</span>
-                        </motion.button>
-                      )}
-                    </div>
+                    <Title level={5} className="!mb-0">
+                      Danh sách giỏ hàng ({cartItems.length})
+                    </Title>
                   </div>
 
-                  {/* Cart Items List */}
                   <div className="divide-y divide-gray-100">
                     <AnimatePresence>
                       {cartItems.map((item, index) => (
@@ -173,9 +184,20 @@ const ViewCartPage: React.FC = () => {
                         >
                           <CartCard
                             item={item}
-                            checked={selectedIds.includes(item.cartId)}
-                            onSelect={(checked) => handleSelect(item.cartId, checked)}
-                            onDelete={() => removeFromCart(item.cartId)}
+                            checked={isChecked(item.cartId)}
+                            onSelect={(checked) =>
+                              handleSelect(item.cartId, checked)
+                            }
+                            onDelete={
+                              <DeleteCartItem
+                                cartItemId={item.cartId}
+                                onDeleted={() => removeFromCart(item.cartId)}
+                                buttonProps={{
+                                  size: "small",
+                                  type: "text",
+                                }}
+                              />
+                            }
                           />
                         </motion.div>
                       ))}
@@ -193,15 +215,12 @@ const ViewCartPage: React.FC = () => {
                 >
                   <div className="bg-white rounded-2xl shadow-sm p-6 space-y-6">
                     <div className="border-b pb-4">
-                      <h3 className="text-lg font-semibold text-gray-800">Tóm tắt đơn hàng</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        Tóm tắt đơn hàng
+                      </h3>
                     </div>
 
                     <div className="space-y-4">
-                      <div className="flex justify-between text-gray-600">
-                        <span>Số khóa học đã chọn:</span>
-                        <span className="font-medium">{selectedIds.length}</span>
-                      </div>
-
                       <div className="flex justify-between text-gray-600">
                         <span>Tổng số khóa học:</span>
                         <span className="font-medium">{cartItems.length}</span>
@@ -210,16 +229,13 @@ const ViewCartPage: React.FC = () => {
                       <Divider className="my-4" />
 
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-gray-800">Tổng cộng:</span>
+                        <span className="text-lg font-semibold text-gray-800">
+                          Tổng cộng:
+                        </span>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-primary">
                             {formatCurrency(totalPrice)}
                           </div>
-                          {selectedIds.length > 0 && (
-                            <div className="text-sm text-gray-500">
-                              Cho {selectedIds.length} khóa học
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -232,12 +248,12 @@ const ViewCartPage: React.FC = () => {
                         <Button
                           type="primary"
                           size="large"
-                          disabled={selectedIds.length === 0}
+                          disabled={cartItems.length === 0}
                           icon={<CreditCardOutlined />}
+                          onClick={handleCreateOrder}
                           className="w-full h-12 bg-primary hover:bg-secondary border-0 rounded-xl font-semibold text-base"
                         >
                           Thanh toán ngay
-                          {selectedIds.length > 0 && ` (${selectedIds.length})`}
                         </Button>
                       </motion.div>
 
@@ -247,7 +263,7 @@ const ViewCartPage: React.FC = () => {
                       >
                         <Button
                           size="large"
-                          onClick={() => navigate('/courses')}
+                          onClick={() => navigate("/courses")}
                           className="w-full h-12 border-gray-300 rounded-xl font-medium text-base"
                         >
                           Tiếp tục mua sắm
@@ -255,9 +271,10 @@ const ViewCartPage: React.FC = () => {
                       </motion.div>
                     </div>
 
-                    {/* Trust Indicators */}
                     <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                      <div className="text-sm font-medium text-gray-700">Bảo đảm an toàn:</div>
+                      <div className="text-sm font-medium text-gray-700">
+                        Bảo đảm an toàn:
+                      </div>
                       <div className="space-y-1 text-xs text-gray-600">
                         <div>✓ Thanh toán an toàn 100%</div>
                         <div>✓ Hoàn tiền trong 30 ngày</div>

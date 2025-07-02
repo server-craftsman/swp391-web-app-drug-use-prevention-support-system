@@ -23,9 +23,9 @@ const CourseList = () => {
   const fetchCourses = async (page = 1, size = itemsPerPage) => {
     setLoading(true);
     const params: CourseRequest = {
-      PageNumber: page,
-      PageSize: size,
-      FilterByName: searchTerm,
+      pageNumber: page,
+      pageSize: size,
+      filterByName: searchTerm,
     };
     if (selectedCategory) {
       (params as any).CategoryId = selectedCategory;
@@ -58,7 +58,14 @@ const CourseList = () => {
 
     return () => clearTimeout(debounceTimer);
     // eslint-disable-next-line
-  }, [current, pageSize, selectedCategory, priceSort, targetAudience, searchTerm]);
+  }, [
+    current,
+    pageSize,
+    selectedCategory,
+    priceSort,
+    targetAudience,
+    searchTerm,
+  ]);
 
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);

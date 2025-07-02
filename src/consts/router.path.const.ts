@@ -101,5 +101,6 @@ export const ROUTER_URL = {
     APPOINTMENTS: "/appointments",
     FAVORITES: "/favorites",
     SETTINGS: "/settings",
+    PAYMENT: "/payment",
   },
 };
