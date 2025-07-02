@@ -1,3 +1,5 @@
+import type { CartItemStatus } from "../../app/enums/cartItemStatus.enum";
+
 export interface CartItem {
   cartId: string;
   courseId: string;
@@ -5,6 +7,6 @@ export interface CartItem {
   courseImageUrl: string;
   price: number;
   discount: number;
-  status: "Pending" | "Completed" | "Cancelled";
+  status: CartItemStatus;
   createdAt: string;
 }

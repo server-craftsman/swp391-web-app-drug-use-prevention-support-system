@@ -4,3 +4,6 @@ export interface AddToCartRequest {
 export interface ViewCartRequest {
   userId: string;
 }
+export interface DeleteCartItemRequest {
+  cartItemId: string;
+}

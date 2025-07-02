@@ -1,10 +1,14 @@
+import type { CourseStatus } from "../../app/enums/courseStatus.enum";
+import type { Lesson } from "../lesson/Lesson.res.type";
+import type { Session } from "../session/Session.res.type";
+
 export interface Course {
   id: string;
   name: string;
   userId: string;
   categoryId: string;
   content: string;
-  status: string;
+  status: CourseStatus;
   targetAudience: string;
   imageUrls: string[];
   videoUrls: string[];
@@ -27,4 +31,6 @@ export interface CourseListResponse {
 }
 export interface CourseDetailResponse {
   course: Course; // course detail
+  sessionList: Session[];
+  lessonList: Lesson[];
 }

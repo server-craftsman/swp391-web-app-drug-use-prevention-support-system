@@ -8,14 +8,14 @@ const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 
 // Customer routes that require authentication
 export const CustomerRoutes: RouteObject[] = [
-    {
-        path: ROUTER_URL.CUSTOMER.BASE,
-        element: <CustomerLayout />,
-        children: [
-            {
-                path: ROUTER_URL.CUSTOMER.SETTINGS,
-                element: <SettingsPage />,
-            },
-        ],
-    },
-]; 
+  {
+    path: ROUTER_URL.CUSTOMER.BASE,
+    element: <CustomerLayout />,
+    children: [
+      {
+        path: ROUTER_URL.CUSTOMER.SETTINGS,
+        element: <SettingsPage />,
+      },
+    ],
+  },
+];

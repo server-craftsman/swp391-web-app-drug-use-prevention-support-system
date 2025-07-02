@@ -1,8 +1,8 @@
 import React from "react";
-import AdminStaffConsultantManager from "../../../components/admin/user/AdminStaffConsultantManager";
+import AdminStaffConsultantManager from "../../../components/admin/user/staff-consultant/AdminStaffConsultantManager";
 
 const StaffConsultantManagement: React.FC = () => {
-    return <AdminStaffConsultantManager />;
+  return <AdminStaffConsultantManager />;
 };
 
-export default StaffConsultantManagement; 
+export default StaffConsultantManagement;
