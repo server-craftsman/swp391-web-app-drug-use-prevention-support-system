@@ -8,6 +8,7 @@ import CustomPagination from "../../../common/Pagiation.com";
 import CustomSearch from "../../../common/CustomSearch.com"; // ✅ Thêm dòng này
 import AdminCreateStaffForm from "./AdminCreateStaff";
 import AdminDeleteStaff from "./AdminDeleteStaff";
+import AdminViewStaff from "./AdminViewStaff";
 
 const AdminStaffManager = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -15,7 +16,8 @@ const AdminStaffManager = () => {
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
-
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewUserId, setViewUserId] = useState<string | null>(null);
   const [searchKeyword, setSearchKeyword] = useState(""); // ✅ Thêm state tìm kiếm
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -71,7 +73,8 @@ const AdminStaffManager = () => {
   };
 
   const handleView = (record: UserResponse) => {
-    message.info(`Xem chi tiết nhân viên: ${record.lastName}`);
+    setViewUserId(record.id);
+    setViewModalOpen(true);
   };
 
   const handleDelete = (record: UserResponse) => {
@@ -185,6 +188,7 @@ const AdminStaffManager = () => {
           type="primary"
           icon={<PlusOutlined />}
           size="large"
+          className="bg-[#20558A]"
           onClick={() => setCreateModalOpen(true)}
         >
           Thêm nhân viên mới
@@ -237,7 +241,6 @@ const AdminStaffManager = () => {
         onCancel={() => setCreateModalOpen(false)}
         footer={null}
         title="Thêm nhân viên mới"
-        destroyOnClose
         width={700}
       >
         <AdminCreateStaffForm
@@ -247,6 +250,16 @@ const AdminStaffManager = () => {
           }}
         />
       </Modal>
+      {viewUserId && (
+        <AdminViewStaff
+          userId={viewUserId}
+          open={viewModalOpen}
+          onClose={() => {
+            setViewModalOpen(false);
+            setViewUserId(null);
+          }}
+        />
+      )}
     </div>
   );
 };

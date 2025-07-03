@@ -8,6 +8,7 @@ import CustomPagination from "../../../common/Pagiation.com";
 import CustomSearch from "../../../common/CustomSearch.com"; // ✅ Thêm dòng này
 import AdminCreateManagerForm from "./AdminCreateManager";
 import AdminDeleteManager from "./AdminDeleteManager";
+import AdminViewManager from "./AdminViewManager";
 
 const AdminManagerManager = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -21,7 +22,8 @@ const AdminManagerManager = () => {
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
 
   const [createModalOpen, setCreateModalOpen] = useState(false);
-
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewUserId, setViewUserId] = useState<string | null>(null);
   const fetchManagers = async () => {
     setLoading(true);
     try {
@@ -70,9 +72,9 @@ const AdminManagerManager = () => {
   };
 
   const handleView = (record: UserResponse) => {
-    message.info(`Xem chi tiết quản lý: ${record.lastName}`);
+    setViewUserId(record.id); // ✅ Lưu ID
+    setViewModalOpen(true); // ✅ Mở modal
   };
-
   const handleDelete = (record: UserResponse) => {
     setSelectedUser(record);
     setDeleteModalOpen(true);
@@ -184,6 +186,7 @@ const AdminManagerManager = () => {
           type="primary"
           icon={<PlusOutlined />}
           size="large"
+          className="bg-[#20558A]"
           onClick={() => setCreateModalOpen(true)}
         >
           Thêm quản lý viên mới
@@ -246,6 +249,16 @@ const AdminManagerManager = () => {
           }}
         />
       </Modal>
+      {viewUserId && (
+        <AdminViewManager
+          userId={viewUserId}
+          open={viewModalOpen}
+          onClose={() => {
+            setViewModalOpen(false);
+            setViewUserId(null);
+          }}
+        />
+      )}
     </div>
   );
 };

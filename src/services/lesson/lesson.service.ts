@@ -6,6 +6,7 @@ import type {
   DeleteLessonRequest,
   UpdateLessonRequest,
   GetLessonBySessionIdRequest,
+  GetLessonByIdRequest,
 } from "../../types/lesson/Lesson.req.type";
 import type { Lesson } from "../../types/lesson/Lesson.res.type";
 import { API_PATH } from "../../consts/api.path.const";
@@ -38,6 +39,12 @@ export const LessonService = {
   getLessonBySessionId(params: GetLessonBySessionIdRequest) {
     return BaseService.get<ResponseSuccess<Lesson[]>>({
       url: API_PATH.LESSON.GET_LESSON_BY_SESSION_ID(params.SessionId),
+      payload: params,
+    });
+  },
+  getLessonById(params: GetLessonByIdRequest) {
+    return BaseService.get<ResponseSuccess<Lesson>>({
+      url: API_PATH.LESSON.GET_LESSON_BY_ID(params.lessonId),
       payload: params,
     });
   },

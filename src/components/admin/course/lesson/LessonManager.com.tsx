@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Table, Button, Modal, Tooltip, message, Tag, Select } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { Link } from "react-router-dom";
 
@@ -17,7 +22,7 @@ import UpdateLessonForm from "./UpdateLessonForm.com";
 import DeleteLesson from "./DeleteLesson.com";
 import { formatDate } from "../../../../utils/helper";
 import CustomSearch from "../../../common/CustomSearch.com";
-
+import ViewLesson from "./ViewLesson.com";
 const { Option } = Select;
 
 const formatStatusTag = (value: string) => (
@@ -42,7 +47,8 @@ const LessonManager = () => {
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [sessionFilter, setSessionFilter] = useState<string | null>(null); // ✅ Filter session
-
+  const [viewLessonId, setViewLessonId] = useState<string | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
   useEffect(() => {
     const loadAll = async () => {
       try {
@@ -115,7 +121,10 @@ const LessonManager = () => {
     setEditingLesson(lesson);
     setShowUpdateModal(true);
   };
-
+  const openViewModal = (id: string) => {
+    setViewLessonId(id);
+    setShowViewModal(true);
+  };
   const filteredLessons = sessionFilter
     ? lessons.filter((lesson) => lesson.sessionId === sessionFilter)
     : lessons;
@@ -188,6 +197,15 @@ const LessonManager = () => {
               type="default"
               size="small"
               onClick={() => openUpdateModal(record)}
+            />
+          </Tooltip>
+          <Tooltip title="Xem chi tiết">
+            <Button
+              icon={<EyeOutlined />}
+              shape="circle"
+              type="default"
+              size="small"
+              onClick={() => openViewModal(record.id)}
             />
           </Tooltip>
           <Tooltip title="Xóa">
@@ -279,6 +297,13 @@ const LessonManager = () => {
           />
         )}
       </Modal>
+      <ViewLesson
+        lessonId={viewLessonId}
+        open={showViewModal}
+        onClose={() => setShowViewModal(false)}
+        courses={courses}
+        sessions={sessions}
+      />
     </div>
   );
 };

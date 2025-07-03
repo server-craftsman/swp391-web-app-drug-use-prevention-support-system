@@ -32,3 +32,6 @@ export interface DeleteLessonRequest {
 export interface GetLessonBySessionIdRequest {
   SessionId: string;
 }
+export interface GetLessonByIdRequest {
+  lessonId: string;
+}

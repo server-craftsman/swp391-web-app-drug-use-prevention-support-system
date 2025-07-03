@@ -8,6 +8,7 @@ import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import type { UserResponse } from "../../../../types/user/User.res.type";
 import AdminDeleteUser from "./AdminDeleteUser";
 import AdminCreateUserForm from "./AdminCreateUser"; // ✅ Đã thêm sẵn
+import AdminViewUser from "./AdminViewUser";
 
 const AdminUserManager = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -15,7 +16,8 @@ const AdminUserManager = () => {
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
-
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewUserId, setViewUserId] = useState<string | null>(null);
   const [searchKeyword, setSearchKeyword] = useState(""); // ✅ State tìm kiếm
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -70,7 +72,8 @@ const AdminUserManager = () => {
   };
 
   const handleView = (record: UserResponse) => {
-    message.info(`Xem chi tiết khách hàng: ${record.lastName}`);
+    setViewUserId(record.id);
+    setViewModalOpen(true);
   };
 
   const handleDelete = (record: UserResponse) => {
@@ -184,6 +187,7 @@ const AdminUserManager = () => {
           type="primary"
           icon={<PlusOutlined />}
           size="large"
+          className="bg-[#20558A]"
           onClick={() => setCreateModalOpen(true)}
         >
           Thêm khách hàng mới
@@ -236,7 +240,6 @@ const AdminUserManager = () => {
         onCancel={() => setCreateModalOpen(false)}
         footer={null}
         title="Thêm khách hàng mới"
-        destroyOnClose
         width={700}
       >
         <AdminCreateUserForm
@@ -246,6 +249,16 @@ const AdminUserManager = () => {
           }}
         />
       </Modal>
+      {viewUserId && (
+        <AdminViewUser
+          userId={viewUserId}
+          open={viewModalOpen}
+          onClose={() => {
+            setViewModalOpen(false);
+            setViewUserId(null);
+          }}
+        />
+      )}
     </div>
   );
 };

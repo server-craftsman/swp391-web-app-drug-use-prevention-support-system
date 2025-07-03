@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Table, Button, Modal, Tooltip, message, Select } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { Link } from "react-router-dom";
 
@@ -14,7 +19,7 @@ import CreateSessionForm from "./CreateSessionForm.com";
 import UpdateSessionForm from "./UpdateSessionForm.com";
 import DeleteSession from "./DeleteSession.com";
 import CustomSearch from "../../../common/CustomSearch.com";
-
+import ViewSession from "./ViewSession.com";
 const { Option } = Select;
 
 const SessionManager = () => {
@@ -28,7 +33,8 @@ const SessionManager = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [editingSession, setEditingSession] = useState<Session | null>(null);
-
+  const [viewSessionId, setViewSessionId] = useState<string | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
   useEffect(() => {
     const loadAll = async () => {
       try {
@@ -94,7 +100,10 @@ const SessionManager = () => {
     setEditingSession(session);
     setShowUpdateModal(true);
   };
-
+  const openViewModal = (id: string) => {
+    setViewSessionId(id);
+    setShowViewModal(true);
+  };
   // ✅ Filter FE theo courseId
   const filteredSessions = courseFilter
     ? sessions.filter((s) => s.courseId === courseFilter)
@@ -147,6 +156,14 @@ const SessionManager = () => {
               type="default"
               size="small"
               onClick={() => openUpdateModal(record)}
+            />
+          </Tooltip>
+          <Tooltip title="Xem chi tiết">
+            <Button
+              icon={<EyeOutlined />}
+              shape="circle"
+              size="small"
+              onClick={() => openViewModal(record.id)}
             />
           </Tooltip>
           <Tooltip title="Xóa">
@@ -237,6 +254,12 @@ const SessionManager = () => {
           />
         )}
       </Modal>
+      <ViewSession
+        sessionId={viewSessionId}
+        open={showViewModal}
+        onClose={() => setShowViewModal(false)}
+        courses={courses}
+      />
     </div>
   );
 };
