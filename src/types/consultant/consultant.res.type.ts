@@ -11,6 +11,7 @@ export interface Consultant {
   createdAt: string;
   updatedAt: string;
   profilePicUrl: string;
+  phoneNumber: string;
 }
 
 export type ConsultantPageInfo = {
