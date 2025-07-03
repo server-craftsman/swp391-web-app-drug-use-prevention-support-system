@@ -74,6 +74,7 @@ export const API_PATH = {
     DELETE_SESSION: (id: string) => `/session/${id}`,
     GET_SESSION_BY_COURSE_ID: (courseId: string) =>
       `/session/course/${courseId}`,
+    GET_SESSION_BY_ID: (id: string) => `/session/${id}`,
   },
   LESSON: {
     GET_ALL_LESSONS: "/lesson/paged",
@@ -82,6 +83,7 @@ export const API_PATH = {
     DELETE_LESSON: (id: string) => `/lesson/${id}`,
     GET_LESSON_BY_SESSION_ID: (sessionId: string) =>
       `/lesson/session/${sessionId}`,
+    GET_LESSON_BY_ID: (lessonId: string) => `/lesson/${lessonId}`,
   },
   ORDER: {
     GET_ORDERS: "/order/all",

@@ -6,6 +6,7 @@ import type {
   DeleteSessionRequest,
   UpdateSessionRequest,
   GetSessionByCourseIdRequest,
+  GetSessionByIdRequest,
 } from "../../types/session/Session.req.type";
 import type { Session } from "../../types/session/Session.res.type";
 import { API_PATH } from "../../consts/api.path.const";
@@ -38,6 +39,12 @@ export const SessionService = {
   getSessionByCourseId(params: GetSessionByCourseIdRequest) {
     return BaseService.get<ResponseSuccess<Session[]>>({
       url: API_PATH.SESSION.GET_SESSION_BY_COURSE_ID(params.CourseId),
+      payload: params,
+    });
+  },
+  getSessionById(params: GetSessionByIdRequest) {
+    return BaseService.get<ResponseSuccess<Session>>({
+      url: API_PATH.SESSION.GET_SESSION_BY_ID(params.id),
       payload: params,
     });
   },

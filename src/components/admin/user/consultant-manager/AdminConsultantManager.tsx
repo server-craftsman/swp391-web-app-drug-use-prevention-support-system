@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import { Table, Image, message, Button, Space, Tag, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import { ConsultantService } from "../../../../services/consultant/consultant.service";
 import type { Consultant } from "../../../../types/consultant/consultant.res.type";
 import type { ConsultantRequest } from "../../../../types/consultant/consultant.req.type";
@@ -14,12 +9,15 @@ import CustomPagination from "../../../common/Pagiation.com";
 import CustomSearch from "../../../common/CustomSearch.com"; // ✅ thêm component tìm kiếm
 import AdminCreateConsultantForm from "./AdminCreateConsultant";
 import AdminDeleteConsultant from "./AdminDeleteConsultant";
+import AdminViewConsultant from "./AdminViewConsultant";
 
 const AdminConsultantManager = () => {
   const [consultants, setConsultants] = useState<Consultant[]>([]);
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(6);
+  const [viewConsultantId, setViewConsultantId] = useState<string | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [total, setTotal] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState(""); // ✅ tìm kiếm
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -69,11 +67,8 @@ const AdminConsultantManager = () => {
   };
 
   const handleView = (record: Consultant) => {
-    message.info(`Xem chi tiết tư vấn viên: ${record.fullName}`);
-  };
-
-  const handleEdit = (record: Consultant) => {
-    message.info(`Chỉnh sửa tư vấn viên: ${record.fullName}`);
+    setViewConsultantId(record.id);
+    setViewModalOpen(true);
   };
 
   const handleDelete = (record: Consultant) => {
@@ -149,12 +144,6 @@ const AdminConsultantManager = () => {
             onClick={() => handleView(record)}
           />
           <Button
-            type="default"
-            icon={<EditOutlined />}
-            size="small"
-            onClick={() => handleEdit(record)}
-          />
-          <Button
             type="primary"
             danger
             icon={<DeleteOutlined />}
@@ -180,6 +169,7 @@ const AdminConsultantManager = () => {
         <Button
           type="primary"
           size="large"
+          className="bg-[#20558A]"
           icon={<PlusOutlined />}
           onClick={() => setIsModalOpen(true)}
         >
@@ -187,7 +177,6 @@ const AdminConsultantManager = () => {
         </Button>
       </div>
 
-      {/* ✅ Thanh tìm kiếm */}
       <CustomSearch
         placeholder="Tìm kiếm tư vấn viên theo tên"
         onSearch={(keyword) => {
@@ -245,6 +234,16 @@ const AdminConsultantManager = () => {
           fetchConsultants();
         }}
       />
+      {viewConsultantId && (
+        <AdminViewConsultant
+          id={viewConsultantId}
+          open={viewModalOpen}
+          onClose={() => {
+            setViewModalOpen(false);
+            setViewConsultantId(null);
+          }}
+        />
+      )}
     </div>
   );
 };

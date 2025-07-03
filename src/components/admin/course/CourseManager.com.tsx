@@ -12,12 +12,13 @@ import {
   Tag,
   Select,
 } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import CreateCourseForm from "./CreateCourseForm.com";
 import UpdateCourseForm from "./UpdateCourseForm.com";
 import DeleteCourse from "./DeleteCourse.com";
 import CustomPagination from "../../common/Pagiation.com";
 import CustomSearch from "../../common/CustomSearch.com";
+import ViewCourse from "./ViewCourse.com";
 
 const { Option } = Select;
 
@@ -32,7 +33,8 @@ const AdminCourseManager = () => {
   const [total, setTotal] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-
+  const [viewingCourseId, setViewingCourseId] = useState<string | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const fetchCourses = async () => {
     setLoading(true);
     const params: CourseRequest = {
@@ -159,6 +161,18 @@ const AdminCourseManager = () => {
               onClick={() => openUpdateModal(record)}
             />
           </Tooltip>
+          <Tooltip title="Xem chi tiết">
+            <Button
+              icon={<EyeOutlined />}
+              shape="circle"
+              type="default"
+              size="small"
+              onClick={() => {
+                setViewingCourseId(record.id);
+                setViewModalOpen(true);
+              }}
+            />
+          </Tooltip>
           <Tooltip title="Xóa">
             <DeleteCourse
               courseId={record.id}
@@ -256,6 +270,16 @@ const AdminCourseManager = () => {
           />
         )}
       </Modal>
+      {viewingCourseId && (
+        <ViewCourse
+          courseId={viewingCourseId}
+          open={viewModalOpen}
+          onClose={() => {
+            setViewingCourseId(null);
+            setViewModalOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };

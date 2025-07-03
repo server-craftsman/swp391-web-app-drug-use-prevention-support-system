@@ -102,5 +102,7 @@ export const ROUTER_URL = {
     FAVORITES: "/favorites",
     SETTINGS: "/settings",
     PAYMENT: "/payment",
+    PAYMENT_VnPayIpn: "/payment/VnPayIpn",
+    PAYMENT_VnPayReturn: "/payment/VnPayReturn",
   },
 };

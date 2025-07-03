@@ -25,3 +25,6 @@ export interface DeleteSessionRequest {
 export interface GetSessionByCourseIdRequest {
   CourseId: string;
 }
+export interface GetSessionByIdRequest {
+  id: string;
+}
