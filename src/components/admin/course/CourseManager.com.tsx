@@ -110,14 +110,7 @@ const AdminCourseManager = () => {
         <div style={{ maxWidth: 200, fontWeight: 600 }}>{text}</div>
       ),
     },
-    {
-      title: "Giá",
-      dataIndex: "price",
-      key: "price",
-      render: (price: number) => (
-        <div className="text-right">{price?.toLocaleString("vi-VN")}₫</div>
-      ),
-    },
+
     {
       title: "Giảm giá",
       dataIndex: "discount",
@@ -145,6 +138,14 @@ const AdminCourseManager = () => {
         >
           {status?.toUpperCase()}
         </Tag>
+      ),
+    },
+    {
+      title: "Giá",
+      dataIndex: "price",
+      key: "price",
+      render: (price: number) => (
+        <div className="text-right">{price?.toLocaleString("vi-VN")}₫</div>
       ),
     },
     {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Descriptions, Avatar, Spin, message } from "antd";
-import type { UserResponse } from "../../../../types/user/User.res.type";
-import { UserService } from "../../../../services/user/user.service";
+import type { UserResponse } from "../../../types/user/User.res.type";
+import { UserService } from "../../../services/user/user.service";
 
 interface AdminViewUserProps {
   userId: string;

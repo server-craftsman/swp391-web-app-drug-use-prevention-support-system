@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Table, Image, message, Button, Space, Tag, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { UserService } from "../../../../services/user/user.service";
-import CustomPagination from "../../../common/Pagiation.com";
-import CustomSearch from "../../../common/CustomSearch.com"; // ✅ Thêm dòng này
+import { UserService } from "../../../services/user/user.service";
+import CustomPagination from "../../common/Pagiation.com";
+import CustomSearch from "../../common/CustomSearch.com"; // ✅ Thêm dòng này
 import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
-import type { UserResponse } from "../../../../types/user/User.res.type";
+import type { UserResponse } from "../../../types/user/User.res.type";
 import AdminDeleteUser from "./AdminDeleteUser";
 import AdminCreateUserForm from "./AdminCreateUser"; // ✅ Đã thêm sẵn
 import AdminViewUser from "./AdminViewUser";

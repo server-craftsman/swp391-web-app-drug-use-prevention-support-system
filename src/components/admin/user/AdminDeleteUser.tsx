@@ -1,8 +1,8 @@
 import React from "react";
 import { Modal, message } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { UserService } from "../../../../services/user/user.service";
-import type { UserResponse } from "../../../../types/user/User.res.type";
+import { UserService } from "../../../services/user/user.service";
+import type { UserResponse } from "../../../types/user/User.res.type";
 
 interface AdminDeleteUserProps {
   open: boolean;

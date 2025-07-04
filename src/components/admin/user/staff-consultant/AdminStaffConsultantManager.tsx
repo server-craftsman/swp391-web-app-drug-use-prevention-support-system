@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Tabs } from "antd";
 import { UserOutlined, TeamOutlined } from "@ant-design/icons";
-import AdminStaffManager from "../staff-manager/AdminStaffManager";
-import AdminConsultantManager from "../consultant-manager/AdminConsultantManager";
+import AdminStaffManager from "../staff/AdminStaffManager";
+import AdminConsultantManager from "../consultant/AdminConsultantManager";
 
 const AdminStaffConsultantManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState("staff");
