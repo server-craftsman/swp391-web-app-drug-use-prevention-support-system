@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Card, Divider, Button, Typography, Tag, Spin } from "antd";
+import { Divider, Button, Typography, Spin } from "antd";
 import { formatCurrency } from "../../../utils/helper";
 import { motion } from "framer-motion";
 import { OrderService } from "../../../services/order/order.service";
 import type { OrderResponse } from "../../../types/order/Order.res.type";
 import { useCreatePayment } from "../../../hooks/usePayment";
+import { useUpdateOrderStatus } from "../../../hooks/useOrder";
 import { PaymentMethod } from "../../../app/enums/paymentMethod.enum";
+import OrderDetailsList from "./OrderList.com";
+import OrderInfo from "./OderInfo.com";
+import { OrderStatus } from "../../../app/enums/orderStatus.enum";
 
 const PaymentPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { orderId } = location.state || {};
+
   const [order, setOrder] = useState<OrderResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const createPaymentMutation = useCreatePayment(); // ✅ sử dụng hook
+  const createPaymentMutation = useCreatePayment();
+  const updateOrderStatusMutation = useUpdateOrderStatus();
 
   useEffect(() => {
     if (orderId) {
@@ -26,7 +32,7 @@ const PaymentPage: React.FC = () => {
           }
         })
         .catch((err) => {
-          console.error("Lỗi lấy đơn hàng:", err);
+          console.error("❌ Lỗi lấy đơn hàng:", err);
         })
         .finally(() => setLoading(false));
     } else {
@@ -37,17 +43,39 @@ const PaymentPage: React.FC = () => {
   const handleConfirmPayment = () => {
     if (!order) return;
 
-    createPaymentMutation.mutate({
+    createPaymentMutation.mutate(
+      {
+        orderId: order.orderId,
+        userId: order.userId,
+        amount: order.totalAmount,
+        paymentMethod: PaymentMethod.CASH,
+      },
+      {
+        onSuccess: () => {
+          navigate("/payment-result", { state: { isSuccess: true } });
+        },
+      }
+    );
+  };
+
+  const handleCancelPayment = () => {
+    if (!order) return;
+
+    const payload = {
       orderId: order.orderId,
-      userId: order.userId,
-      amount: order.totalAmount,
-      paymentMethod: PaymentMethod.CASH, // hoặc "momo", "credit_card" tùy theo hệ thống của bạn
+      newStatus: OrderStatus.FAIL,
+    };
+
+    updateOrderStatusMutation.mutate(payload, {
+      onSuccess: () => {
+        navigate("/payment-result", { state: { isCancelled: true } });
+      },
     });
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-50 to-blue-100">
         <Spin size="large" />
       </div>
     );
@@ -66,94 +94,56 @@ const PaymentPage: React.FC = () => {
 
   return (
     <motion.div
-      className="max-w-4xl mx-auto mt-6 p-4 bg-white rounded-2xl shadow-md"
-      initial={{ opacity: 0, y: 20 }}
+      className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-2xl shadow-2xl border border-blue-100"
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <Typography.Title level={2}>Thông tin thanh toán</Typography.Title>
+      <Typography.Title
+        level={2}
+        className="text-center text-[#20558A] mb-6 font-bold"
+        style={{ letterSpacing: 1 }}
+      >
+        Xác nhận thanh toán
+      </Typography.Title>
       <Divider />
-
-      <div className="mb-4 space-y-2">
-        <div className="flex justify-between text-gray-700">
-          <span>Mã đơn hàng:</span>
-          <span className="font-medium">{order.orderId}</span>
-        </div>
-        <div className="flex justify-between text-gray-700">
-          <span>Ngày đặt:</span>
-          <span>{new Date(order.orderDate).toLocaleString("vi-VN")}</span>
-        </div>
-        <div className="flex justify-between text-gray-700">
-          <span>Khách hàng:</span>
-          <span>{order.userName}</span>
-        </div>
-        <div className="flex justify-between text-gray-700">
-          <span>Trạng thái đơn hàng:</span>
-          <Tag
-            color={
-              order.orderStatus?.toLowerCase() === "pending"
-                ? "orange"
-                : "green"
-            }
-          >
-            {order.orderStatus || "Đang xử lý"}
-          </Tag>
-        </div>
-        <div className="flex justify-between text-gray-700">
-          <span>Trạng thái thanh toán:</span>
-          <Tag
-            color={
-              order.paymentStatus?.toLowerCase() === "unpaid" ? "red" : "green"
-            }
-          >
-            {order.paymentStatus || "unpaid"}
-          </Tag>
-        </div>
-      </div>
+      <OrderInfo order={order} />
 
       <Divider />
-      <Typography.Title level={4}>Danh sách khóa học</Typography.Title>
-
-      {order.orderDetails?.length ? (
-        <div className="space-y-4">
-          {order.orderDetails.map((item) => (
-            <Card
-              key={item.orderDetailId}
-              className="border border-gray-200 shadow-sm"
-            >
-              <div className="flex justify-between items-center">
-                <Typography.Text strong>{item.courseName}</Typography.Text>
-                <div className="text-right text-primary font-semibold">
-                  {formatCurrency(item.amount)}
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Typography.Text type="secondary">
-          Không có khóa học nào trong đơn hàng này.
-        </Typography.Text>
-      )}
+      <Typography.Title level={4} className="mb-2 text-[#20558A]">
+        Danh sách khóa học
+      </Typography.Title>
+      <OrderDetailsList orderDetails={order.orderDetails} />
 
       <Divider />
-
-      <div className="flex justify-between items-center text-lg font-semibold">
+      <div className="flex justify-between items-center text-lg font-semibold mb-4">
         <span>Tổng thanh toán:</span>
-        <span className="text-green-600">
+        <span className="text-green-600 text-2xl">
           {formatCurrency(order.totalAmount || 0)}
         </span>
       </div>
 
-      <Button
-        type="primary"
-        block
-        size="large"
-        loading={createPaymentMutation.isPending}
-        className="mt-6"
-        onClick={handleConfirmPayment}
-      >
-        Xác nhận đã thanh toán
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-4 mt-6">
+        <Button
+          danger
+          block
+          size="large"
+          loading={updateOrderStatusMutation.isPending}
+          onClick={handleCancelPayment}
+          className="font-semibold"
+        >
+          Huỷ thanh toán
+        </Button>
+        <Button
+          type="primary"
+          block
+          size="large"
+          loading={createPaymentMutation.isPending}
+          onClick={handleConfirmPayment}
+          className="bg-gradient-to-r from-[#20558A] to-blue-500 font-semibold"
+        >
+          Xác nhận đã thanh toán
+        </Button>
+      </div>
     </motion.div>
   );
 };

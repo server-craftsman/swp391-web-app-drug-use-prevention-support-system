@@ -89,8 +89,16 @@ export const API_PATH = {
     GET_ORDERS: "/order/all",
     CREATE_ORDER: "/order/createOrderFromCart",
     GET_ORDER_BY_ID: (orderId: string) => `/order/${orderId}`,
+    CHANGE_ORDER_STATUS: (orderId: string, newStatus: string) =>
+      `/order/status/${orderId}/${newStatus}`,
   },
   PAYMENT: {
     CREATE_PAYMENT: "/payment/createPaymentFromOrder",
+  },
+  REVIEW: {
+    GET_ALL_REVIEWS: "/review",
+    GET_REVIEW_BY_ID: (id: string) => `/review/${id}`,
+    CREATE_REVIEW: "/review/create",
+    DELETE_REVIEW: (id: string) => `/review/${id}`,
   },
 };

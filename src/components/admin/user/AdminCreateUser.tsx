@@ -18,17 +18,17 @@ import {
   LockOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useCreateUser } from "../../../../hooks/useUser";
-import { UserRole } from "../../../../app/enums";
-import { BaseService } from "../../../../app/api/base.service";
-import { LocationService } from "../../../../services/location.service";
+import { useCreateUser } from "../../../hooks/useUser";
+import { UserRole } from "../../../app/enums";
+import { BaseService } from "../../../app/api/base.service";
+import { LocationService } from "../../../services/location.service";
 import type { UploadFile, UploadProps } from "antd/es/upload/interface";
 import type { RcFile } from "antd/es/upload";
 import type {
   Province,
   District,
   Ward,
-} from "../../../../services/location.service";
+} from "../../../services/location.service";
 
 const { Option } = Select;
 

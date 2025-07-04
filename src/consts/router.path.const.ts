@@ -80,6 +80,7 @@ export const ROUTER_URL = {
     SETTINGS: "/customer/settings",
     COURSE: "/customer/courses",
     ASSESSMENT: "/customer/assessment",
+    MY_COURSE: "/customer/my-course",
   },
   COMMON: {
     HOME: "/",
@@ -102,7 +103,6 @@ export const ROUTER_URL = {
     FAVORITES: "/favorites",
     SETTINGS: "/settings",
     PAYMENT: "/payment",
-    PAYMENT_VnPayIpn: "/payment/VnPayIpn",
-    PAYMENT_VnPayReturn: "/payment/VnPayReturn",
+    PAYMENT_RESULT: "/payment-result",
   },
 };
