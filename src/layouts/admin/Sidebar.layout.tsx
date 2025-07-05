@@ -24,6 +24,7 @@ import {
   BulbOutlined,
   CrownOutlined,
   LogoutOutlined,
+  FolderOpenOutlined,
 } from "@ant-design/icons";
 import { Tooltip, Badge, Avatar, Divider } from "antd";
 import { cn } from "../../utils/cn";
@@ -39,16 +40,16 @@ const navSections = [
         to: ROUTER_URL.ADMIN.BASE,
         icon: <DashboardOutlined />,
         badge: null,
-        description: "Tổng quan hệ thống"
+        description: "Tổng quan hệ thống",
       },
       {
         name: "Thống Kê & Báo Cáo",
         to: ROUTER_URL.ADMIN.ANALYTICS,
         icon: <BarChartOutlined />,
         badge: null,
-        description: "Phân tích dữ liệu và báo cáo"
+        description: "Phân tích dữ liệu và báo cáo",
       },
-    ]
+    ],
   },
   {
     title: "Quản Lý Người Dùng",
@@ -58,30 +59,30 @@ const navSections = [
         to: ROUTER_URL.ADMIN.MANAGER_USER,
         icon: <TeamOutlined />,
         badge: "2.8k",
-        description: "Quản lý tất cả tài khoản"
+        description: "Quản lý tất cả tài khoản",
       },
       {
         name: "Quản Lý Viên",
         to: ROUTER_URL.ADMIN.MANAGERS,
         icon: <UserOutlined />,
         badge: "5",
-        description: "Quản lý đội ngũ quản lý"
+        description: "Quản lý đội ngũ quản lý",
       },
       {
         name: "Nhân Viên & Tư Vấn",
         to: ROUTER_URL.ADMIN.STAFF_CONSULTANTS,
         icon: <CrownOutlined />,
         badge: "45",
-        description: "Quản lý đội ngũ chuyên gia"
+        description: "Quản lý đội ngũ chuyên gia",
       },
       {
         name: "Phân Quyền Hệ Thống",
         to: ROUTER_URL.ADMIN.PERMISSIONS,
         icon: <SecurityScanOutlined />,
         badge: null,
-        description: "Cấu hình quyền truy cập"
+        description: "Cấu hình quyền truy cập",
       },
-    ]
+    ],
   },
   {
     title: "Nội Dung & Chương Trình",
@@ -91,30 +92,37 @@ const navSections = [
         to: ROUTER_URL.ADMIN.MANAGER_COURSE,
         icon: <BookOutlined />,
         badge: "23",
-        description: "Khóa học phòng chống ma túy"
+        description: "Khóa học phòng chống ma túy",
+      },
+      {
+        name: "Quản Lý Danh Mục",
+        to: ROUTER_URL.ADMIN.MANAGER_CATEGORY, // <-- Đường dẫn quản lý category
+        icon: <FolderOpenOutlined />, // <-- Icon phù hợp cho category
+        badge: null,
+        description: "Quản lý danh mục khóa học",
       },
       {
         name: "Quản Lý Blog",
         to: ROUTER_URL.ADMIN.MANAGER_BLOG,
         icon: <EditOutlined />,
         badge: "156",
-        description: "Bài viết giáo dục"
+        description: "Bài viết giáo dục",
       },
       {
         name: "Chương Trình Cộng Đồng",
         to: ROUTER_URL.ADMIN.COMMUNITY_PROGRAMS,
         icon: <GlobalOutlined />,
         badge: "12",
-        description: "Hoạt động cộng đồng"
+        description: "Hoạt động cộng đồng",
       },
       {
         name: "Tài Nguyên Hỗ Trợ",
         to: ROUTER_URL.ADMIN.RESOURCES,
         icon: <BulbOutlined />,
         badge: null,
-        description: "Tài liệu và công cụ hỗ trợ"
+        description: "Tài liệu và công cụ hỗ trợ",
       },
-    ]
+    ],
   },
   {
     title: "Đánh Giá & Tư Vấn",
@@ -124,23 +132,23 @@ const navSections = [
         to: ROUTER_URL.ADMIN.ASSESSMENTS,
         icon: <FileTextOutlined />,
         badge: "8",
-        description: "Bộ câu hỏi đánh giá nguy cơ"
+        description: "Bộ câu hỏi đánh giá nguy cơ",
       },
       {
         name: "Lịch Tư Vấn",
         to: ROUTER_URL.ADMIN.CONSULTATIONS,
         icon: <CalendarOutlined />,
         badge: "34",
-        description: "Quản lý lịch hẹn tư vấn"
+        description: "Quản lý lịch hẹn tư vấn",
       },
       {
         name: "Hỗ Trợ Khẩn Cấp",
         to: ROUTER_URL.ADMIN.EMERGENCY_SUPPORT,
         icon: <HeartOutlined />,
         badge: "7",
-        description: "Hỗ trợ khủng hoảng"
+        description: "Hỗ trợ khủng hoảng",
       },
-    ]
+    ],
   },
   {
     title: "Hệ Thống",
@@ -150,31 +158,31 @@ const navSections = [
         to: ROUTER_URL.ADMIN.ALERTS,
         icon: <AlertOutlined />,
         badge: "3",
-        description: "Quản lý cảnh báo hệ thống"
+        description: "Quản lý cảnh báo hệ thống",
       },
       {
         name: "Tin Nhắn & Liên Lạc",
         to: ROUTER_URL.ADMIN.MESSAGES,
         icon: <MessageOutlined />,
         badge: "12",
-        description: "Hệ thống nhắn tin"
+        description: "Hệ thống nhắn tin",
       },
       {
         name: "Bảo Mật & Kiểm Soát",
         to: ROUTER_URL.ADMIN.SECURITY,
         icon: <SafetyOutlined />,
         badge: null,
-        description: "Cấu hình bảo mật"
+        description: "Cấu hình bảo mật",
       },
       {
         name: "Cài Đặt Hệ Thống",
         to: ROUTER_URL.ADMIN.SETTINGS,
         icon: <SettingOutlined />,
         badge: null,
-        description: "Cấu hình chung"
+        description: "Cấu hình chung",
       },
-    ]
-  }
+    ],
+  },
 ];
 
 const SidebarLayout: React.FC = () => {
@@ -188,7 +196,7 @@ const SidebarLayout: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -231,10 +239,12 @@ const SidebarLayout: React.FC = () => {
         </button>
 
         {/* Header */}
-        <div className={cn(
-          "p-6 border-b border-[#20558A]/30 flex items-center relative z-10",
-          collapsed ? "justify-center" : "justify-start"
-        )}>
+        <div
+          className={cn(
+            "p-6 border-b border-[#20558A]/30 flex items-center relative z-10",
+            collapsed ? "justify-center" : "justify-start"
+          )}
+        >
           <NavLink
             to={ROUTER_URL.COMMON.HOME}
             className="flex items-center space-x-3 group"
@@ -292,8 +302,7 @@ const SidebarLayout: React.FC = () => {
 
         {/* Navigation */}
         <div className="flex-1 overflow-hidden flex flex-col">
-          <nav className="flex-1 px-4 py-2 space-y-2 relative z-10 overflow-y-auto overflow-x-hidden custom-scrollbar"
-          >
+          <nav className="flex-1 px-4 py-2 space-y-2 relative z-10 overflow-y-auto overflow-x-hidden custom-scrollbar">
             {navSections.map((section, sectionIndex) => (
               <div key={section.title} className="mb-6">
                 {!collapsed && (
@@ -317,7 +326,7 @@ const SidebarLayout: React.FC = () => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{
                         duration: 0.3,
-                        delay: (sectionIndex * 0.1) + (itemIndex * 0.05)
+                        delay: sectionIndex * 0.1 + itemIndex * 0.05,
                       }}
                       whileHover={{ x: collapsed ? 0 : 5 }}
                     >
@@ -326,7 +335,9 @@ const SidebarLayout: React.FC = () => {
                           title={
                             <div>
                               <div className="font-medium">{item.name}</div>
-                              <div className="text-xs opacity-80">{item.description}</div>
+                              <div className="text-xs opacity-80">
+                                {item.description}
+                              </div>
                             </div>
                           }
                           placement="right"
@@ -366,10 +377,14 @@ const SidebarLayout: React.FC = () => {
                             )
                           }
                         >
-                          <span className="text-lg flex-shrink-0">{item.icon}</span>
+                          <span className="text-lg flex-shrink-0">
+                            {item.icon}
+                          </span>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
-                              <span className="font-medium truncate">{item.name}</span>
+                              <span className="font-medium truncate">
+                                {item.name}
+                              </span>
                               {item.badge && (
                                 <Badge
                                   count={item.badge}
@@ -397,10 +412,12 @@ const SidebarLayout: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className={cn(
-          "p-4 border-t border-[#20558A]/30 relative z-10 flex-shrink-0",
-          collapsed ? "text-center" : ""
-        )}>
+        <div
+          className={cn(
+            "p-4 border-t border-[#20558A]/30 relative z-10 flex-shrink-0",
+            collapsed ? "text-center" : ""
+          )}
+        >
           {!collapsed ? (
             <div className="space-y-3">
               <button

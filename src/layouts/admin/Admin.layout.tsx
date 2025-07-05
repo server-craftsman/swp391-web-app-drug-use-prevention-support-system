@@ -1,7 +1,19 @@
-import React, { useState } from 'react';
-import SidebarLayout from './Sidebar.layout';
-import { Outlet, useLocation } from 'react-router-dom';
-import { Layout, Breadcrumb, Avatar, Dropdown, Badge, Card, Row, Col, Button, Input, Typography } from 'antd';
+import React, { useState } from "react";
+import SidebarLayout from "./Sidebar.layout";
+import { Outlet, useLocation } from "react-router-dom";
+import {
+  Layout,
+  Breadcrumb,
+  Avatar,
+  Dropdown,
+  Badge,
+  Card,
+  Row,
+  Col,
+  Button,
+  Input,
+  Typography,
+} from "antd";
 import {
   BellOutlined,
   SearchOutlined,
@@ -12,12 +24,12 @@ import {
   BookOutlined,
   FileTextOutlined,
   AlertOutlined,
-  ArrowUpOutlined
-} from '@ant-design/icons';
-import { useAuth } from '../../contexts/Auth.context';
-import { motion } from 'framer-motion';
-import { cn } from '../../utils/cn';
-import FooterLayout from '../main/Footer.layout';
+  ArrowUpOutlined,
+} from "@ant-design/icons";
+import { useAuth } from "../../contexts/Auth.context";
+import { motion } from "framer-motion";
+import { cn } from "../../utils/cn";
+import FooterLayout from "../main/Footer.layout";
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
@@ -29,49 +41,69 @@ const AdminLayout: React.FC = () => {
 
   // Mock stats data - in real app, this would come from API
   const quickStats = [
-    { title: 'Tổng Người Dùng', value: 2847, icon: <TeamOutlined className="text-blue-500" />, trend: '+12%' },
-    { title: 'Khóa Học Hoạt Động', value: 23, icon: <BookOutlined className="text-green-500" />, trend: '+3%' },
-    { title: 'Đánh Giá Nguy Cơ', value: 156, icon: <FileTextOutlined className="text-orange-500" />, trend: '+8%' },
-    { title: 'Cảnh Báo Hệ Thống', value: 3, icon: <AlertOutlined className="text-red-500" />, trend: '-2' },
+    {
+      title: "Tổng Người Dùng",
+      value: 2847,
+      icon: <TeamOutlined className="text-blue-500" />,
+      trend: "+12%",
+    },
+    {
+      title: "Khóa Học Hoạt Động",
+      value: 23,
+      icon: <BookOutlined className="text-green-500" />,
+      trend: "+3%",
+    },
+    {
+      title: "Đánh Giá Nguy Cơ",
+      value: 156,
+      icon: <FileTextOutlined className="text-orange-500" />,
+      trend: "+8%",
+    },
+    {
+      title: "Cảnh Báo Hệ Thống",
+      value: 3,
+      icon: <AlertOutlined className="text-red-500" />,
+      trend: "-2",
+    },
   ];
 
   // Generate breadcrumb from current path
   const generateBreadcrumb = () => {
-    const pathSegments = location.pathname.split('/').filter(Boolean);
-    const breadcrumbItems = [
-      { title: 'Trang Chủ', href: '/admin' }
-    ];
+    const pathSegments = location.pathname.split("/").filter(Boolean);
+    const breadcrumbItems = [{ title: "Trang Chủ", href: "/admin" }];
 
     const routeMap: { [key: string]: string } = {
-      'overview': 'Tổng Quan',
-      'users': 'Quản Lý Người Dùng',
-      'manager-user': 'Quản Lý Tài Khoản',
-      'manager-blog': 'Quản Lý Blog',
-      'manager-course': 'Quản Lý Khóa Học',
-      'settings': 'Cài Đặt',
+      overview: "Tổng Quan",
+      users: "Quản Lý Người Dùng",
+      "manager-user": "Quản Lý Tài Khoản",
+      "manager-blog": "Quản Lý Blog",
+      "manager-course": "Quản Lý Khóa Học",
+      "manager-category": "Quản Lý Danh Mục",
+      settings: "Cài Đặt",
       // Analytics & Reporting
-      'analytics': 'Thống Kê & Báo Cáo',
+      analytics: "Thống Kê & Báo Cáo",
       // User Management
-      'staff-consultants': 'Nhân Viên & Tư Vấn',
-      'permissions': 'Phân Quyền Hệ Thống',
+      "staff-consultants": "Nhân Viên & Tư Vấn",
+      permissions: "Phân Quyền Hệ Thống",
       // Content & Programs
-      'community-programs': 'Chương Trình Cộng Đồng',
-      'resources': 'Tài Nguyên Hỗ Trợ',
+      "community-programs": "Chương Trình Cộng Đồng",
+      resources: "Tài Nguyên Hỗ Trợ",
       // Assessment & Counseling
-      'assessments': 'Công Cụ Đánh Giá',
-      'consultations': 'Lịch Tư Vấn',
-      'emergency-support': 'Hỗ Trợ Khẩn Cấp',
+      assessments: "Công Cụ Đánh Giá",
+      consultations: "Lịch Tư Vấn",
+      "emergency-support": "Hỗ Trợ Khẩn Cấp",
       // System
-      'alerts': 'Cảnh Báo & Thông Báo',
-      'messages': 'Tin Nhắn & Liên Lạc',
-      'security': 'Bảo Mật & Kiểm Soát',
+      alerts: "Cảnh Báo & Thông Báo",
+      messages: "Tin Nhắn & Liên Lạc",
+      security: "Bảo Mật & Kiểm Soát",
     };
 
     pathSegments.slice(1).forEach((segment, index) => {
-      const title = routeMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
+      const title =
+        routeMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
       breadcrumbItems.push({
         title,
-        href: '/' + pathSegments.slice(0, index + 2).join('/')
+        href: "/" + pathSegments.slice(0, index + 2).join("/"),
       });
     });
 
@@ -81,7 +113,9 @@ const AdminLayout: React.FC = () => {
   const userMenu = (
     <div className="bg-white rounded-lg shadow-lg border border-gray-100 min-w-[200px] py-2">
       <div className="px-4 py-3 border-b border-gray-100">
-        <p className="font-medium text-gray-900">{userInfo?.firstName} {userInfo?.lastName}</p>
+        <p className="font-medium text-gray-900">
+          {userInfo?.firstName} {userInfo?.lastName}
+        </p>
         <p className="text-sm text-gray-500">Quản trị viên</p>
       </div>
       <div className="py-1">
@@ -109,7 +143,10 @@ const AdminLayout: React.FC = () => {
     <Layout className="min-h-screen bg-gray-50">
       <SidebarLayout />
 
-      <Layout style={{ marginLeft: "320px" }} className="lg:ml-80 md:ml-0 sm:ml-0">
+      <Layout
+        style={{ marginLeft: "320px" }}
+        className="lg:ml-80 md:ml-0 sm:ml-0"
+      >
         {/* Enhanced Header */}
         <Header className="bg-white shadow-sm border-b border-gray-200 px-6 flex items-center justify-between sticky top-0 z-40">
           <div className="flex items-center space-x-4">
@@ -148,7 +185,7 @@ const AdminLayout: React.FC = () => {
             {/* User Menu */}
             <Dropdown
               overlay={userMenu}
-              trigger={['click']}
+              trigger={["click"]}
               placement="bottomRight"
             >
               <div className="flex items-center space-x-2 cursor-pointer p-2 hover:bg-gray-50 rounded-lg">
@@ -181,7 +218,7 @@ const AdminLayout: React.FC = () => {
           </motion.div>
 
           {/* Quick Stats - Only show on dashboard */}
-          {location.pathname === '/admin' && (
+          {location.pathname === "/admin" && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -193,7 +230,7 @@ const AdminLayout: React.FC = () => {
                   <Col xs={24} sm={12} lg={6} key={index}>
                     <Card
                       className="hover:shadow-lg transition-shadow duration-300 border-0 shadow-sm"
-                      bodyStyle={{ padding: '20px' }}
+                      bodyStyle={{ padding: "20px" }}
                     >
                       <div className="flex items-center justify-between">
                         <div>
@@ -203,16 +240,18 @@ const AdminLayout: React.FC = () => {
                           <Title level={3} className="mb-0 text-gray-800">
                             {stat.value.toLocaleString()}
                           </Title>
-                          <Text className={cn(
-                            "text-sm font-medium",
-                            stat.trend.startsWith('+') ? "text-green-600" : "text-red-600"
-                          )}>
+                          <Text
+                            className={cn(
+                              "text-sm font-medium",
+                              stat.trend.startsWith("+")
+                                ? "text-green-600"
+                                : "text-red-600"
+                            )}
+                          >
                             {stat.trend}
                           </Text>
                         </div>
-                        <div className="text-3xl opacity-80">
-                          {stat.icon}
-                        </div>
+                        <div className="text-3xl opacity-80">{stat.icon}</div>
                       </div>
                     </Card>
                   </Col>

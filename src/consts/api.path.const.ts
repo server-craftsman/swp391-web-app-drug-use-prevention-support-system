@@ -4,9 +4,9 @@ export const API_PATH = {
     LOGOUT: "/auth/logout",
     REGISTER: "/auth/register",
     FORGOT_PASSWORD: "/auth/forgot-password",
-    CONFIRM_EMAIL: "/auth/confirm-email",
-    REQUEST_PASSWORD_RESET: "/auth/request-password-reset",
-    RESET_PASSWORD: "/auth/reset-password",
+    CONFIRM_EMAIL: "/auth/confirmEmail",
+    REQUEST_PASSWORD_RESET: "/auth/requestPasswordReset",
+    RESET_PASSWORD: "/auth/resetPassword",
   },
   USER: {
     GET_USERS: "/user",
@@ -29,6 +29,7 @@ export const API_PATH = {
     CREATE_BLOG: "/blog/create",
     DELETE_BLOG: (id: string) => `/blog/${id}`,
     UPDATE_BLOG: (id: string) => `/blog/${id}`,
+    GET_BLOG_BY_ID: (id: string) => `/blog/${id}`,
   },
   APPOINTMENT: {
     CREATE_APPOINTMENT: "/appointment/create",
@@ -43,6 +44,7 @@ export const API_PATH = {
     UPDATE_COURSE: (id: string) => `/course/${id}`,
     DELETE_COURSE: (id: string) => `/course/${id}`,
     GET_COURSE_BY_ID: (id: string) => `/Course/${id}`,
+    GET_MY_COURSES: "/course/myCourses",
   },
   CONSULTANT: {
     GET_ALL_CONSULTANTS: "/consultant",
@@ -54,6 +56,9 @@ export const API_PATH = {
   CATEGORY: {
     GET_ALL_CATEGORIES: "/category",
     CREATE_CATEGORY: "/category/create",
+    UPDATE_CATEGORY: (categoryId: string) => `/category/${categoryId}`,
+    DELETE_CATEGORY: (categoryId: string) => `/category/${categoryId}`,
+    GET_CATEGORY_BY_ID: (categoryId: string) => `/category/${categoryId}`,
   },
   CART: {
     GET_CART: "/cart/myCart",
@@ -100,5 +105,7 @@ export const API_PATH = {
     GET_REVIEW_BY_ID: (id: string) => `/review/${id}`,
     CREATE_REVIEW: "/review/create",
     DELETE_REVIEW: (id: string) => `/review/${id}`,
+    GET_REVIEW_BY_COURSE_ID: (courseId: string) => `/review/course/${courseId}`,
+    GET_REVIEW_BY_USER_ID: (userId: string) => `/review/user/${userId}`,
   },
 };

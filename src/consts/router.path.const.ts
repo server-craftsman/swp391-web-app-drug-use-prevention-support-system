@@ -30,6 +30,7 @@ export const ROUTER_URL = {
     SECURITY: "/admin/security",
     MANAGER_SESSION: "/admin/manager-course",
     MANAGER_LESSON: "/admin/manager-lesson",
+    MANAGER_CATEGORY: "/admin/manager-category",
   },
   CONSULTANT: {
     BASE: "/consultant",

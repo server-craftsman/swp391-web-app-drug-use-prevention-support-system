@@ -1,24 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Row, Col, Spin, Button, Typography } from "antd";
+import { Row, Col, Spin, Button, Typography, message } from "antd";
 import type { CourseDetailResponse } from "../../../types/course/Course.res.type";
 import { CourseService } from "../../../services/course/course.service";
-// import { useQueryClient } from "@tanstack/react-query";
-
+import { ReviewService } from "../../../services/review/review.service";
 // Import detail components
 import CourseHero from "./detail/CourseHero.com.tsx";
 import CourseHighlights from "./detail/CourseHighlights.com.tsx";
 import CourseContent from "./detail/CourseContent.com.tsx";
 import CourseDescription from "./detail/CourseDescription.com.tsx";
 import CourseInstructor from "./detail/CourseInstructor.com.tsx";
-// import CourseReviews from "./detail/CourseReviews.com.tsx";
 import CoursePurchaseCard from "./detail/CoursePurchaseCard.com.tsx";
 import MoreCourses from "./detail/MoreCourses.com.tsx";
-
-// Import hook lấy review
-// import { useCourseReviews } from "../../../hooks/useReview";
-// import CreateReview from "./review/CreateReview.com";
-// import DeleteReview from "./review/DeleteReview.com";
+import CreateReview from "./review/CreateReview.com";
+import DeleteReview from "./review/DeleteReview.com";
 
 const { Title } = Typography;
 
@@ -28,6 +23,23 @@ const CourseDetail: React.FC = () => {
   const [course, setCourse] = useState<CourseDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // State cho review
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+
+  // Lấy userId từ localStorage userInfo
+  let userId = "";
+  const userInfoStr = localStorage.getItem("userInfo");
+  if (userInfoStr) {
+    try {
+      const userInfo = JSON.parse(userInfoStr);
+      userId = userInfo.id || "";
+    } catch {
+      userId = "";
+    }
+  }
+
+  // Lấy course
   useEffect(() => {
     const fetchCourse = async () => {
       setLoading(true);
@@ -49,10 +61,32 @@ const CourseDetail: React.FC = () => {
     fetchCourse();
   }, [courseId]);
 
-  // // Lấy review theo courseId (nếu đã có course)
-  // const { data: reviews = [], isLoading: loadingReviews } = useCourseReviews(
-  //   course?.id
-  // );
+  // Lấy review theo courseId
+  const fetchReviews = async () => {
+    if (!courseId) return;
+    setLoadingReviews(true);
+    try {
+      const res = await ReviewService.getReviewByCourseId({ courseId });
+      setReviews(res.data?.data || []);
+    } catch (err) {
+      message.error("Không thể tải đánh giá!");
+      setReviews([]);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  useEffect(() => {
+    if (courseId) {
+      fetchReviews();
+    }
+    // eslint-disable-next-line
+  }, [courseId]);
+
+  // Hàm refetch review sau khi thêm/xóa
+  const handleReviewChanged = () => {
+    fetchReviews();
+  };
 
   // Loading state
   if (loading) {
@@ -102,20 +136,8 @@ const CourseDetail: React.FC = () => {
         })) || [],
     })) || [];
 
-  // Instructor info (giả sử có trường fullName và instructorTitle)
   const instructorName = course.name || "Giảng viên";
   const instructorTitle = course.name || "Giảng viên khóa học";
-
-  // Lấy userId từ localStorage userInfo (không dùng regex)
-  // const userInfoStr = localStorage.getItem("userInfo");
-  // if (userInfoStr) {
-  //   try {
-  //     const userInfo = JSON.parse(userInfoStr);
-  //     userId = userInfo.id || "";
-  //   } catch {
-  //     userId = "";
-  //   }
-  // }
 
   return (
     <div className="min-h-screen ">
@@ -142,26 +164,20 @@ const CourseDetail: React.FC = () => {
                 instructorName={instructorName}
                 instructorTitle={instructorTitle}
               />
-              {/* {/* Reviews Section */}
-              {/*   <div>
+
+              {/* Reviews Section */}
+              <div>
                 <Typography.Title level={4}>Đánh giá khóa học</Typography.Title>
-                {/* Nếu chưa đăng nhập, báo lỗi */}
-              {/*{!userId && (
+                {!userId && (
                   <div className="text-red-500 mb-4">
                     Bạn cần đăng nhập để đánh giá.
                   </div>
                 )}
-                {/* Nếu đã đăng nhập, hiển thị form đánh giá */}
-              {/* {userId && (
+                {userId && (
                   <CreateReview
                     courseId={course.id}
                     userId={userId}
-                    onSuccess={() => {
-                      // Refetch lại review sau khi tạo mới
-                      queryClient.invalidateQueries({
-                        queryKey: ["reviews", course.id],
-                      });
-                    }}
+                    onSuccess={handleReviewChanged}
                   />
                 )}
                 <div className="mt-6">
@@ -185,21 +201,17 @@ const CourseDetail: React.FC = () => {
                             {new Date(review.createdAt).toLocaleString()}
                           </div>
                         </div>
-                        {/* Chỉ cho phép xóa nếu là review của user hiện tại */}
-              {/*     {review.userId === userId && (
+                        {review.userId === userId && (
                           <DeleteReview
                             reviewId={review.id}
-                            onDeleted={() => {
-                              // Refetch lại review sau khi xóa
-                              // Nếu dùng react-query thì gọi queryClient.invalidateQueries(["reviews", course.id])
-                            }}
+                            onDeleted={handleReviewChanged}
                           />
                         )}
                       </div>
                     ))
                   )}
                 </div>
-              </div> */}
+              </div>
 
               {/* More Courses Section */}
               <MoreCourses instructorName={instructorName} />

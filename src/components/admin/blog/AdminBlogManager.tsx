@@ -3,7 +3,7 @@ import { BlogService } from "../../../services/blog/blog.service";
 import type { BlogRequest } from "../../../types/blog/Blog.req.type";
 import type { Blog } from "../../../types/blog/Blog.res.type";
 import { Table, Button, message, Image, Modal, Tooltip } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import CreateBlogForm from "./CreateBlog.com";
 import DeleteBlog from "./DeleteBlog.com";
 import UpdateBlogForm from "./UpdateBlog.com";
@@ -22,12 +22,17 @@ const AdminBlogManager = () => {
   const [total, setTotal] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
 
+  // Thêm state cho View
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewingBlog, setViewingBlog] = useState<Blog | null>(null);
+  const [viewLoading, setViewLoading] = useState(false);
+
   const fetchBlogs = async () => {
     setLoading(true);
     const params: BlogRequest = {
       pageNumber: current,
       pageSize: pageSize,
-      filterByContent: searchKeyword, // gửi từ khóa tìm kiếm theo name
+      filterByContent: searchKeyword,
     };
     try {
       const res = await BlogService.getAllBlogs(params);
@@ -59,6 +64,21 @@ const AdminBlogManager = () => {
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);
     setPageSize(size);
+  };
+
+  // Hàm view blog
+  const handleViewBlog = async (id: string) => {
+    setShowViewModal(true);
+    setViewLoading(true);
+    try {
+      const res = await BlogService.getBlogById({ id });
+      setViewingBlog(res.data?.data || null);
+    } catch {
+      setViewingBlog(null);
+      message.error("Không thể tải chi tiết blog!");
+    } finally {
+      setViewLoading(false);
+    }
   };
 
   const columns = [
@@ -115,6 +135,15 @@ const AdminBlogManager = () => {
         <div className="flex gap-2">
           {!record.isDeleted && (
             <>
+              <Tooltip title="Xem chi tiết">
+                <Button
+                  icon={<EyeOutlined />}
+                  shape="circle"
+                  type="default"
+                  size="small"
+                  onClick={() => handleViewBlog(record.id)}
+                />
+              </Tooltip>
               <Tooltip title="Cập nhật">
                 <Button
                   icon={<EditOutlined />}
@@ -204,6 +233,61 @@ const AdminBlogManager = () => {
       >
         {selectedBlog && (
           <UpdateBlogForm blog={selectedBlog} onSuccess={handleBlogUpdated} />
+        )}
+      </Modal>
+
+      {/* Modal xem chi tiết */}
+      <Modal
+        open={showViewModal}
+        onCancel={() => setShowViewModal(false)}
+        footer={null}
+        title="Chi tiết blog"
+        width={600}
+      >
+        {viewLoading ? (
+          <div>Đang tải...</div>
+        ) : viewingBlog ? (
+          <div className="space-y-4">
+            <div>
+              <strong>Nội dung:</strong>
+              <div style={{ whiteSpace: "pre-line" }}>
+                {viewingBlog.content}
+              </div>
+            </div>
+            <div>
+              <strong>Ảnh:</strong>
+              <div>
+                {viewingBlog.blogImgUrl ? (
+                  <Image
+                    src={viewingBlog.blogImgUrl}
+                    alt="blog"
+                    width={120}
+                    height={90}
+                    style={{ objectFit: "cover" }}
+                  />
+                ) : (
+                  <span>Không có ảnh</span>
+                )}
+              </div>
+            </div>
+            <div>
+              <strong>Người đăng:</strong>
+              <div className="flex items-center gap-2">
+                <img
+                  src={viewingBlog.userAvatar || "/no-avatar.png"}
+                  alt={viewingBlog.fullName || "Không rõ"}
+                  className="w-8 h-8 rounded-full object-cover border"
+                />
+                <span>{viewingBlog.fullName || "Không rõ"}</span>
+              </div>
+            </div>
+            <div>
+              <strong>Ngày tạo:</strong>
+              <div>{helpers.formatDate(new Date(viewingBlog.createdAt))}</div>
+            </div>
+          </div>
+        ) : (
+          <div>Không tìm thấy blog.</div>
         )}
       </Modal>
     </div>
