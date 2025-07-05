@@ -10,6 +10,7 @@ interface Lecture {
   duration: string;
   preview: boolean;
   completed: boolean;
+  imageUrl?: string;
 }
 
 interface CourseSection {
@@ -25,12 +26,17 @@ interface CourseContentProps {
 }
 
 const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
-  const totalLessons = content.reduce((acc, section) => acc + section.lessons, 0);
+  const totalLessons = content.reduce(
+    (acc, section) => acc + section.lessons,
+    0
+  );
 
   return (
     <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-        <Title level={3} className="text-gray-900 mb-0">Nội dung khóa học</Title>
+        <Title level={3} className="text-gray-900 mb-0">
+          Nội dung khóa học
+        </Title>
         <div className="text-gray-600 text-sm">
           <Text className="mr-4">
             {content.length} phần • {totalLessons} bài giảng • 4 giờ 57 phút
@@ -41,19 +47,16 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
         </div>
       </div>
 
-      <Collapse 
+      <Collapse
         ghost
         expandIconPosition="end"
         expandIcon={({ isActive }) => (
-          <DownOutlined 
-            rotate={isActive ? 180 : 0} 
-            className="text-gray-500"
-          />
+          <DownOutlined rotate={isActive ? 180 : 0} className="text-gray-500" />
         )}
       >
         {content.map((section, index) => (
-          <Panel 
-            key={index} 
+          <Panel
+            key={index}
             header={
               <div className="flex items-center justify-between w-full pr-4">
                 <Text className="font-semibold text-gray-900">
@@ -69,17 +72,43 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
             {section.lectures && section.lectures.length > 0 ? (
               <div className="space-y-1 pb-4">
                 {section.lectures.map((lecture, lectureIndex) => (
-                  <div key={lectureIndex} className="flex items-center justify-between py-2 px-4 hover:bg-gray-50 rounded transition-colors">
+                  <div
+                    key={lectureIndex}
+                    className="flex items-center justify-between py-2 px-4 hover:bg-gray-50 rounded transition-colors"
+                  >
                     <div className="flex items-center space-x-3">
                       <PlayCircleOutlined className="text-gray-500 text-sm" />
-                      <Text className="text-gray-700 text-sm">{lecture.title}</Text>
+                      <Text className="text-gray-700 text-sm">
+                        {lecture.title}
+                      </Text>
                       {lecture.preview && (
-                        <Button type="link" size="small" className="text-purple-600 p-0 h-auto text-xs">
+                        <Button
+                          type="link"
+                          size="small"
+                          className="text-purple-600 p-0 h-auto text-xs"
+                        >
                           Xem trước
                         </Button>
                       )}
+                      {/* Hiển thị ảnh nếu có */}
+                      {lecture.imageUrl && lecture.imageUrl !== "" && (
+                        <img
+                          src={lecture.imageUrl}
+                          alt={lecture.title}
+                          style={{
+                            maxWidth: 80,
+                            maxHeight: 80,
+                            marginLeft: 8,
+                            borderRadius: 6,
+                            border: "1px solid #eee",
+                            objectFit: "cover",
+                          }}
+                        />
+                      )}
                     </div>
-                    <Text className="text-gray-600 text-sm">{lecture.duration}</Text>
+                    <Text className="text-gray-600 text-sm">
+                      {lecture.duration}
+                    </Text>
                   </div>
                 ))}
               </div>
@@ -95,4 +124,4 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
   );
 };
 
-export default CourseContent; 
+export default CourseContent;

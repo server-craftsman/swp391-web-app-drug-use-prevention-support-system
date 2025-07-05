@@ -40,7 +40,10 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
     const fetchCategories = async () => {
       setCatLoading(true);
       try {
-        const res = await CategoryService.getAllCategories();
+        const res = await CategoryService.getAllCategories({
+          pageNumber: 1,
+          pageSize: 100,
+        });
         setCategories(res.data?.data || []);
       } catch {
         message.error("Không thể tải danh mục!");
