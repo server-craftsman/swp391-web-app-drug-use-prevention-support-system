@@ -15,6 +15,7 @@ export const API_PATH = {
     CHANGE_PASSWORD: "/user/password/change",
     GET_USER_BY_ID: (id: string) => `/user/${id}`,
     DELETE_USER: (id: string) => `/user/${id}`,
+    CREATE_USER: "/user/create",
   },
   PRODUCT: {
     GET_ALL_PRODUCTS: "/products",
@@ -47,7 +48,7 @@ export const API_PATH = {
     GET_ALL_CONSULTANTS: "/consultant",
     CREATE_CONSULTANT: "/consultant/create",
     UPDATE_CONSULTANT: (id: string) => `/consultant/update/${id}`,
-    DELETE_CONSULTANT: (id: string) => `/consultant/delete/${id}`,
+    DELETE_CONSULTANT: (id: string) => `/consultant/${id}`,
     GET_CONSULTANT_BY_ID: (id: string) => `/consultant/${id}`,
   },
   CATEGORY: {
@@ -57,6 +58,7 @@ export const API_PATH = {
   CART: {
     GET_CART: "/cart/myCart",
     ADD_CART_ITEM: "/cart/addCourse",
+    DELETE_CART_ITEM: (cartItemId: string) => `/cart/remove/${cartItemId}`,
   },
   PROGRAM: {
     GET_ALL_PROGRAMS: "/program",
@@ -64,21 +66,39 @@ export const API_PATH = {
     UPDATE_PROGRAM: (id: string) => `/program/${id}`,
     DELETE_PROGRAM: (id: string) => `/program/${id}`,
     GET_PROGRAM_BY_ID: (id: string) => `/program/${id}`,
-    SESSION: {
-      GET_ALL_SESSIONS: "/session/all",
-      CREATE_SESSION: "/session",
-      UPDATE_SESSION: (id: string) => `/session/${id}`,
-      DELETE_SESSION: (id: string) => `/session/${id}`,
-      GET_SESSION_BY_COURSE_ID: (courseId: string) =>
-        `/session/course/${courseId}`,
-    },
-    LESSON: {
-      GET_ALL_LESSONS: "/lesson/paged",
-      CREATE_LESSON: "/lesson",
-      UPDATE_LESSON: (id: string) => `/lesson/${id}`,
-      DELETE_LESSON: (id: string) => `/lesson/${id}`,
-      GET_LESSON_BY_SESSION_ID: (sessionId: string) =>
-        `/lesson/session/${sessionId}`,
-    },
+  },
+  SESSION: {
+    GET_ALL_SESSIONS: "/session/all",
+    CREATE_SESSION: "/session",
+    UPDATE_SESSION: (id: string) => `/session/${id}`,
+    DELETE_SESSION: (id: string) => `/session/${id}`,
+    GET_SESSION_BY_COURSE_ID: (courseId: string) =>
+      `/session/course/${courseId}`,
+    GET_SESSION_BY_ID: (id: string) => `/session/${id}`,
+  },
+  LESSON: {
+    GET_ALL_LESSONS: "/lesson/paged",
+    CREATE_LESSON: "/lesson",
+    UPDATE_LESSON: (id: string) => `/lesson/${id}`,
+    DELETE_LESSON: (id: string) => `/lesson/${id}`,
+    GET_LESSON_BY_SESSION_ID: (sessionId: string) =>
+      `/lesson/session/${sessionId}`,
+    GET_LESSON_BY_ID: (lessonId: string) => `/lesson/${lessonId}`,
+  },
+  ORDER: {
+    GET_ORDERS: "/order/all",
+    CREATE_ORDER: "/order/createOrderFromCart",
+    GET_ORDER_BY_ID: (orderId: string) => `/order/${orderId}`,
+    CHANGE_ORDER_STATUS: (orderId: string, newStatus: string) =>
+      `/order/status/${orderId}/${newStatus}`,
+  },
+  PAYMENT: {
+    CREATE_PAYMENT: "/payment/createPaymentFromOrder",
+  },
+  REVIEW: {
+    GET_ALL_REVIEWS: "/review",
+    GET_REVIEW_BY_ID: (id: string) => `/review/${id}`,
+    CREATE_REVIEW: "/review/create",
+    DELETE_REVIEW: (id: string) => `/review/${id}`,
   },
 };

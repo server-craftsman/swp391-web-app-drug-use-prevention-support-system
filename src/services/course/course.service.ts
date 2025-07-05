@@ -8,7 +8,10 @@ import type {
   DeleteCourseRequest,
   CourseDetailRequest,
 } from "../../types/course/Course.req.type";
-import type { Course } from "../../types/course/Course.res.type";
+import type {
+  Course,
+  CourseDetailResponse,
+} from "../../types/course/Course.res.type";
 
 export const CourseService = {
   getAllCourses(params: CourseRequest) {
@@ -36,7 +39,7 @@ export const CourseService = {
     });
   },
   getCourseById(param: CourseDetailRequest) {
-    return BaseService.get<ResponseSuccess<Course>>({
+    return BaseService.get<ResponseSuccess<CourseDetailResponse>>({
       url: API_PATH.COURSE.GET_COURSE_BY_ID(param.id),
       payload: param,
     });

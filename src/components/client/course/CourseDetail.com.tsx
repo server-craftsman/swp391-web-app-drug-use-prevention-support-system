@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Row, Col, Spin, Button, Typography } from "antd";
-import type { Course } from "../../../types/course/Course.res.type";
+import type { CourseDetailResponse } from "../../../types/course/Course.res.type";
 import { CourseService } from "../../../services/course/course.service";
+// import { useQueryClient } from "@tanstack/react-query";
 
 // Import detail components
 import CourseHero from "./detail/CourseHero.com.tsx";
@@ -10,16 +11,21 @@ import CourseHighlights from "./detail/CourseHighlights.com.tsx";
 import CourseContent from "./detail/CourseContent.com.tsx";
 import CourseDescription from "./detail/CourseDescription.com.tsx";
 import CourseInstructor from "./detail/CourseInstructor.com.tsx";
-import CourseReviews from "./detail/CourseReviews.com.tsx";
+// import CourseReviews from "./detail/CourseReviews.com.tsx";
 import CoursePurchaseCard from "./detail/CoursePurchaseCard.com.tsx";
 import MoreCourses from "./detail/MoreCourses.com.tsx";
+
+// Import hook lấy review
+// import { useCourseReviews } from "../../../hooks/useReview";
+// import CreateReview from "./review/CreateReview.com";
+// import DeleteReview from "./review/DeleteReview.com";
 
 const { Title } = Typography;
 
 const CourseDetail: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
-  const [course, setCourse] = useState<Course | null>(null);
+  const [course, setCourse] = useState<CourseDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,7 +35,7 @@ const CourseDetail: React.FC = () => {
         if (courseId) {
           const res = await CourseService.getCourseById({ id: courseId });
           if (res.data && res.data.success && res.data.data) {
-            setCourse(res.data.data);
+            setCourse(res.data.data as CourseDetailResponse);
           } else {
             setCourse(null);
           }
@@ -42,6 +48,11 @@ const CourseDetail: React.FC = () => {
     };
     fetchCourse();
   }, [courseId]);
+
+  // // Lấy review theo courseId (nếu đã có course)
+  // const { data: reviews = [], isLoading: loadingReviews } = useCourseReviews(
+  //   course?.id
+  // );
 
   // Loading state
   if (loading) {
@@ -64,131 +75,47 @@ const CourseDetail: React.FC = () => {
     );
   }
 
-  // Sample data for components
+  // Highlights từ data thật
   const courseHighlights = [
-    "12 giờ video theo yêu cầu",
-    "45 tài liệu có thể tải xuống", 
+    `${course.videoUrls?.length || 0} video`,
+    `${course.imageUrls?.length || 0} tài liệu`,
     "Truy cập trên thiết bị di động và TV",
     "Quyền truy cập đầy đủ suốt đời",
-    "Giấy chứng nhận hoàn thành"
+    "Giấy chứng nhận hoàn thành",
   ];
 
-  const courseContent = [
-    {
-      title: "Chào mừng đến với khóa học Automation với n8n",
-      duration: "1 phút",
-      lessons: 1,
-      expanded: true,
-      lectures: [
-        {
-          title: "Giới thiệu về khóa học",
-          duration: "00:36",
-          preview: true,
-          completed: false
-        }
-      ]
-    },
-    {
-      title: "Giới thiệu về Automation, AI và n8n",
-      duration: "21 phút",
-      lessons: 6,
+  // Content từ sessionList
+  const courseContent =
+    course.sessionList?.map((session) => ({
+      title: session.name,
+      duration: "",
+      lessons: session.lessonList?.length || 0,
       expanded: false,
-      lectures: [
-        {
-          title: "Chào mừng đến với Chương 1",
-          duration: "00:33",
-          preview: true,
-          completed: false
-        },
-        {
-          title: "Tìm hiểu về Automation",
-          duration: "06:09",
-          preview: true,
-          completed: false
-        },
-        {
-          title: "Tìm hiểu về AI và kết hợp AI với Automation",
-          duration: "04:18",
-          preview: true,
-          completed: false
-        },
-        {
-          title: "Giới thiệu về Low-Code, No-Code",
-          duration: "04:05",
-          preview: true,
-          completed: false
-        },
-        {
-          title: "Giới thiệu sơ bộ về n8n",
-          duration: "05:48",
-          preview: true,
-          completed: false
-        },
-        {
-          title: "Tổng kết Chương 1",
-          duration: "00:22",
+      lectures:
+        session.lessonList?.map((lesson) => ({
+          title: lesson.name,
+          duration: lesson.fullTime ? `${lesson.fullTime} phút` : "",
           preview: false,
-          completed: false
-        }
-      ]
-    },
-    {
-      title: "Tạo tài khoản, cài đặt n8n",
-      duration: "38 phút",
-      lessons: 9,
-      expanded: false,
-      lectures: []
-    },
-    {
-      title: "Các loại Nodes trong n8n",
-      duration: "41 phút", 
-      lessons: 10,
-      expanded: false,
-      lectures: []
-    },
-    {
-      title: "Credentials in n8n",
-      duration: "34 phút",
-      lessons: 7,
-      expanded: false,
-      lectures: []
-    },
-    {
-      title: "Hands on #1",
-      duration: "58 phút",
-      lessons: 6,
-      expanded: false,
-      lectures: []
-    },
-    {
-      title: "Các công cụ phụ trợ cho n8n",
-      duration: "25 phút",
-      lessons: 5,
-      expanded: false,
-      lectures: []
-    },
-    {
-      title: "Các nodes liên quan đến AI",
-      duration: "39 phút",
-      lessons: 7,
-      expanded: false,
-      lectures: []
-    },
-    {
-      title: "Hands on #2",
-      duration: "40 phút",
-      lessons: 5,
-      expanded: false,
-      lectures: []
-    },
-    {
-      title: "Tổng kết khóa học",
-      duration: "1 phút",
-      lessons: 2,
-      expanded: false,
-      lectures: []
-    }
-  ];
+          completed: false,
+          imageUrl: lesson.imageUrl || undefined,
+          videoUrl: lesson.videoUrl || undefined,
+        })) || [],
+    })) || [];
+
+  // Instructor info (giả sử có trường fullName và instructorTitle)
+  const instructorName = course.name || "Giảng viên";
+  const instructorTitle = course.name || "Giảng viên khóa học";
+
+  // Lấy userId từ localStorage userInfo (không dùng regex)
+  // const userInfoStr = localStorage.getItem("userInfo");
+  // if (userInfoStr) {
+  //   try {
+  //     const userInfo = JSON.parse(userInfoStr);
+  //     userId = userInfo.id || "";
+  //   } catch {
+  //     userId = "";
+  //   }
+  // }
 
   return (
     <div className="min-h-screen ">
@@ -211,16 +138,71 @@ const CourseDetail: React.FC = () => {
               <CourseDescription course={course} />
 
               {/* Instructor Section */}
-              <CourseInstructor 
-                instructorName="Huy Nguyen"
-                instructorTitle="Founder at M&A.vn"
+              <CourseInstructor
+                instructorName={instructorName}
+                instructorTitle={instructorTitle}
               />
-
-              {/* Reviews Section */}
-              <CourseReviews />
+              {/* {/* Reviews Section */}
+              {/*   <div>
+                <Typography.Title level={4}>Đánh giá khóa học</Typography.Title>
+                {/* Nếu chưa đăng nhập, báo lỗi */}
+              {/*{!userId && (
+                  <div className="text-red-500 mb-4">
+                    Bạn cần đăng nhập để đánh giá.
+                  </div>
+                )}
+                {/* Nếu đã đăng nhập, hiển thị form đánh giá */}
+              {/* {userId && (
+                  <CreateReview
+                    courseId={course.id}
+                    userId={userId}
+                    onSuccess={() => {
+                      // Refetch lại review sau khi tạo mới
+                      queryClient.invalidateQueries({
+                        queryKey: ["reviews", course.id],
+                      });
+                    }}
+                  />
+                )}
+                <div className="mt-6">
+                  {loadingReviews ? (
+                    <Spin />
+                  ) : reviews.length === 0 ? (
+                    <div>Chưa có đánh giá nào cho khóa học này.</div>
+                  ) : (
+                    reviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="mb-4 border-b pb-2 flex items-center justify-between"
+                      >
+                        <div>
+                          <div className="font-semibold">
+                            Người dùng: {review.userId}
+                          </div>
+                          <div>Đánh giá: {review.rating} ⭐</div>
+                          <div>{review.comment}</div>
+                          <div className="text-xs text-gray-400">
+                            {new Date(review.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                        {/* Chỉ cho phép xóa nếu là review của user hiện tại */}
+              {/*     {review.userId === userId && (
+                          <DeleteReview
+                            reviewId={review.id}
+                            onDeleted={() => {
+                              // Refetch lại review sau khi xóa
+                              // Nếu dùng react-query thì gọi queryClient.invalidateQueries(["reviews", course.id])
+                            }}
+                          />
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div> */}
 
               {/* More Courses Section */}
-              <MoreCourses instructorName="Huy Nguyen" />
+              <MoreCourses instructorName={instructorName} />
             </div>
           </Col>
 
