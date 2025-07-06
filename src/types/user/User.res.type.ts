@@ -19,6 +19,7 @@ export interface UserResponse {
   profilePicUrl: string;
   createdAt: Date;
   updatedAt: Date;
+  fullName: string;
 }
 export interface UserPageInfo {
   pageNum: number;

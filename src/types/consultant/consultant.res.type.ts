@@ -1,15 +1,30 @@
 export interface Consultant {
-  id: number;
-  name: string;
+  id: string;
+  userId: string;
+  fullName: string;
+  qualifications: string[];
+  jobTitle: string;
+  hireDate: string;
+  salary: number;
+  status: string;
   email: string;
-  phone: string;
-  profilePicUrl: string;
-  description: string;
   createdAt: string;
   updatedAt: string;
+  profilePicUrl: string;
+  phoneNumber: string;
 }
 
-export type ConsultantListResponse = Consultant[];
+export type ConsultantPageInfo = {
+  pageNum: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+};
+
+export interface ConsultantListResponse {
+  pageData: Consultant[];
+  pageInfo: ConsultantPageInfo;
+}
 
 export interface ConsultantDetailResponse {
   consultant: Consultant;

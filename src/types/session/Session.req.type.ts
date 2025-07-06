@@ -1,7 +1,7 @@
 export interface SessionRequest {
-  PageNumber: number;
-  PageSize: number;
-  FilterByName?: string;
+  pageNumber: number;
+  pageSize: number;
+  name?: string;
 }
 export interface CreateSessionRequest {
   courseId: string;
@@ -24,4 +24,7 @@ export interface DeleteSessionRequest {
 }
 export interface GetSessionByCourseIdRequest {
   CourseId: string;
+}
+export interface GetSessionByIdRequest {
+  id: string;
 }
