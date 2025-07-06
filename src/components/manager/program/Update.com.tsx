@@ -237,7 +237,16 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
                         <Upload beforeUpload={beforeUploadVideo} showUploadList={false} accept="video/*">
                             <Button icon={<VideoCameraAddOutlined />} loading={uploadingVideo}> Tải lên video </Button>
                         </Upload>
-                        {vidUrl && <video src={vidUrl} controls className="mt-2 w-40 h-28 object-cover" />}
+                        {vidUrl && (
+                            <video
+                                controls
+                                className="mt-2 w-60 h-36 object-cover"
+                                playsInline
+                                crossOrigin="anonymous"
+                            >
+                                <source src={vidUrl} />
+                            </video>
+                        )}
                     </Form.Item>
                     <Form.Item label="Ảnh chương trình" valuePropName="fileList">
                         <Upload beforeUpload={beforeUpload} showUploadList={false}>
