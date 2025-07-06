@@ -32,11 +32,13 @@ export const API_PATH = {
     GET_BLOG_BY_ID: (id: string) => `/blog/${id}`,
   },
   APPOINTMENT: {
-    CREATE_APPOINTMENT: "/appointment/create",
-    GET_APPOINTMENTS: "/appointment",
-    GET_APPOINTMENT_BY_ID: (id: string) => `/appointment/${id}`,
-    UPDATE_APPOINTMENT: (id: string) => `/appointment/update/${id}`,
-    DELETE_APPOINTMENT: (id: string) => `/appointment/delete/${id}`,
+    CREATE_APPOINTMENT: "/appointments/book",
+    SEARCH_APPOINTMENT: "/appointments/search",
+    CHANGE_STATUS: (appointmentId: string, newStatus: string) =>
+      `/appointments/status?appointmentId=${appointmentId}&newStatus=${newStatus}`,
+    ASSIGN_CONSULTANT: "/appointments/assign",
+    CANCEL_APPOINTMENT: (appointmentId: string) =>
+      `/appointments/cancel/${appointmentId}`,
   },
   COURSE: {
     GET_ALL_COURSES: "/Course",
@@ -65,30 +67,31 @@ export const API_PATH = {
     ADD_CART_ITEM: "/cart/addCourse",
     DELETE_CART_ITEM: (cartItemId: string) => `/cart/remove/${cartItemId}`,
   },
+  SESSION: {
+    GET_ALL_SESSIONS: "/session/all",
+    GET_SESSION_BY_ID: (id: string) => `/session/${id}`,
+    CREATE_SESSION: "/session",
+    UPDATE_SESSION: (id: string) => `/session/${id}`,
+    DELETE_SESSION: (id: string) => `/session/${id}`,
+    GET_SESSION_BY_COURSE_ID: (courseId: string) =>
+      `/session/course/${courseId}`,
+  },
+  LESSON: {
+    GET_ALL_LESSONS: "/lesson/paged",
+    GET_LESSON_BY_ID: (id: string) => `/lesson/${id}`,
+    CREATE_LESSON: "/lesson",
+    UPDATE_LESSON: (id: string) => `/lesson/${id}`,
+    DELETE_LESSON: (id: string) => `/lesson/${id}`,
+    GET_LESSON_BY_SESSION_ID: (sessionId: string) =>
+      `/lesson/session/${sessionId}`,
+  },
   PROGRAM: {
     GET_ALL_PROGRAMS: "/program",
     CREATE_PROGRAM: "/program/create",
     UPDATE_PROGRAM: (id: string) => `/program/${id}`,
     DELETE_PROGRAM: (id: string) => `/program/${id}`,
     GET_PROGRAM_BY_ID: (id: string) => `/program/${id}`,
-  },
-  SESSION: {
-    GET_ALL_SESSIONS: "/session/all",
-    CREATE_SESSION: "/session",
-    UPDATE_SESSION: (id: string) => `/session/${id}`,
-    DELETE_SESSION: (id: string) => `/session/${id}`,
-    GET_SESSION_BY_COURSE_ID: (courseId: string) =>
-      `/session/course/${courseId}`,
-    GET_SESSION_BY_ID: (id: string) => `/session/${id}`,
-  },
-  LESSON: {
-    GET_ALL_LESSONS: "/lesson/paged",
-    CREATE_LESSON: "/lesson",
-    UPDATE_LESSON: (id: string) => `/lesson/${id}`,
-    DELETE_LESSON: (id: string) => `/lesson/${id}`,
-    GET_LESSON_BY_SESSION_ID: (sessionId: string) =>
-      `/lesson/session/${sessionId}`,
-    GET_LESSON_BY_ID: (lessonId: string) => `/lesson/${lessonId}`,
+
   },
   ORDER: {
     GET_ORDERS: "/order/all",

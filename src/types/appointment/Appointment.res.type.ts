@@ -1,11 +1,13 @@
 export interface Appointment {
-  id: number;
-  fullName: string;
-  message: string;
-  selectedDate: string;
-  selectedTime: string;
-  consultantId: number;
+  id: string;
+  appointmentTime: string; // ISO string
   status: string;
-  createdAt: string;
-  updatedAt: string;
+  note: string;
+  name: string;
+  consultant: Consultant | null;
+}
+
+export interface Consultant {
+  id?: string;
+  name?: string;
 }

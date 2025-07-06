@@ -8,6 +8,7 @@ const ManagerLayout = lazy(() => import("../../../layouts/manager/Manager.layout
 const OverviewPage = lazy(() => import("../../../pages/admin/overview")); // Temporary, use admin overview
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 const ProgramManagementPage = lazy(() => import("../../../pages/manager/program"));
+const AppointmentManagementPage = lazy(() => import("../../../pages/customer/appointment"));
 // Manager routes with layout protection
 export const ManagerRoutes: RouteObject[] = [
     {
@@ -52,7 +53,7 @@ export const ManagerRoutes: RouteObject[] = [
             },
             {
                 path: ROUTER_URL.MANAGER.SCHEDULE,
-                element: <OverviewPage />, // Temporary placeholder
+                element: <AppointmentManagementPage />, // Temporary placeholder
             },
             {
                 path: ROUTER_URL.MANAGER.REVIEWS,

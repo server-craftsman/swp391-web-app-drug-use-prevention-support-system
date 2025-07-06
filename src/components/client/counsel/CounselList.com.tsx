@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CounselCard from "./CounselCard.com";
 import type { Consultant } from "../../../types/consultant/consultant.res.type";
-// import BookingSchedule from "./BookingSchedule.com";
 import { Spin, Empty } from "antd";
 import { ConsultantService } from "../../../services/consultant/consultant.service";
 import CustomPagination from "../../common/Pagiation.com";
@@ -44,33 +43,43 @@ export default function CounselList() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-8 border-[#20558A]">
-      {/* Danh sách tư vấn viên */}
-      <div className="md:col-span-2 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-8 text-center">
+        <h1 className="text-3xl font-bold text-[#20558A] mb-4">
+          Đội ngũ tư vấn viên chuyên nghiệp
+        </h1>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Tìm hiểu về đội ngũ tư vấn viên giàu kinh nghiệm của chúng tôi,
+          sẵn sàng hỗ trợ bạn trong mọi vấn đề.
+        </p>
+      </div>
+
+      <div className="space-y-6">
         {loading ? (
           <div className="flex justify-center py-8">
-            <Spin />
+            <Spin size="large" />
           </div>
         ) : consultants.length === 0 ? (
           <Empty description="Không có tư vấn viên nào" />
         ) : (
           consultants.map((counsel) => (
-            <CounselCard counsel={counsel} key={counsel.id} />
+            <CounselCard
+              counsel={counsel}
+              key={counsel.id}
+            />
           ))
         )}
-        <div className="flex justify-center mt-6">
-          <CustomPagination
-            current={current}
-            pageSize={pageSize}
-            total={total}
-            onChange={handlePageChange}
-          />
-        </div>
-      </div>
 
-      {/* Lịch đặt hẹn */}
-      <div className="sticky top-20 h-fit bg-white rounded-xl p-4">
-        {/* <BookingSchedule /> */}
+        {!loading && consultants.length > 0 && (
+          <div className="flex justify-center mt-8">
+            <CustomPagination
+              current={current}
+              pageSize={pageSize}
+              total={total}
+              onChange={handlePageChange}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

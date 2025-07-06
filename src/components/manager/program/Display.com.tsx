@@ -5,6 +5,7 @@ import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { Program } from "../../../types/program/Program.type";
 import { helpers } from "../../../utils";
 import CustomSearch from "../../common/CustomSearch.com";
+import { RiskLevel } from "../../../app/enums/riskLevel.enum";
 
 interface DisplayProps {
     programs: Program[];
@@ -73,6 +74,29 @@ const ProgramDisplay: React.FC<DisplayProps> = ({
             dataIndex: "endDate",
             key: "endDate",
             render: (value: string) => helpers.formatDate(new Date(value)),
+        },
+        {
+            title: "Mức rủi ro",
+            dataIndex: "riskLevel",
+            key: "riskLevel",
+            render: (value: Program["riskLevel"]) => {
+                const colorMap: Record<RiskLevel, string> = {
+                    [RiskLevel.NONE]: 'green',
+                    [RiskLevel.LOW]: 'blue',
+                    [RiskLevel.MEDIUM]: 'gold',
+                    [RiskLevel.HIGH]: 'orange',
+                    [RiskLevel.VERY_HIGH]: 'red',
+                } as any;
+                const riskLabels: Record<RiskLevel, string> = {
+                    [RiskLevel.NONE]: "Không",
+                    [RiskLevel.LOW]: "Thấp",
+                    [RiskLevel.MEDIUM]: "Trung bình",
+                    [RiskLevel.HIGH]: "Cao",
+                    [RiskLevel.VERY_HIGH]: "Rất cao",
+                };
+                return <Tag color={colorMap[value as RiskLevel] || 'default'}>{riskLabels[value as RiskLevel] || value}</Tag>;
+            },
+            width: 120,
         },
         {
             title: "Hành động",
