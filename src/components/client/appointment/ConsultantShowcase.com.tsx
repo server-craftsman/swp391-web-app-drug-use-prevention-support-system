@@ -39,8 +39,7 @@ const ConsultantShowcase: React.FC<ConsultantShowcaseProps> = ({ onBookAppointme
 
     useEffect(() => {
         const filtered = consultants.filter(consultant =>
-            (consultant.name && consultant.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            (consultant.description && consultant.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (consultant.fullName && consultant.fullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
             (consultant.email && consultant.email.toLowerCase().includes(searchTerm.toLowerCase()))
         );
         setFilteredConsultants(filtered);

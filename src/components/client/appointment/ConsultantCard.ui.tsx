@@ -42,7 +42,7 @@ const ConsultantCard: React.FC<ConsultantCardProps> = ({
                 title={
                     <div className="text-center">
                         <h3 className="text-lg font-semibold text-[#20558A] mb-1">
-                            {consultant.name}
+                            {consultant.fullName}
                         </h3>
                         <Rate disabled defaultValue={5} className="text-sm" />
                     </div>
@@ -50,7 +50,7 @@ const ConsultantCard: React.FC<ConsultantCardProps> = ({
                 description={
                     <div className="space-y-2">
                         <p className="text-gray-600 text-sm line-clamp-3 mb-3">
-                            {consultant.description || "Chuyên gia tư vấn với nhiều năm kinh nghiệm"}
+                            {consultant.jobTitle || "Chuyên gia tư vấn với nhiều năm kinh nghiệm"}
                         </p>
 
                         <div className="space-y-1 text-xs">
@@ -60,7 +60,7 @@ const ConsultantCard: React.FC<ConsultantCardProps> = ({
                             </div>
                             <div className="flex items-center gap-2 text-gray-500">
                                 <PhoneOutlined className="w-3 h-3" />
-                                <span>{consultant.phone}</span>
+                                <span>{consultant.phoneNumber}</span>
                             </div>
                         </div>
 
