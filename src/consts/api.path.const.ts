@@ -39,6 +39,28 @@ export const API_PATH = {
     CANCEL_APPOINTMENT: (appointmentId: string) =>
       `/appointments/cancel/${appointmentId}`,
   },
+  SURVEY: {
+    GET_ALL_SURVEYS: "/survey/paged",
+    CREATE_SURVEY: "/survey",
+    SUBMIT_SURVEY: "/survey/submit",
+    UPDATE_SURVEY: (id: string) => `/survey/${id}`,
+    DELETE_SURVEY: (id: string) => `/survey/${id}`,
+  },
+  QUESTION: {
+    GET_ALL_QUESTIONS: "/question/paged",
+    GET_QUESTION_BY_ID: (id: string) => `/question/${id}`,
+    GET_QUESTION_BY_SURVEY_ID: (surveyId: string) => `/question/by-survey/${surveyId}`,
+    CREATE_QUESTION: "/question",
+    UPDATE_QUESTION: (id: string) => `/question/${id}`,
+    DELETE_QUESTION: (id: string) => `/question/${id}`,
+  },
+  ANSWER: {
+    GET_ALL_ANSWERS: "/AnswerOption/paged",
+    GET_ANSWER_BY_QUESTION_ID: (questionId: string) => `/AnswerOption/by-question/${questionId}`,
+    CREATE_ANSWER: "/AnswerOption",
+    UPDATE_ANSWER: (id: string) => `/AnswerOption/${id}`,
+    DELETE_ANSWER: (id: string) => `/AnswerOption/${id}`,
+  },
   COURSE: {
     GET_ALL_COURSES: "/Course",
     CREATE_COURSE: "/course/create",
