@@ -6,7 +6,7 @@ import { useAuth } from "./Auth.context";
 import { helpers } from "../utils";
 import { HttpException } from "../app/exceptions/http.exception";
 import { HTTP_STATUS } from "../app/enums/http.enum";
-import { clearLocalStorage } from "../../utils/storage";
+import { clearLocalStorage } from "../utils/storage";
 
 interface CartContextType {
     cartItems: CartItem[];

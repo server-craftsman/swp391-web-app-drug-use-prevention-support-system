@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { AppointmentService } from "../services/appointment/appointment.service";
-import type { AppointmentRequest } from "../types/appointment/Appointment.req.type";
 import { useNavigate } from "react-router-dom";
+import type { CreateAppointmentRequest } from "../types/appointment/Appointment.req.type";
 import { ROUTER_URL } from "../consts/router.path.const";
 import { helpers } from "../utils";
 
@@ -12,7 +12,7 @@ export const useCreateAppointment = () => {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (data: AppointmentRequest) =>
+    mutationFn: (data: CreateAppointmentRequest) =>
       AppointmentService.createAppointment(data),
     onSuccess: () => {
       helpers.notificationMessage(
