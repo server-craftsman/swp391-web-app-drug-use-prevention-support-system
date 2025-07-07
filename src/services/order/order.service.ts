@@ -5,6 +5,7 @@ import type {
   CreateOrderRequest,
   OrderDetailRequest,
   ChangeOrderStatusRequest,
+  MyOrderRequest,
 } from "../../types/order/Order.req.type";
 import type { OrderResponse } from "../../types/order/Order.res.type";
 import { API_PATH } from "../../consts/api.path.const";
@@ -32,6 +33,12 @@ export const OrderService = {
     return BaseService.put<ResponseSuccess<OrderResponse>>({
       url: API_PATH.ORDER.CHANGE_ORDER_STATUS(params.orderId, params.newStatus),
       payload: undefined,
+    });
+  },
+  getOrderByUserId: (params: MyOrderRequest) => {
+    return BaseService.get<ResponseSuccess<OrderResponse[]>>({
+      url: API_PATH.ORDER.GET_ORDER_BY_USER_ID,
+      payload: params,
     });
   },
 };

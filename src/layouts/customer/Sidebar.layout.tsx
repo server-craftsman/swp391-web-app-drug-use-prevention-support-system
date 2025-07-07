@@ -85,6 +85,13 @@ const SidebarLayout: React.FC = () => {
       label: <Link to={ROUTER_URL.CLIENT.CART}>Giỏ hàng</Link>,
     },
     {
+      key: ROUTER_URL.CUSTOMER.ORDER_HISTORY,
+      icon: <FileTextOutlined />,
+      label: (
+        <Link to={ROUTER_URL.CUSTOMER.ORDER_HISTORY}>Lịch sử đơn hàng</Link>
+      ),
+    },
+    {
       key: ROUTER_URL.CUSTOMER.FAVORITES,
       icon: <HeartOutlined />,
       label: <Link to={ROUTER_URL.CUSTOMER.FAVORITES}>Yêu thích</Link>,

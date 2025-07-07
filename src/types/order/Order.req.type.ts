@@ -14,3 +14,7 @@ export interface ChangeOrderStatusRequest {
   orderId: string;
   newStatus: OrderStatus;
 }
+export interface MyOrderRequest {
+  pageNumber: number;
+  pageSize: number;
+}

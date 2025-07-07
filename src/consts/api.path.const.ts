@@ -92,6 +92,7 @@ export const API_PATH = {
   },
   ORDER: {
     GET_ORDERS: "/order/all",
+    GET_ORDER_BY_USER_ID: "order/myOrders",
     CREATE_ORDER: "/order/createOrderFromCart",
     GET_ORDER_BY_ID: (orderId: string) => `/order/${orderId}`,
     CHANGE_ORDER_STATUS: (orderId: string, newStatus: string) =>
