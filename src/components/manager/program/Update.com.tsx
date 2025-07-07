@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Form, Input, DatePicker, Select, Upload, Button } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined, VideoCameraAddOutlined } from "@ant-design/icons";
 import type { Program } from "../../../types/program/Program.type";
 import { ProgramService } from "../../../services/program/program.service";
 import dayjs from "dayjs";
@@ -9,6 +9,7 @@ import { ProgramType } from "../../../app/enums/programType.enum";
 import { helpers } from "../../../utils";
 import Editor from "../../common/Editor.com";
 import LocationPicker from "../../common/LocationPicker";
+import { RiskLevel } from "../../../app/enums/riskLevel.enum";
 
 interface UpdateProps {
     visible: boolean;
@@ -19,11 +20,21 @@ interface UpdateProps {
 
 const { Option } = Select;
 
+const riskLabels: Record<RiskLevel, string> = {
+    [RiskLevel.NONE]: "Không",
+    [RiskLevel.LOW]: "Thấp",
+    [RiskLevel.MEDIUM]: "Trung bình",
+    [RiskLevel.HIGH]: "Cao",
+    [RiskLevel.VERY_HIGH]: "Rất cao",
+};
+
 const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSuccess, programId }) => {
     const [form] = Form.useForm();
     const [uploading, setUploading] = useState(false);
     const [imgUrl, setImgUrl] = useState<string>("");
     const [loadingDetail, setLoadingDetail] = useState(false);
+    const [vidUrl, setVidUrl] = useState<string>("");
+    const [uploadingVideo, setUploadingVideo] = useState(false);
 
     useEffect(() => {
         if (visible && programId) {
@@ -48,11 +59,14 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
                             type: program.type,
                             startDate: program.startDate ? dayjs(program.startDate) : undefined,
                             endDate: program.endDate ? dayjs(program.endDate) : undefined,
+                            riskLevel: program.riskLevel,
+                            programVidUrl: program.programVidUrl,
                         };
 
                         console.log("Setting form values:", formValues);
                         form.setFieldsValue(formValues);
                         setImgUrl(program.programImgUrl ?? "");
+                        setVidUrl(program.programVidUrl ?? "");
                     }
                 } catch (err) {
                     console.error("Fetch detail error", err);
@@ -65,6 +79,7 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
             // Reset form when modal is closed
             form.resetFields();
             setImgUrl("");
+            setVidUrl("");
         }
     }, [visible, programId, form]);
 
@@ -90,13 +105,41 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
         return false;
     };
 
+    const handleVideoUpload = async (file: File) => {
+        try {
+            setUploadingVideo(true);
+            const url = await BaseService.uploadFile(file);
+            setVidUrl(url || "");
+        } catch {
+            helpers.notificationMessage("Upload video thất bại", 'error');
+        } finally {
+            setUploadingVideo(false);
+        }
+    };
+
+    const beforeUploadVideo = (file: File) => {
+        const isVideo = file.type.startsWith("video/");
+        if (!isVideo) {
+            helpers.notificationMessage("Chỉ được upload file video", 'error');
+            return Upload.LIST_IGNORE;
+        }
+        handleVideoUpload(file);
+        return false;
+    };
+
     const handleFinish = async (values: any) => {
         if (!programId) return;
+        const errorMsg = validateProgram(values);
+        if (errorMsg) {
+            helpers.notificationMessage(errorMsg, 'error');
+            return;
+        }
         const payload = {
             ...values,
             startDate: dayjs(values.startDate).format("YYYY-MM-DD"),
             endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
             programImgUrl: imgUrl,
+            programVidUrl: vidUrl,
         } as Program;
 
         try {
@@ -106,6 +149,27 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
         } catch {
             helpers.notificationMessage("Cập nhật chương trình thất bại", 'error')
         }
+    };
+
+    const validateProgram = (values: any): string | null => {
+        if (!values.riskLevel) {
+            return "Vui lòng chọn mức độ rủi ro";
+        }
+        if (values.programVidUrl && !/^https?:\/\/.+/.test(values.programVidUrl)) {
+            return "Đường dẫn video không hợp lệ";
+        }
+        if (values.startDate && values.endDate && (dayjs(values.startDate).isSame(values.endDate, 'day') || dayjs(values.startDate).isAfter(values.endDate))) {
+            return "Ngày bắt đầu phải nhỏ hơn ngày kết thúc";
+        }
+        return null;
+    };
+
+    const disablePastDate = (current: any) => current && current < dayjs().startOf('day');
+
+    const disabledEndDate = (current: any) => {
+        const start = form.getFieldValue('startDate');
+        if (!start) return disablePastDate(current);
+        return current && (current < dayjs().startOf('day') || current.isSame(start, 'day') || current.isBefore(start, 'day'));
     };
 
     return (
@@ -157,10 +221,23 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
                         </Select>
                     </Form.Item>
                     <Form.Item name="startDate" label="Ngày bắt đầu" rules={[{ required: true }]}>
-                        <DatePicker className="w-full" format="DD/MM/YYYY" />
+                        <DatePicker className="w-full" format="DD/MM/YYYY" disabledDate={disablePastDate} />
                     </Form.Item>
                     <Form.Item name="endDate" label="Ngày kết thúc" rules={[{ required: true }]}>
-                        <DatePicker className="w-full" format="DD/MM/YYYY" />
+                        <DatePicker className="w-full" format="DD/MM/YYYY" disabledDate={disabledEndDate} />
+                    </Form.Item>
+                    <Form.Item name="riskLevel" label="Mức độ rủi ro" rules={[{ required: true, message: "Vui lòng chọn mức độ rủi ro" }]}>
+                        <Select>
+                            {Object.entries(riskLabels).map(([value, label]) => (
+                                <Option key={value} value={value}>{label}</Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                    <Form.Item label="Video giới thiệu" valuePropName="fileList">
+                        <Upload beforeUpload={beforeUploadVideo} showUploadList={false} accept="video/*">
+                            <Button icon={<VideoCameraAddOutlined />} loading={uploadingVideo}> Tải lên video </Button>
+                        </Upload>
+                        {vidUrl && <video src={vidUrl} controls className="mt-2 w-40 h-28 object-cover" />}
                     </Form.Item>
                     <Form.Item label="Ảnh chương trình" valuePropName="fileList">
                         <Upload beforeUpload={beforeUpload} showUploadList={false}>

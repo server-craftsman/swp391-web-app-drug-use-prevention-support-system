@@ -111,7 +111,7 @@ const SidebarLayout: React.FC = () => {
         {
             key: ROUTER_URL.MANAGER.SCHEDULE,
             icon: <CalendarOutlined />,
-            label: <Link to={ROUTER_URL.MANAGER.SCHEDULE}>Lịch trình</Link>,
+            label: <Link to={ROUTER_URL.MANAGER.SCHEDULE}>Lịch hẹn tư vấn</Link>,
         },
         {
             key: ROUTER_URL.MANAGER.REVIEWS,

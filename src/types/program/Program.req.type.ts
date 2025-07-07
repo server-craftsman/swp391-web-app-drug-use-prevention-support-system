@@ -1,3 +1,5 @@
+import { RiskLevel } from "../../app/enums/riskLevel.enum";
+
 export interface ProgramRequest {
   pageNumber: number;
   pageSize: number;
@@ -12,5 +14,6 @@ export interface CreateProgramRequest {
   startDate: string;
   endDate: string;
   programImgUrl: string;
+  programVidUrl: string;
+  riskLevel: RiskLevel;
 }
-

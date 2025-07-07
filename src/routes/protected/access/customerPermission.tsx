@@ -8,6 +8,8 @@ import OrderHistory from "../../../pages/client/order";
 import ReviewHistory from "../../../pages/client/review";
 // Lazy load customer pages
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
+const AppointmentPage = lazy(() => import("../../../pages/customer/appointment"));
+
 
 // Customer routes that require authentication
 export const CustomerRoutes: RouteObject[] = [
@@ -15,6 +17,14 @@ export const CustomerRoutes: RouteObject[] = [
     path: ROUTER_URL.CUSTOMER.BASE,
     element: <CustomerLayout />,
     children: [
+      {
+        path: ROUTER_URL.CUSTOMER.SETTINGS,
+        element: <SettingsPage />,
+      },
+      {
+        path: ROUTER_URL.CUSTOMER.APPOINTMENTS,
+        element: <AppointmentPage />,
+      },
       {
         path: ROUTER_URL.CUSTOMER.SETTINGS,
         element: <SettingsPage />,
@@ -33,4 +43,4 @@ export const CustomerRoutes: RouteObject[] = [
       },
     ],
   },
-];
+]; 

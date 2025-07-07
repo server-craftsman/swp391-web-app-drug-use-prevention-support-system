@@ -6,7 +6,7 @@ import type { RouteObject } from "react-router-dom";
 const ConsultantLayout = lazy(() => import("../../../layouts/consultant/Consultant.layout"));
 const OverviewPage = lazy(() => import("../../../pages/admin/overview")); // Temporary, use admin overview
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
-
+const AppointmentPage = lazy(() => import("../../../pages/customer/appointment"));
 // Consultant routes with layout protection
 export const ConsultantRoutes: RouteObject[] = [
     {
@@ -18,8 +18,8 @@ export const ConsultantRoutes: RouteObject[] = [
                 element: <OverviewPage />,
             },
             {
-                path: "appointments",
-                element: <OverviewPage />, // Temporary placeholder
+                path: ROUTER_URL.CONSULTANT.APPOINTMENTS,
+                element: <AppointmentPage />, // Temporary placeholder
             },
             {
                 path: "clients",
