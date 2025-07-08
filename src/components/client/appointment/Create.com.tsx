@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, DatePicker, Button, message, Select } from "antd";
+import { Modal, Form, Input, DatePicker, Button, Select } from "antd";
 import { UserOutlined, CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { AppointmentService } from "../../../services/appointment/appointment.service";
 import type { CreateAppointmentRequest } from "../../../types/appointment/Appointment.req.type";
-
+import { helpers } from "../../../utils";
 interface CreateAppointmentProps {
     visible: boolean;
     onCancel: () => void;
@@ -65,11 +65,11 @@ const CreateAppointmentModal: React.FC<CreateAppointmentProps> = ({
             };
 
             await AppointmentService.createAppointment(requestData);
-            message.success("Đặt lịch hẹn thành công!");
+            helpers.notificationMessage("Đặt lịch hẹn thành công!", "success");
             form.resetFields();
             onSuccess();
         } catch (err) {
-            message.error("Đặt lịch hẹn thất bại. Vui lòng thử lại!");
+            helpers.notificationMessage("Đặt lịch hẹn thất bại. Vui lòng thử lại!", "error");
         } finally {
             setLoading(false);
         }

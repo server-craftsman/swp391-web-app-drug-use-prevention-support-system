@@ -4,7 +4,6 @@ import type { MenuProps } from "antd";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
     DashboardOutlined,
-    CalendarOutlined,
     UserOutlined,
     MessageOutlined,
     FileTextOutlined,
@@ -65,20 +64,20 @@ const SidebarLayout: React.FC = () => {
             icon: <DashboardOutlined />,
             label: <Link to={ROUTER_URL.CONSULTANT.BASE}>Tổng quan</Link>,
         },
-        {
-            key: ROUTER_URL.CONSULTANT.APPOINTMENTS,
-            icon: <CalendarOutlined />,
-            label: <Link to={ROUTER_URL.CONSULTANT.APPOINTMENTS}>Lịch hẹn tư vấn</Link>,
-        },
+        // {
+        //     key: ROUTER_URL.CONSULTANT.APPOINTMENTS,
+        //     icon: <CalendarOutlined />,
+        //     label: <Link to={ROUTER_URL.CONSULTANT.APPOINTMENTS}>Lịch hẹn tư vấn</Link>,
+        // },
         {
             key: ROUTER_URL.CONSULTANT.CLIENTS,
             icon: <TeamOutlined />,
             label: <Link to={ROUTER_URL.CONSULTANT.CLIENTS}>Khách hàng</Link>,
         },
         {
-            key: ROUTER_URL.CONSULTANT.CONSULTATIONS,
+            key: ROUTER_URL.CONSULTANT.APPOINTMENTS,
             icon: <MessageOutlined />,
-            label: <Link to={ROUTER_URL.CONSULTANT.CONSULTATIONS}>Phiên tư vấn</Link>,
+            label: <Link to={ROUTER_URL.CONSULTANT.APPOINTMENTS}>Phiên tư vấn</Link>,
         },
         {
             key: ROUTER_URL.CONSULTANT.ASSESSMENTS,
