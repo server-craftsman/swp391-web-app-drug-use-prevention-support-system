@@ -5,6 +5,7 @@ import type {
   CreateBlogRequest,
   DeleteBlogRequest,
   UpdateBlogRequest,
+  GetBlogByIdRequest,
 } from "../../types/blog/Blog.req.type";
 import type { Blog } from "../../types/blog/Blog.res.type";
 import { API_PATH } from "../../consts/api.path.const";
@@ -31,6 +32,12 @@ export const BlogService = {
   updateBlog(params: UpdateBlogRequest) {
     return BaseService.put<ResponseSuccess<Blog>>({
       url: API_PATH.BLOG.UPDATE_BLOG(params.id), // Assuming the same endpoint for update
+      payload: params,
+    });
+  },
+  getBlogById(params: GetBlogByIdRequest) {
+    return BaseService.get<ResponseSuccess<Blog>>({
+      url: API_PATH.BLOG.GET_BLOG_BY_ID(params.id),
       payload: params,
     });
   },
