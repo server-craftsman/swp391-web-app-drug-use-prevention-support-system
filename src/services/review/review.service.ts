@@ -6,6 +6,7 @@ import type {
   GetAllReviewRequest,
   GetReviewByCourseIdRequest,
   GetReviewByUserIdRequest,
+  GetReviewById,
 } from "../../types/review/Review.req.type";
 import type { Review } from "../../types/review/Review.res.type";
 import { API_PATH } from "../../consts/api.path.const";
@@ -38,6 +39,12 @@ export const ReviewService = {
   getReviewByUserId(params: GetReviewByUserIdRequest) {
     return BaseService.get<ResponseSuccess<Review[]>>({
       url: API_PATH.REVIEW.GET_REVIEW_BY_USER_ID(params.userId),
+      payload: params,
+    });
+  },
+  getReviewById(params: GetReviewById) {
+    return BaseService.get<ResponseSuccess<Review>>({
+      url: API_PATH.REVIEW.GET_REVIEW_BY_ID(params.id),
       payload: params,
     });
   },

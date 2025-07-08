@@ -82,7 +82,9 @@ export const ROUTER_URL = {
     COURSE: "/customer/courses",
     ASSESSMENT: "/customer/assessment",
     MY_COURSE: "/customer/my-course",
-    ORDER_HISTORY: "/customer/order-history",
+    MY_COURSE_DETAIL: "/customer/my-course/:courseId",
+    ORDER_HISTORY: "/customer/order",
+    REVIEW_HISTORY: "/customer/review",
   },
   COMMON: {
     HOME: "/",

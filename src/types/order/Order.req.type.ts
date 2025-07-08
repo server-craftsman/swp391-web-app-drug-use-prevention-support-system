@@ -18,3 +18,6 @@ export interface MyOrderRequest {
   pageNumber: number;
   pageSize: number;
 }
+export interface GetOrderByIdRequest {
+  orderId: string;
+}

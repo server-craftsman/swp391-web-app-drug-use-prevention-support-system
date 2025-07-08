@@ -9,7 +9,7 @@ import {
   Input,
   Form,
 } from "antd";
-import DeleteReview from "../review/DeleteReview.com";
+import DeleteReview from "../../../client/review/DeleteReview.com";
 import { useCreateReview } from "../../../../hooks/useReview";
 import { UserService } from "../../../../services/user/user.service";
 
@@ -45,8 +45,6 @@ interface UserInfo {
 const CourseReviews: React.FC<CourseReviewsProps> = ({
   courseId,
   userId,
-  rating = 4.7,
-  totalReviews = 0,
   reviews = [],
   loading,
   onReviewChanged,
@@ -102,53 +100,9 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
     <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>
       <div className="mb-6">
         <Title level={3} className="text-gray-900 mb-2">
-          <Rate
-            disabled
-            defaultValue={1}
-            count={1}
-            className="text-yellow-400 mr-2"
-          />
-          {rating} xếp hạng khóa học • {totalReviews} đánh giá
+          Tất cả đánh giá
         </Title>
       </div>
-
-      {/* Form đánh giá */}
-      {userId ? (
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleFinish}
-          className="mb-8"
-        >
-          <Form.Item
-            name="rating"
-            label="Đánh giá của bạn"
-            rules={[{ required: true, message: "Vui lòng chọn số sao!" }]}
-          >
-            <Rate />
-          </Form.Item>
-          <Form.Item
-            name="comment"
-            label="Nhận xét"
-            rules={[{ required: true, message: "Vui lòng nhập nhận xét!" }]}
-          >
-            <Input.TextArea
-              rows={3}
-              placeholder="Nhận xét của bạn về khóa học..."
-            />
-          </Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={submitting}
-            disabled={submitting}
-          >
-            Gửi đánh giá
-          </Button>
-        </Form>
-      ) : (
-        <div className="mb-8 text-red-500">Bạn cần đăng nhập để đánh giá.</div>
-      )}
 
       <div className="space-y-6">
         {reviews.length === 0 ? (
@@ -214,6 +168,44 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
       </div>
 
       <div className="mt-6">{loading ? <Spin /> : null}</div>
+      {/* Form đánh giá */}
+      {userId ? (
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleFinish}
+          className="mb-8"
+        >
+          <Form.Item
+            name="rating"
+            label="Đánh giá của bạn"
+            rules={[{ required: true, message: "Vui lòng chọn số sao!" }]}
+          >
+            <Rate />
+          </Form.Item>
+          <Form.Item
+            name="comment"
+            label="Nhận xét"
+            rules={[{ required: true, message: "Vui lòng nhập nhận xét!" }]}
+          >
+            <Input.TextArea
+              rows={3}
+              placeholder="Nhận xét của bạn về khóa học..."
+            />
+          </Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={submitting}
+            disabled={submitting}
+            className="bg-blue-900 hover:bg-blue-700 text-white"
+          >
+            Gửi đánh giá
+          </Button>
+        </Form>
+      ) : (
+        <div className="mb-8 text-red-500">Bạn cần đăng nhập để đánh giá.</div>
+      )}
     </Card>
   );
 };

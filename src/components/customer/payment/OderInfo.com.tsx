@@ -2,11 +2,7 @@
 import React from "react";
 import { Tag } from "antd";
 import type { OrderResponse } from "../../../types/order/Order.res.type";
-import {
-  UserOutlined,
-  CalendarOutlined,
-  CreditCardOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, CalendarOutlined } from "@ant-design/icons";
 
 interface OrderInfoProps {
   order: OrderResponse;
@@ -32,13 +28,6 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ order }) => {
           Ngày đặt:
         </span>
         <span>{new Date(order.orderDate).toLocaleString("vi-VN")}</span>
-      </div>
-      <div className="flex justify-between text-gray-700">
-        <span>
-          <CreditCardOutlined className="mr-1" />
-          Phương thức thanh toán:
-        </span>
-        <span className="font-medium text-blue-700">Tiền Mặt</span>
       </div>
       <div className="flex justify-between text-gray-700">
         <span>Trạng thái đơn hàng:</span>

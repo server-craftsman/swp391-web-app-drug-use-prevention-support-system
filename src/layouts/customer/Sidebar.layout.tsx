@@ -92,6 +92,13 @@ const SidebarLayout: React.FC = () => {
       ),
     },
     {
+      key: ROUTER_URL.CUSTOMER.REVIEW_HISTORY,
+      icon: <FileTextOutlined />,
+      label: (
+        <Link to={ROUTER_URL.CUSTOMER.REVIEW_HISTORY}>Lịch sử đánh giá</Link>
+      ),
+    },
+    {
       key: ROUTER_URL.CUSTOMER.FAVORITES,
       icon: <HeartOutlined />,
       label: <Link to={ROUTER_URL.CUSTOMER.FAVORITES}>Yêu thích</Link>,
