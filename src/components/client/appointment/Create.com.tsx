@@ -101,7 +101,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentProps> = ({
                 className="space-y-4"
             >
                 {/* Thông tin cá nhân */}
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-white p-4 rounded-lg">
                     <h4 className="text-md font-medium text-gray-700 mb-3 flex items-center gap-2">
                         <UserOutlined /> Thông tin liên hệ
                     </h4>
