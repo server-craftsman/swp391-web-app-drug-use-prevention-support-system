@@ -46,7 +46,7 @@ export const SurveyService = {
     /* Lấy survey theo id */
     getSurveyById(id: string) {
         return BaseService.get<ResponseSuccess<SurveyResponse>>({
-            url: API_PATH.SURVEY.UPDATE_SURVEY(id), // same path as update (GET)
+            url: API_PATH.SURVEY.GET_SURVEY_BY_ID(id),
         });
     },
 

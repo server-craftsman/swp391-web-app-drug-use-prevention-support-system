@@ -1,10 +1,14 @@
 import { SurveyType } from "../../app/enums/surveyType.enum";
+import type { QuestionResponse } from "../question/Question.res.type";
 
 export interface SurveyResponse {
     id: string;
     name: string;
     description: string;
-    surveyType: SurveyType;
+    surveyType?: SurveyType;
+    type?: SurveyType;
+    createdAt?: string;
+    questions?: QuestionResponse[];
 }
 
 export interface SurveySubmissionResponse {

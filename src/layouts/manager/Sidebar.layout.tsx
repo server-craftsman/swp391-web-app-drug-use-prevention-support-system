@@ -89,6 +89,11 @@ const SidebarLayout: React.FC = () => {
             label: <Link to={ROUTER_URL.MANAGER.PROGRAMS}>Chương trình</Link>,
         },
         {
+            key: ROUTER_URL.MANAGER.SURVEYS,
+            icon: <BookOutlined />,
+            label: <Link to={ROUTER_URL.MANAGER.SURVEYS}>Khảo sát</Link>,
+        },
+        {
             key: ROUTER_URL.MANAGER.COURSES,
             icon: <BookOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.COURSES}>Khóa học</Link>,
