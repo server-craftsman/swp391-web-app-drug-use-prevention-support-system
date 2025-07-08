@@ -43,3 +43,6 @@ export interface DeleteCourseRequest {
 export interface CourseDetailRequest {
   id: string;
 }
+export interface MyCoursesRequest {
+  userId: string;
+}

@@ -44,4 +44,10 @@ export const CourseService = {
       payload: param,
     });
   },
+  getMyCourses(userId: string) {
+    return BaseService.get<ResponseSuccess<Course[]>>({
+      url: API_PATH.COURSE.GET_MY_COURSES,
+      payload: { userId },
+    });
+  },
 };
