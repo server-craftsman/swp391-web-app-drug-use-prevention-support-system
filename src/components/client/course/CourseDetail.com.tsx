@@ -44,18 +44,6 @@ const CourseDetail: React.FC = () => {
   // State cho user info
   const [userMap, setUserMap] = useState<Record<string, UserInfo>>({});
 
-  // Lấy userId từ localStorage userInfo
-  let userId = "";
-  const userInfoStr = localStorage.getItem("userInfo");
-  if (userInfoStr) {
-    try {
-      const userInfo = JSON.parse(userInfoStr);
-      userId = userInfo.id || "";
-    } catch {
-      userId = "";
-    }
-  }
-
   // Lấy course
   useEffect(() => {
     const fetchCourse = async () => {
