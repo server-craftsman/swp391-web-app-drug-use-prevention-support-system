@@ -12,7 +12,7 @@ const CourseHighlights: React.FC<CourseHighlightsProps> = ({ highlights }) => {
   return (
     <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>
       <Title level={3} className="text-gray-900 mb-6">
-        Bạn được gì
+        Bạn sẽ được gì
       </Title>
       <Row gutter={[16, 12]}>
         {highlights.map((highlight, index) => (

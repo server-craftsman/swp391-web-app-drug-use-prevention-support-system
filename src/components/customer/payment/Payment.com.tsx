@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Divider, Button, Typography, Spin } from "antd";
+import { Divider, Button, Typography, Spin, Select } from "antd";
 import { formatCurrency } from "../../../utils/helper";
 import { motion } from "framer-motion";
 import { OrderService } from "../../../services/order/order.service";
@@ -11,6 +11,7 @@ import { PaymentMethod } from "../../../app/enums/paymentMethod.enum";
 import OrderDetailsList from "./OrderList.com";
 import OrderInfo from "./OderInfo.com";
 import { OrderStatus } from "../../../app/enums/orderStatus.enum";
+import { CreditCardOutlined, DollarCircleOutlined } from "@ant-design/icons";
 
 const PaymentPage: React.FC = () => {
   const location = useLocation();
@@ -19,6 +20,9 @@ const PaymentPage: React.FC = () => {
 
   const [order, setOrder] = useState<OrderResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    PaymentMethod.CASH
+  );
 
   const createPaymentMutation = useCreatePayment();
   const updateOrderStatusMutation = useUpdateOrderStatus();
@@ -48,11 +52,20 @@ const PaymentPage: React.FC = () => {
         orderId: order.orderId,
         userId: order.userId,
         amount: order.totalAmount,
-        paymentMethod: PaymentMethod.CASH,
+        paymentMethod: paymentMethod,
       },
       {
-        onSuccess: () => {
-          navigate("/payment-result", { state: { isSuccess: true } });
+        onSuccess: (res) => {
+          if (
+            paymentMethod === PaymentMethod.CREDIT_CARD &&
+            res?.data?.data?.payUrl
+          ) {
+            // Mở tab mới khi thanh toán chuyển khoản ngân hàng
+            window.open(res.data.data.payUrl, "_blank");
+            navigate("/payment-result", { state: { isSuccess: true } });
+          } else {
+            navigate("/payment-result", { state: { isSuccess: true } });
+          }
         },
       }
     );
@@ -122,6 +135,36 @@ const PaymentPage: React.FC = () => {
         </span>
       </div>
 
+      {/* Chỉ giữ lại phần Select phương thức thanh toán */}
+      <div className="mb-6">
+        <Select
+          value={paymentMethod}
+          onChange={setPaymentMethod}
+          style={{ width: "100%" }}
+          size="large"
+          options={[
+            {
+              value: PaymentMethod.CASH,
+              label: (
+                <span>
+                  <DollarCircleOutlined className="mr-2 text-green-600" />
+                  Tiền mặt
+                </span>
+              ),
+            },
+            {
+              value: PaymentMethod.CREDIT_CARD,
+              label: (
+                <span>
+                  <CreditCardOutlined className="mr-2 text-blue-600" />
+                  Chuyển khoản ngân hàng
+                </span>
+              ),
+            },
+          ]}
+        />
+      </div>
+
       <div className="flex flex-col sm:flex-row gap-4 mt-6">
         <Button
           danger
@@ -141,7 +184,7 @@ const PaymentPage: React.FC = () => {
           onClick={handleConfirmPayment}
           className="bg-gradient-to-r from-[#20558A] to-blue-500 font-semibold"
         >
-          Xác nhận đã thanh toán
+          Thanh toán
         </Button>
       </div>
     </motion.div>
