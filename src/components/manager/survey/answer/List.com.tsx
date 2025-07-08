@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space } from "antd";
-import { EyeOutlined, EditOutlined } from "@ant-design/icons";
+import { Table, Button, Space, Input, Card, Tag, Collapse, Empty } from "antd";
+import { PlusOutlined, EditOutlined, EyeOutlined, ReloadOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { AnswerResponse } from "../../../../types/answer/Answer.res.type";
 import { AnswerService } from "../../../../services/answer/answer.service";
@@ -12,82 +12,156 @@ import AnswerUpdateModal from "./Update.com";
 import AnswerDeleteButton from "./Delete.com";
 import AnswerDetailDrawer from "./Detail.com";
 
+const { Panel } = Collapse;
+
 interface Props {
     questions: QuestionResponse[];
     pageSizeDefault?: number;
 }
 
+interface QuestionWithAnswers {
+    question: QuestionResponse;
+    answers: AnswerResponse[];
+    loading: boolean;
+}
+
 const AnswerList: React.FC<Props> = ({ questions, pageSizeDefault = 10 }) => {
-    const [questionId, setQuestionId] = useState<string | undefined>();
-    const [pageNumber, setPageNumber] = useState(1);
-    const [pageSize, setPageSize] = useState(pageSizeDefault);
-    const [total, setTotal] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<AnswerResponse[]>([]);
+    const [questionsWithAnswers, setQuestionsWithAnswers] = useState<QuestionWithAnswers[]>([]);
+    const [filter, setFilter] = useState("");
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
     const [detailDrawerVisible, setDetailDrawerVisible] = useState(false);
-    const [editingAnswer, setEditingAnswer] = useState<AnswerResponse | null>(null);
+    const [selectedQuestion, setSelectedQuestion] = useState<QuestionResponse | null>(null);
+    const [selectedAnswers, setSelectedAnswers] = useState<AnswerResponse[]>([]);
     const [viewingAnswer, setViewingAnswer] = useState<AnswerResponse | null>(null);
 
-    const fetchData = async () => {
-        if (!questionId) return;
+    const fetchAnswersForQuestion = async (question: QuestionResponse) => {
         try {
-            setLoading(true);
-            const res = await AnswerService.getAllAnswers({
-                questionId,
-                pageNumber,
-                pageSize,
-                filter: "",
-                filterByScore: 0,
-            } as any);
-            const resp: any = res?.data ?? {};
-            const list = resp.data ?? [];
-            const totalCount = resp.totalCount ?? list.length;
-            setData(list);
-            setTotal(totalCount);
-        } catch {
-            helpers.notificationMessage("Không thể tải đáp án", "error");
-        } finally {
-            setLoading(false);
+            const res = await AnswerService.getAnswerByQuestionId(question.id);
+            // ResponseSuccess<AnswerResponse[]> structure: { success: boolean, data: AnswerResponse[] }
+            const answers = res?.data || [];
+            // Sort answers by positionOrder
+            const sortedAnswers = Array.isArray(answers)
+                ? answers.sort((a, b) => a.positionOrder - b.positionOrder)
+                : [];
+            return sortedAnswers;
+        } catch (error) {
+            console.error(`Error fetching answers for question ${question.id}:`, error);
+            helpers.notificationMessage(`Không thể tải đáp án cho câu hỏi: ${question.questionContent}`, "error");
+            return [];
         }
     };
 
-    useEffect(() => {
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [questionId, pageNumber, pageSize]);
+    const loadAllAnswers = async () => {
+        console.log("Loading answers for questions:", questions.length);
+        const questionAnswerPromises = questions.map(async (question) => {
+            console.log(`Fetching answers for question: ${question.questionContent} (${question.id})`);
+            const answers = await fetchAnswersForQuestion(question);
+            console.log(`Found ${answers.length} answers for question: ${question.questionContent}`);
+            return {
+                question,
+                answers,
+                loading: false,
+            };
+        });
 
-    const openCreate = () => {
+        const results = await Promise.all(questionAnswerPromises);
+        console.log("All answers loaded:", results);
+        setQuestionsWithAnswers(results);
+    };
+
+    useEffect(() => {
+        if (questions.length > 0) {
+            loadAllAnswers();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [questions]);
+
+    const filteredQuestionsWithAnswers = questionsWithAnswers.filter(
+        ({ question, answers }) =>
+            filter === "" ||
+            question.questionContent.toLowerCase().includes(filter.toLowerCase()) ||
+            answers.some(answer => answer.optionContent.toLowerCase().includes(filter.toLowerCase()))
+    );
+
+    const openCreate = (question: QuestionResponse) => {
+        setSelectedQuestion(question);
         setCreateModalVisible(true);
     };
 
-    const openEdit = (record: AnswerResponse) => {
-        setEditingAnswer(record);
+    const openUpdate = (question: QuestionResponse, answers: AnswerResponse[]) => {
+        setSelectedQuestion(question);
+        setSelectedAnswers(answers);
         setUpdateModalVisible(true);
     };
 
-    const openDetail = (record: AnswerResponse) => {
-        setViewingAnswer(record);
+    const openDetail = (answer: AnswerResponse) => {
+        setViewingAnswer(answer);
         setDetailDrawerVisible(true);
     };
 
-    const handleDeleteSuccess = () => { fetchData(); };
+    const handleDeleteSuccess = () => {
+        loadAllAnswers();
+    };
 
-    const handleCreateSuccess = () => { setCreateModalVisible(false); fetchData(); };
-    const handleUpdateSuccess = () => { setUpdateModalVisible(false); setEditingAnswer(null); fetchData(); };
+    const handleCreateSuccess = () => {
+        setCreateModalVisible(false);
+        setSelectedQuestion(null);
+        loadAllAnswers();
+    };
 
-    const columns: ColumnsType<AnswerResponse> = [
-        { title: "Phương án", dataIndex: "optionContent", key: "optionContent", render: (html) => <div dangerouslySetInnerHTML={{ __html: html }} /> },
-        { title: "Điểm", dataIndex: "score", key: "score", width: 80 },
-        { title: "Thứ tự", dataIndex: "positionOrder", key: "positionOrder", width: 80 },
+    const handleUpdateSuccess = () => {
+        setUpdateModalVisible(false);
+        setSelectedQuestion(null);
+        setSelectedAnswers([]);
+        loadAllAnswers();
+    };
+
+    const answerColumns: ColumnsType<AnswerResponse> = [
+        {
+            title: "Phương án",
+            dataIndex: "optionContent",
+            key: "optionContent",
+            render: (html) => <div dangerouslySetInnerHTML={{ __html: html }} />,
+        },
+        {
+            title: "Điểm",
+            dataIndex: "score",
+            key: "score",
+            width: 80,
+            render: (score) => <Tag color="green">{score}</Tag>,
+        },
+        {
+            title: "Thứ tự",
+            dataIndex: "positionOrder",
+            key: "positionOrder",
+            width: 80,
+            render: (order, record: AnswerResponse) => {
+                // Check if there are duplicates in position order
+                const currentQuestion = questionsWithAnswers.find(q => q.question.id === record.questionId);
+                const answers = currentQuestion?.answers || [];
+                const duplicateCount = answers.filter(a => a.positionOrder === order).length;
+                const isDuplicate = duplicateCount > 1;
+
+                return (
+                    <Tag color={isDuplicate ? "red" : "blue"}>
+                        #{order} {isDuplicate && "(Trùng)"}
+                    </Tag>
+                );
+            },
+        },
         {
             title: "Hành động",
             key: "action",
+            width: 120,
             render: (_, record) => (
                 <Space>
-                    <Button size="small" type="text" icon={<EyeOutlined />} onClick={() => openDetail(record)} />
-                    <Button size="small" type="text" icon={<EditOutlined />} onClick={() => openEdit(record)} />
+                    <Button
+                        size="small"
+                        type="text"
+                        icon={<EyeOutlined />}
+                        onClick={() => openDetail(record)}
+                    />
                     <AnswerDeleteButton answer={record} onSuccess={handleDeleteSuccess} />
                 </Space>
             ),
@@ -95,66 +169,120 @@ const AnswerList: React.FC<Props> = ({ questions, pageSizeDefault = 10 }) => {
     ];
 
     return (
-        <>
-            {/* <div className="flex gap-4 mb-4 items-center flex-wrap">
-                <Select
+        <div className="answer-management">
+            <div className="flex gap-4 mb-4 items-center">
+                <Input.Search
+                    placeholder="Tìm kiếm câu hỏi hoặc đáp án..."
+                    style={{ width: 400 }}
                     allowClear
-                    placeholder="Chọn câu hỏi"
-                    style={{ width: 300 }}
-                    value={questionId}
-                    onChange={(val) => {
-                        setQuestionId(val);
-                        setPageNumber(1);
-                    }}
+                    onSearch={(value) => setFilter(value)}
+                    onChange={(e) => setFilter(e.target.value)}
+                />
+                <Button
+                    icon={<ReloadOutlined />}
+                    onClick={loadAllAnswers}
+                    title="Tải lại dữ liệu"
                 >
-                    {questions.map((q) => (
-                        <Select.Option key={q.id} value={q.id}>
-                            {q.questionContent}
-                        </Select.Option>
+                    Tải lại
+                </Button>
+                <div className="text-gray-500">
+                    {questions.length} câu hỏi | {questionsWithAnswers.reduce((total, q) => total + q.answers.length, 0)} đáp án
+                </div>
+            </div>
+
+            {filteredQuestionsWithAnswers.length === 0 ? (
+                <Empty description="Không có câu hỏi nào" />
+            ) : (
+                <Collapse size="small">
+                    {filteredQuestionsWithAnswers.map(({ question, answers, loading }) => (
+                        <Panel
+                            key={question.id || `question-${Math.random()}`}
+                            header={
+                                <div className="flex justify-between items-center w-full mr-4">
+                                    <div>
+                                        <strong>{question.questionContent}</strong>
+                                        <Tag color="blue" className="ml-2">{question.questionType}</Tag>
+                                        <Tag color="orange" className="ml-1">
+                                            {answers.length} đáp án
+                                        </Tag>
+                                    </div>
+                                </div>
+                            }
+                            extra={
+                                <Space onClick={(e) => e.stopPropagation()}>
+                                    <Button
+                                        type="primary"
+                                        size="small"
+                                        className="bg-primary"
+                                        icon={<PlusOutlined />}
+                                        onClick={() => openCreate(question)}
+                                    >
+                                        Tạo đáp án
+                                    </Button>
+                                    {answers.length > 0 && (
+                                        <Button
+                                            size="small"
+                                            icon={<EditOutlined />}
+                                            onClick={() => openUpdate(question, answers)}
+                                        >
+                                            Sửa tất cả
+                                        </Button>
+                                    )}
+                                </Space>
+                            }
+                        >
+                            {answers.length === 0 ? (
+                                <Empty
+                                    description="Chưa có đáp án nào"
+                                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                />
+                            ) : (
+                                <Table
+                                    columns={answerColumns}
+                                    dataSource={answers}
+                                    rowKey="id"
+                                    loading={loading}
+                                    pagination={false}
+                                    size="small"
+                                />
+                            )}
+                        </Panel>
                     ))}
-                </Select>
-            </div> */}
-            <Table
-                columns={columns}
-                dataSource={data}
-                rowKey="id"
-                loading={loading}
-                pagination={{
-                    current: pageNumber,
-                    pageSize,
-                    total,
-                    showSizeChanger: true,
-                    onChange: (p, s) => {
-                        setPageNumber(p);
-                        setPageSize(s);
-                    },
-                }}
-            />
-            <Button onClick={openCreate}>Tạo đáp án</Button>
+                </Collapse>
+            )}
 
             <AnswerCreateModal
                 open={createModalVisible}
-                questions={questions}
-                defaultQuestionId={questionId}
-                onClose={() => setCreateModalVisible(false)}
+                question={selectedQuestion}
+                onClose={() => {
+                    setCreateModalVisible(false);
+                    setSelectedQuestion(null);
+                }}
                 onSuccess={handleCreateSuccess}
             />
 
             <AnswerUpdateModal
                 open={updateModalVisible}
-                initialData={editingAnswer}
-                questions={questions}
-                onClose={() => { setUpdateModalVisible(false); setEditingAnswer(null); }}
+                question={selectedQuestion}
+                existingAnswers={selectedAnswers}
+                onClose={() => {
+                    setUpdateModalVisible(false);
+                    setSelectedQuestion(null);
+                    setSelectedAnswers([]);
+                }}
                 onSuccess={handleUpdateSuccess}
             />
 
             <AnswerDetailDrawer
                 open={detailDrawerVisible}
                 data={viewingAnswer}
-                onClose={() => { setDetailDrawerVisible(false); setViewingAnswer(null); }}
+                onClose={() => {
+                    setDetailDrawerVisible(false);
+                    setViewingAnswer(null);
+                }}
             />
-        </>
+        </div>
     );
 };
 
-export default AnswerList; 
+export default AnswerList;

@@ -1,5 +1,5 @@
 import { BaseService } from "../../app/api/base.service";
-import type { ResponseSuccess } from "../../app/interface";
+import type { ResponseSuccess, ResponsePaged } from "../../app/interface";
 import type {
     CreateQuestionRequest,
     SearchQuestionRequest,
@@ -13,7 +13,7 @@ export const QuestionService = {
     getAllQuestions(params: SearchQuestionRequest) {
         const url = API_PATH.QUESTION.GET_ALL_QUESTIONS;
         const payload = params;
-        return BaseService.get<ResponseSuccess<QuestionResponse[]>>({
+        return BaseService.get<ResponsePaged<QuestionResponse[]>>({
             url,
             payload,
         });

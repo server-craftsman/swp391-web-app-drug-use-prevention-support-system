@@ -1,5 +1,5 @@
 import { BaseService } from "../../app/api/base.service";
-import type { ResponseSuccess } from "../../app/interface";
+import type { ResponseSuccess, ResponsePaged } from "../../app/interface";
 import type {
     CreateAnswerRequest,
     SearchAnswerRequest,
@@ -13,7 +13,7 @@ export const AnswerService = {
     getAllAnswers(params: SearchAnswerRequest) {
         const url = API_PATH.ANSWER.GET_ALL_ANSWERS;
         const payload = params;
-        return BaseService.get<ResponseSuccess<AnswerResponse[]>>({
+        return BaseService.get<ResponsePaged<AnswerResponse[]>>({
             url,
             payload,
         });
@@ -35,9 +35,9 @@ export const AnswerService = {
     },
 
     /* Cập nhật answer */
-    updateAnswer(id: string, params: UpdateAnswerRequest) {
+    updateAnswer(params: UpdateAnswerRequest) {
         return BaseService.put<ResponseSuccess<AnswerResponse>>({
-            url: API_PATH.ANSWER.UPDATE_ANSWER(id),
+            url: API_PATH.ANSWER.UPDATE_ANSWER,
             payload: params,
         });
     },

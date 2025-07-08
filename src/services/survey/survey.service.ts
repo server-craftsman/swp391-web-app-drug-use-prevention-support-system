@@ -1,5 +1,5 @@
 import { BaseService } from "../../app/api/base.service";
-import type { ResponseSuccess } from "../../app/interface";
+import type { ResponseSuccess, ResponsePaged } from "../../app/interface";
 import type {
     CreateSurveyRequest,
     SearchSurveyRequest,
@@ -14,7 +14,7 @@ export const SurveyService = {
     getAllSurveys(params: SearchSurveyRequest) {
         const url = API_PATH.SURVEY.GET_ALL_SURVEYS;
         const payload = params;
-        return BaseService.get<ResponseSuccess<SurveyResponse[]>>({
+        return BaseService.get<ResponsePaged<SurveyResponse[]>>({
             url,
             payload,
         });

@@ -56,11 +56,11 @@ export const API_PATH = {
     DELETE_QUESTION: (id: string) => `/question/${id}`,
   },
   ANSWER: {
-    GET_ALL_ANSWERS: "/AnswerOption/paged",
-    GET_ANSWER_BY_QUESTION_ID: (questionId: string) => `/AnswerOption/by-question/${questionId}`,
-    CREATE_ANSWER: "/AnswerOption",
-    UPDATE_ANSWER: (id: string) => `/AnswerOption/${id}`,
-    DELETE_ANSWER: (id: string) => `/AnswerOption/${id}`,
+    GET_ALL_ANSWERS: "/answer-options/paged",
+    GET_ANSWER_BY_QUESTION_ID: (questionId: string) => `/answer-options/by-question/${questionId}`,
+    CREATE_ANSWER: "/answer-options/create",
+    UPDATE_ANSWER: "/answer-options/update",
+    DELETE_ANSWER: (id: string) => `/answer-options/${id}`,
   },
   COURSE: {
     GET_ALL_COURSES: "/Course",
