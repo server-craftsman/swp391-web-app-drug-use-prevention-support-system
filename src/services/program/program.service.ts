@@ -37,8 +37,19 @@ export const ProgramService = {
     });
   },
   getProgramById(id: string) {
-    return BaseService.get<ResponseSuccess<Program>>({
+    return BaseService.get<Program>({
       url: API_PATH.PROGRAM.GET_PROGRAM_BY_ID(id),
+    });
+  },
+  enrollProgram(programId: string) {
+    return BaseService.post<ResponseSuccess<any>>({
+      url: API_PATH.PROGRAM.ENROLL_PROGRAM,
+      payload: { programId },
+    });
+  },
+  programEnrollments() {
+    return BaseService.get<ResponseSuccess<Program[]>>({
+      url: API_PATH.PROGRAM.PROGRAM_ENROLLMENTS,
     });
   },
 };

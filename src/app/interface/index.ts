@@ -1,3 +1,3 @@
-import type { ResponseSuccess } from "./formatResponse";
+import type { ResponseSuccess, ResponsePaged } from "./formatResponse";
 
-export type { ResponseSuccess };
+export type { ResponseSuccess, ResponsePaged };

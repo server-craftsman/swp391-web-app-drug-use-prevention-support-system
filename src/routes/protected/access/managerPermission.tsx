@@ -9,6 +9,7 @@ const OverviewPage = lazy(() => import("../../../pages/admin/overview")); // Tem
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 const ProgramManagementPage = lazy(() => import("../../../pages/manager/program"));
 const AppointmentManagementPage = lazy(() => import("../../../pages/customer/appointment"));
+const SurveyPageManagement = lazy(() => import("../../../pages/manager/survey"));
 // Manager routes with layout protection
 export const ManagerRoutes: RouteObject[] = [
     {
@@ -34,6 +35,10 @@ export const ManagerRoutes: RouteObject[] = [
             {
                 path: ROUTER_URL.MANAGER.PROGRAMS,
                 element: <ProgramManagementPage />, // Temporary placeholder
+            },
+            {
+                path: ROUTER_URL.MANAGER.SURVEYS,
+                element: <SurveyPageManagement />, // Temporary placeholder
             },
             {
                 path: ROUTER_URL.MANAGER.COURSES,
