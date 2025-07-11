@@ -89,6 +89,11 @@ const SidebarLayout: React.FC = () => {
             label: <Link to={ROUTER_URL.MANAGER.PROGRAMS}>Chương trình</Link>,
         },
         {
+            key: ROUTER_URL.MANAGER.SURVEYS,
+            icon: <BookOutlined />,
+            label: <Link to={ROUTER_URL.MANAGER.SURVEYS}>Khảo sát</Link>,
+        },
+        {
             key: ROUTER_URL.MANAGER.COURSES,
             icon: <BookOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.COURSES}>Khóa học</Link>,
@@ -149,15 +154,17 @@ const SidebarLayout: React.FC = () => {
             <div className="p-4 border-b border-gray-700">
                 <div className="flex items-center justify-between">
                     {!collapsed && (
-                        <div className="flex items-center space-x-3">
-                            <div className="bg-purple-500 rounded p-2 text-white font-bold">
-                                QL
+                        <Link to={ROUTER_URL.COMMON.HOME}>
+                            <div className="flex items-center space-x-3">
+                                <div className="bg-purple-500 rounded p-2 text-white font-bold">
+                                    QL
+                                </div>
+                                <div className="text-white">
+                                    <div className="text-sm font-medium">Quản lý</div>
+                                    <div className="text-xs text-gray-300">Phòng ngừa ma túy</div>
+                                </div>
                             </div>
-                            <div className="text-white">
-                                <div className="text-sm font-medium">Quản lý</div>
-                                <div className="text-xs text-gray-300">Phòng ngừa ma túy</div>
-                            </div>
-                        </div>
+                        </Link>
                     )}
                     <Button
                         type="text"

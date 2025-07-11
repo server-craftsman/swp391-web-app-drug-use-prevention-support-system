@@ -41,7 +41,17 @@ const ProgramDetailDrawer: React.FC<DetailProps> = ({ visible, onClose, program 
                     <Descriptions.Item label="Ngày kết thúc">{helpers.formatDate(new Date(program.endDate))}</Descriptions.Item>
                     <Descriptions.Item label="Video">
                         {program.programVidUrl ? (
-                            <video src={program.programVidUrl} controls width={250} />
+                            <video
+                                controls
+                                width={500}
+                                height={280}
+                                style={{ objectFit: 'cover', backgroundColor: '#000' }}
+                                playsInline
+                                crossOrigin="anonymous"
+                            >
+                                <source src={program.programVidUrl} />
+                                Trình duyệt của bạn không hỗ trợ video.
+                            </video>
                         ) : (
                             <span className="text-gray-500 italic">Không có video</span>
                         )}

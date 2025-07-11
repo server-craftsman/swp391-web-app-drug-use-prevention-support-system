@@ -1,12 +1,12 @@
 import React from "react";
-import { Button, Space, Table, Tag, Tooltip, Select, DatePicker, message, Avatar, Typography } from "antd";
+import { Button, Space, Table, Tag, Tooltip, Select, DatePicker, Avatar, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import type { Appointment } from "../../../types/appointment/Appointment.res.type";
 import { AppointmentStatus } from "../../../app/enums/appointmentStatus.enum";
 import { ConsultantService } from "../../../services/consultant/consultant.service";
 import { AppointmentService } from "../../../services/appointment/appointment.service";
 import { UserRole } from "../../../app/enums";
-// import { helpers } from "../../../utils";
+import { helpers } from "../../../utils";
 import dayjs from "dayjs";
 import { CloseCircleOutlined } from "@ant-design/icons";
 
@@ -78,37 +78,37 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
                     })) as ConsultantOption[];
                     setConsultants(list);
                 })
-                .catch(() => message.error("Không thể tải danh sách tư vấn viên"));
+                .catch(() => helpers.notificationMessage("Không thể tải danh sách tư vấn viên", "error"));
         }
     }, [role]);
 
     const handleChangeStatus = async (appointmentId: string, newStatus: AppointmentStatus) => {
         try {
             await AppointmentService.changeStatus({ appointmentId, newStatus });
-            message.success("Cập nhật trạng thái thành công");
+            helpers.notificationMessage("Cập nhật trạng thái thành công", "success");
             onRefresh();
         } catch (err) {
-            message.error("Cập nhật trạng thái thất bại");
+            helpers.notificationMessage("Cập nhật trạng thái thất bại", "error");
         }
     };
 
     const handleAssignConsultant = async (appointmentId: string, consultantUserId: string) => {
         try {
             await AppointmentService.assignConsultant({ appointmentId, consultantUserId });
-            message.success("Gán tư vấn viên thành công");
+            helpers.notificationMessage("Gán tư vấn viên thành công", "success");
             onRefresh();
         } catch (err) {
-            message.error("Gán tư vấn viên thất bại");
+            helpers.notificationMessage("Gán tư vấn viên thất bại", "error");
         }
     };
 
     const handleCancel = async (record: Appointment) => {
         try {
             await AppointmentService.cancelAppointment(record.id);
-            message.success("Đã hủy lịch hẹn");
+            helpers.notificationMessage("Đã hủy lịch hẹn", "success");
             onRefresh();
         } catch (err) {
-            message.error("Hủy lịch hẹn thất bại");
+            helpers.notificationMessage("Hủy lịch hẹn thất bại", "error");
         }
     };
 
@@ -118,7 +118,7 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
 
     const handleApplyFilter = () => {
         if (dateRange && dateRange[0].isAfter(dateRange[1])) {
-            message.error('Ngày bắt đầu phải trước ngày kết thúc');
+            helpers.notificationMessage('Ngày bắt đầu phải trước ngày kết thúc', 'error');
             return;
         }
         onFilterChange(
@@ -166,7 +166,7 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
                             onChange={(selectedId) => {
                                 const selected = consultants.find(c => c.id === selectedId);
                                 if (selected) {
-                                    handleAssignConsultant(record.id, selected.userId ?? selected.id);
+                                    handleAssignConsultant(record.id, selected.id ?? selected.userId ?? "");
                                 }
                             }}
                         >
@@ -197,7 +197,8 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
             dataIndex: "status",
             key: "status",
             render: (status: Appointment["status"], record) => {
-                if ((role === UserRole.MANAGER || role === UserRole.CONSULTANT) && !isFinalStatus(status)) {
+                // Manager: can change any non-final status
+                if (role === UserRole.MANAGER && !isFinalStatus(status)) {
                     return (
                         <Select
                             value={status}
@@ -213,6 +214,33 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
                         </Select>
                     );
                 }
+
+                // Consultant: only allow change from ASSIGNED to PROCESSING / COMPLETED / CANCELLED
+                if (role === UserRole.CONSULTANT && (status === AppointmentStatus.ASSIGNED || status === AppointmentStatus.PROCESSING)) {
+                    const allowedNext = status === AppointmentStatus.ASSIGNED
+                        ? [AppointmentStatus.PROCESSING, AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED]
+                        : [AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED];
+                    return (
+                        <Select
+                            value={status}
+                            style={{ width: 160 }}
+                            onChange={(val) => handleChangeStatus(record.id, val as AppointmentStatus)}
+                            optionLabelProp="label"
+                        >
+                            {/* Disabled current status */}
+                            <Select.Option value={status} disabled label={statusViMap[status]}>
+                                <Tag color={statusColorMap[status]} style={{ margin: 0 }}>{statusViMap[status]}</Tag>
+                            </Select.Option>
+                            {allowedNext.map((st) => (
+                                <Select.Option key={st} value={st} label={statusViMap[st]}>
+                                    <Tag color={statusColorMap[st]} style={{ margin: 0 }}>{statusViMap[st]}</Tag>
+                                </Select.Option>
+                            ))}
+                        </Select>
+                    );
+                }
+
+                // Default: display tag only
                 return (
                     <Tag color={statusColorMap[status] || "default"}>{statusViMap[status] || status}</Tag>
                 );

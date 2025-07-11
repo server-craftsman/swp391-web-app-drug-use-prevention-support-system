@@ -1,4 +1,7 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import {
+    S3Client, PutObjectCommand, DeleteObjectCommand,
+    type PutObjectCommandInput,
+} from "@aws-sdk/client-s3";
 import { notificationMessage } from './helper';
 
 // Configure AWS S3
@@ -47,12 +50,12 @@ export const uploadFileToS3 = async (file: File, folder: string = 'profile-pictu
         // Use FileReader instead of arrayBuffer
         const fileData = await fileToUint8Array(file);
 
-        const params = {
+        const params: PutObjectCommandInput = {
             Bucket: import.meta.env.VITE_S3_BUCKET_NAME as string,
             Key: fileName,
             Body: fileData,
             ContentType: file.type,
-            // ACL: 'public-read'
+            ACL: "public-read"
         };
 
         await s3Client.send(new PutObjectCommand(params));

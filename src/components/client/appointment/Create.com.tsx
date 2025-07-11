@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, DatePicker, Button, message, Select } from "antd";
+import { Modal, Form, Input, DatePicker, Button, Select } from "antd";
 import { UserOutlined, CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { AppointmentService } from "../../../services/appointment/appointment.service";
 import type { CreateAppointmentRequest } from "../../../types/appointment/Appointment.req.type";
-
+import { helpers } from "../../../utils";
 interface CreateAppointmentProps {
     visible: boolean;
     onCancel: () => void;
@@ -65,11 +65,11 @@ const CreateAppointmentModal: React.FC<CreateAppointmentProps> = ({
             };
 
             await AppointmentService.createAppointment(requestData);
-            message.success("Đặt lịch hẹn thành công!");
+            helpers.notificationMessage("Đặt lịch hẹn thành công!", "success");
             form.resetFields();
             onSuccess();
         } catch (err) {
-            message.error("Đặt lịch hẹn thất bại. Vui lòng thử lại!");
+            helpers.notificationMessage("Đặt lịch hẹn thất bại. Vui lòng thử lại!", "error");
         } finally {
             setLoading(false);
         }
@@ -101,7 +101,7 @@ const CreateAppointmentModal: React.FC<CreateAppointmentProps> = ({
                 className="space-y-4"
             >
                 {/* Thông tin cá nhân */}
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-white p-4 rounded-lg">
                     <h4 className="text-md font-medium text-gray-700 mb-3 flex items-center gap-2">
                         <UserOutlined /> Thông tin liên hệ
                     </h4>

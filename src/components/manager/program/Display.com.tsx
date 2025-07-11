@@ -102,10 +102,10 @@ const ProgramDisplay: React.FC<DisplayProps> = ({
             title: "Hành động",
             key: "actions",
             render: (_, record) => (
-                <Space>
-                    <Button icon={<EyeOutlined />} onClick={() => onView(record)} />
-                    <Button icon={<EditOutlined />} onClick={() => onEdit(record)} />
-                    <Button danger icon={<DeleteOutlined />} onClick={() => onDelete(record)} />
+                <Space size="small">
+                    <Button size="small" type="text" icon={<EyeOutlined />} onClick={() => onView(record)} />
+                    <Button size="small" type="text" icon={<EditOutlined />} onClick={() => onEdit(record)} />
+                    <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={() => onDelete(record)} />
                 </Space>
             ),
             width: 150,
