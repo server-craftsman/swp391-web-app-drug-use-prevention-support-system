@@ -1,5 +1,4 @@
 import React from "react";
-import { Typography } from "antd";
 import CourseraVideoPlayer from "./video/CourseraVideoPlayer.ui";
 import type { Program } from "../../../types/program/Program.type";
 
@@ -14,7 +13,6 @@ const ProgramMediaBanner: React.FC<ProgramMediaBannerProps> = ({
     videoRef,
     onTimeUpdate
 }) => {
-    const { Title } = Typography;
     return (
         <div style={{
             marginBottom: '32px',

@@ -27,14 +27,14 @@ const SurveyDetailDrawer: React.FC<DetailProps> = ({ surveyId, surveyName, surve
                 try {
                     setLoading(true);
                     const qRes = await QuestionService.getQuestionBySurveyId(surveyId);
-                    const qList = qRes?.data?.data ?? [];
+                    const qList = qRes?.data ?? [];
                     setQuestions(qList);
                     // Fetch answers for each question in parallel
                     const answerPromises = qList.map((q) => AnswerService.getAnswerByQuestionId(q.id));
                     const answerResList = await Promise.all(answerPromises);
                     const map: Record<string, AnswerResponse[]> = {};
                     answerResList.forEach((res, idx) => {
-                        map[qList[idx].id] = res?.data?.data ?? [];
+                        map[qList[idx].id] = res?.data ?? [];
                     });
                     setAnswersMap(map);
                 } finally {
@@ -86,7 +86,7 @@ const SurveyDetailDrawer: React.FC<DetailProps> = ({ surveyId, surveyName, surve
                     {questions.map((q) => (
                         <div key={q.id} className="mt-4">
                             <Table
-                                title={() => q.questionContent}
+                                title={() => <div dangerouslySetInnerHTML={{ __html: q.questionContent }} />}
                                 dataSource={answersMap[q.id] ?? []}
                                 columns={answerColumns}
                                 pagination={false}

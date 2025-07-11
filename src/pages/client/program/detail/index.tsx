@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Spin, Typography, Button, Form, message, Layout, Drawer, Breadcrumb } from "antd";
-import { MenuUnfoldOutlined, LeftOutlined, HomeOutlined } from "@ant-design/icons";
+import { useParams, useNavigate } from "react-router-dom";
+import { Spin, Typography, Button, Layout, Drawer, Breadcrumb } from "antd";
+import { MenuUnfoldOutlined, HomeOutlined } from "@ant-design/icons";
 import type { Program } from "../../../../types/program/Program.type";
 import { ProgramService } from "../../../../services/program/program.service";
 import { helpers } from "../../../../utils";
 import { SurveyService } from "../../../../services/survey/survey.service";
-import { QuestionService } from "../../../../services/question/question.service";
-import { AnswerService } from "../../../../services/answer/answer.service";
 import { SurveyType } from "../../../../app/enums/surveyType.enum";
 import { ROUTER_URL } from "../../../../consts/router.path.const";
 
@@ -21,7 +19,6 @@ const { Title } = Typography;
 const ProgramDetail: React.FC = () => {
     const { programId } = useParams<{ programId: string }>();
     const navigate = useNavigate();
-    const location = useLocation();
 
     // Create video ref for transcript integration
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -38,15 +35,9 @@ const ProgramDetail: React.FC = () => {
 
     const [activeSurveyType, setActiveSurveyType] = useState<SurveyType>(SurveyType.PRE_FEEDBACK);
     const [selectedSurvey, setSelectedSurvey] = useState<any | null>(null);
-    const [questions, setQuestions] = useState<any[]>([]);
-    const [answersMap, setAnswersMap] = useState<Record<string, any[]>>({});
-    const [submitting, setSubmitting] = useState(false);
 
     // UI state
     const [drawerVisible, setDrawerVisible] = useState(false);
-    const [answeredIds, setAnsweredIds] = useState<Set<string>>(new Set());
-
-    // No survey content on this page
 
     useEffect(() => {
         const fetchProgram = async () => {
@@ -94,7 +85,6 @@ const ProgramDetail: React.FC = () => {
     }, []);
 
     // Update selected survey when survey type changes
-    // Chỉ tự động chọn survey đầu tiên nếu survey hiện tại KHÔNG thuộc loại đang chọn
     useEffect(() => {
         const surveysForType = activeSurveyType === SurveyType.PRE_FEEDBACK ? preFeedbackSurveys : postFeedbackSurveys;
 
@@ -114,86 +104,17 @@ const ProgramDetail: React.FC = () => {
     // Fetch questions when survey changes
     useEffect(() => {
         if (!selectedSurvey) {
-            setQuestions([]);
-            setAnswersMap({});
             return;
         }
 
-        const fetchQs = async () => {
-            try {
-                const resQ = await QuestionService.getQuestionBySurveyId(selectedSurvey.id);
-                const qs = resQ?.data ?? [];
-                setQuestions(qs);
-                setAnsweredIds(new Set());
-
-                // Fetch answers for each question
-                const ansPromises = qs.map((q: any) => AnswerService.getAnswerByQuestionId(q.id));
-                const ansResults = await Promise.all(ansPromises);
-                const map: Record<string, any[]> = {};
-                qs.forEach((q: any, idx: number) => {
-                    map[q.id] = (ansResults[idx] as any)?.data?.data ?? [];
-                });
-                setAnswersMap(map);
-            } catch {
-                helpers.notificationMessage("Không thể tải câu hỏi", "error");
-            }
-        };
-        fetchQs();
+        // Questions are handled in the separate survey page
+        // This effect can be removed if not needed for sidebar functionality
     }, [selectedSurvey]);
 
-    // // Extract survey param
-    // const surveyQueryId = new URLSearchParams(location.search).get('survey');
-
-    // useEffect(() => {
-    //     if (surveyQueryId) {
-    //         const sv = [...preFeedbackSurveys, ...postFeedbackSurveys].find(s => s.id === surveyQueryId);
-    //         if (sv) setSelectedSurvey(sv);
-    //     }
-    // }, [surveyQueryId, preFeedbackSurveys, postFeedbackSurveys]);
-
-    const handleFormChange = (changed: any, all: any) => {
-        const ans = new Set<string>();
-        Object.keys(all).forEach(k => { if (all[k]) ans.add(k); });
-        setAnsweredIds(ans);
-    };
-
-    const scrollToQuestion = (qId: string) => {
-        const el = document.getElementById(`q-${qId}`);
-        if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
-            if (window.innerWidth < 768) setDrawerVisible(false);
-        }
-    };
-
-    const getCurrentSurveys = () => {
-        return activeSurveyType === SurveyType.PRE_FEEDBACK ? preFeedbackSurveys : postFeedbackSurveys;
-    };
-
-    const [form] = Form.useForm();
-    const userInfo = localStorage.getItem("userInfo");
-    const userId = userInfo ? (() => { try { return JSON.parse(userInfo).id || ""; } catch { return "" } })() : "";
-
-    const handleSubmitSurvey = async () => {
-        try {
-            const values = await form.validateFields();
-            const answersArr = Object.keys(values).map(qId => ({ questionId: qId, answerOptionId: values[qId] }));
-            setSubmitting(true);
-            await SurveyService.submitSurvey({ userId, surveyId: selectedSurvey.id, answers: answersArr } as any);
-            message.success("Đã gửi khảo sát thành công! Cảm ơn bạn đã tham gia.");
-            form.resetFields();
-            setAnsweredIds(new Set());
-        } catch (err: any) {
-            if (err?.errorFields) return;
-            message.error("Gửi khảo sát thất bại. Vui lòng thử lại.");
-        } finally { setSubmitting(false); }
-    };
 
     // Handler functions for sidebar
     const handleSurveyTypeChange = (type: SurveyType) => {
         setActiveSurveyType(type);
-        form.resetFields();
-        // Navigate to survey page instead
-        // handled in sidebar
     };
 
     const handleSurveySelect = (_: string) => { };
@@ -206,8 +127,6 @@ const ProgramDetail: React.FC = () => {
             // Ẩn drawer trên mobile để cải thiện UX
             if (window.innerWidth < 768) setDrawerVisible(false);
         }
-
-        // Scroll only
     };
 
     // Sidebar content with Coursera-inspired design
@@ -218,12 +137,8 @@ const ProgramDetail: React.FC = () => {
             preFeedbackSurveys={preFeedbackSurveys}
             postFeedbackSurveys={postFeedbackSurveys}
             activeSurveyType={activeSurveyType}
-            selectedSurvey={selectedSurvey}
-            questions={questions}
-            answeredIds={answeredIds}
             onSurveyTypeChange={handleSurveyTypeChange}
             onSurveySelect={handleSurveySelect}
-            onQuestionClick={scrollToQuestion}
             onProgramClick={scrollToProgram}
         />
     ) : null;
@@ -266,7 +181,6 @@ const ProgramDetail: React.FC = () => {
                 breakpoint="lg"
                 collapsedWidth="0"
                 style={{
-                    // backgroundColor: '#f8f9fa',
                     overflowY: 'auto',
                     height: '100vh',
                     position: 'sticky',
@@ -294,21 +208,6 @@ const ProgramDetail: React.FC = () => {
                         alignItems: 'center',
                         gap: '16px'
                     }}>
-                        {/* <Button
-                            type="text"
-                            icon={<LeftOutlined />}
-                            onClick={() => navigate(ROUTER_URL.CLIENT.PROGRAM)}
-                            style={{
-                                color: '#0056d3',
-                                fontWeight: 500,
-                                padding: '4px 8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px'
-                            }}
-                        >
-                            Quay lại danh sách
-                        </Button> */}
                         <Breadcrumb
                             style={{ flex: 1 }}
                             items={[
@@ -358,7 +257,6 @@ const ProgramDetail: React.FC = () => {
                         videoRef={videoRef}
                     />
                 </div>
-                {/* Removed floating submit button */}
             </Layout.Content>
         </Layout>
     );

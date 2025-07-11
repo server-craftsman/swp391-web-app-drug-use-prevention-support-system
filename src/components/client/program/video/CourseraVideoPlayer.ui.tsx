@@ -7,10 +7,7 @@ import {
     FullscreenOutlined,
     FullscreenExitOutlined,
     SettingOutlined,
-    BackwardOutlined,
-    ForwardOutlined,
     RetweetOutlined,
-    PictureOutlined
 } from '@ant-design/icons';
 import type { Program } from '../../../../types/program/Program.type';
 
@@ -512,188 +509,188 @@ const CourseraVideoPlayer: React.FC<CourseraVideoPlayerProps> = ({
                                         lineHeight: '1'
                                     }}>
                                         10
-                                </span>
-                            </Button>
-                        </Tooltip>
+                                    </span>
+                                </Button>
+                            </Tooltip>
 
-                        {/* Forward 10s button */}
-                        <Tooltip title="Tua tới 10 giây">
+                            {/* Forward 10s button */}
+                            <Tooltip title="Tua tới 10 giây">
+                                <Button
+                                    type="text"
+                                    onClick={() => skipTime(10)}
+                                    style={{
+                                        color: '#fff',
+                                        fontSize: '18px',
+                                        padding: '6px',
+                                        borderRadius: '6px',
+                                        width: '36px',
+                                        height: '36px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        backgroundColor: 'rgba(0,0,0,0.4)',
+                                        // border: '1px solid rgba(255,255,255,0.2)',
+                                        transition: 'all 0.2s',
+                                        position: 'relative'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.7)';
+                                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.4)';
+                                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                                    }}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+                                        <path fillRule="evenodd" d="M12.207 2.232a.75.75 0 0 0 .025 1.06l4.146 3.958H6.375a5.375 5.375 0 0 0 0 10.75H9.25a.75.75 0 0 0 0-1.5H6.375a3.875 3.875 0 0 1 0-7.75h10.003l-4.146 3.957a.75.75 0 0 0 1.036 1.085l5.5-5.25a.75.75 0 0 0 0-1.085l-5.5-5.25a.75.75 0 0 0-1.06.025Z" clipRule="evenodd" />
+                                    </svg>
+
+                                    <span style={{
+                                        position: 'absolute',
+                                        bottom: '0px',
+                                        fontSize: '8px',
+                                        fontWeight: '600',
+                                        lineHeight: '1'
+                                    }}>
+                                        10
+                                    </span>
+                                </Button>
+                            </Tooltip>
+                        </div>
+
+                        {/* Volume Controls */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <Button
                                 type="text"
-                                onClick={() => skipTime(10)}
+                                icon={<SoundOutlined />}
+                                onClick={toggleMute}
+                                style={{ color: '#fff', fontSize: '18px', padding: '4px' }}
+                            />
+                            <div style={{ width: '80px' }}>
+                                <Slider
+                                    value={isMuted ? 0 : volume * 100}
+                                    onChange={handleVolumeChange}
+                                    tooltip={{
+                                        formatter: (value) => `${value}%`
+                                    }}
+                                    trackStyle={{ backgroundColor: '#1890ff', height: '3px' }}
+                                    railStyle={{ backgroundColor: 'rgba(255,255,255,0.3)', height: '3px' }}
+                                    handleStyle={{
+                                        backgroundColor: '#1890ff',
+                                        borderColor: '#1890ff',
+                                        width: '10px',
+                                        height: '10px',
+                                        marginTop: '-1px'
+                                    }}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Time Display */}
+                        <span style={{ fontSize: '14px', color: '#fff', whiteSpace: 'nowrap' }}>
+                            {formatTime(currentTime)} / {formatTime(duration)}
+                        </span>
+                    </div>
+
+                    {/* Nhóm controls bên phải */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {/* Playback Speed */}
+                        <Tooltip title="Tốc độ phát">
+                            <select
+                                value={playbackRate}
+                                onChange={(e) => changePlaybackRate(Number(e.target.value))}
                                 style={{
+                                    backgroundColor: 'transparent',
                                     color: '#fff',
-                                    fontSize: '18px',
-                                    padding: '6px',
-                                    borderRadius: '6px',
-                                    width: '36px',
-                                    height: '36px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    backgroundColor: 'rgba(0,0,0,0.4)',
-                                    // border: '1px solid rgba(255,255,255,0.2)',
-                                    transition: 'all 0.2s',
-                                    position: 'relative'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.7)';
-                                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.4)';
-                                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                                    border: '1px solid rgba(255,255,255,0.3)',
+                                    borderRadius: '4px',
+                                    padding: '4px 8px',
+                                    fontSize: '14px'
                                 }}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
-                                    <path fillRule="evenodd" d="M12.207 2.232a.75.75 0 0 0 .025 1.06l4.146 3.958H6.375a5.375 5.375 0 0 0 0 10.75H9.25a.75.75 0 0 0 0-1.5H6.375a3.875 3.875 0 0 1 0-7.75h10.003l-4.146 3.957a.75.75 0 0 0 1.036 1.085l5.5-5.25a.75.75 0 0 0 0-1.085l-5.5-5.25a.75.75 0 0 0-1.06.025Z" clipRule="evenodd" />
-                                </svg>
-
-                                <span style={{
-                                    position: 'absolute',
-                                    bottom: '0px',
-                                    fontSize: '8px',
-                                    fontWeight: '600',
-                                    lineHeight: '1'
-                                }}>
-                                    10
-                                </span>
-                            </Button>
+                                <option value={0.5} style={{ color: '#000' }}>0.5x</option>
+                                <option value={0.75} style={{ color: '#000' }}>0.75x</option>
+                                <option value={1} style={{ color: '#000' }}>1x</option>
+                                <option value={1.25} style={{ color: '#000' }}>1.25x</option>
+                                <option value={1.5} style={{ color: '#000' }}>1.5x</option>
+                                <option value={2} style={{ color: '#000' }}>2x</option>
+                            </select>
                         </Tooltip>
-                    </div>
 
-                    {/* Volume Controls */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Button
-                            type="text"
-                            icon={<SoundOutlined />}
-                            onClick={toggleMute}
-                            style={{ color: '#fff', fontSize: '18px', padding: '4px' }}
-                        />
-                        <div style={{ width: '80px' }}>
-                            <Slider
-                                value={isMuted ? 0 : volume * 100}
-                                onChange={handleVolumeChange}
-                                tooltip={{
-                                    formatter: (value) => `${value}%`
-                                }}
-                                trackStyle={{ backgroundColor: '#1890ff', height: '3px' }}
-                                railStyle={{ backgroundColor: 'rgba(255,255,255,0.3)', height: '3px' }}
-                                handleStyle={{
-                                    backgroundColor: '#1890ff',
-                                    borderColor: '#1890ff',
-                                    width: '10px',
-                                    height: '10px',
-                                    marginTop: '-1px'
-                                }}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Time Display */}
-                    <span style={{ fontSize: '14px', color: '#fff', whiteSpace: 'nowrap' }}>
-                        {formatTime(currentTime)} / {formatTime(duration)}
-                    </span>
-                </div>
-
-                {/* Nhóm controls bên phải */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    {/* Playback Speed */}
-                    <Tooltip title="Tốc độ phát">
-                        <select
-                            value={playbackRate}
-                            onChange={(e) => changePlaybackRate(Number(e.target.value))}
-                            style={{
-                                backgroundColor: 'transparent',
-                                color: '#fff',
-                                border: '1px solid rgba(255,255,255,0.3)',
-                                borderRadius: '4px',
-                                padding: '4px 8px',
-                                fontSize: '14px'
-                            }}
-                        >
-                            <option value={0.5} style={{ color: '#000' }}>0.5x</option>
-                            <option value={0.75} style={{ color: '#000' }}>0.75x</option>
-                            <option value={1} style={{ color: '#000' }}>1x</option>
-                            <option value={1.25} style={{ color: '#000' }}>1.25x</option>
-                            <option value={1.5} style={{ color: '#000' }}>1.5x</option>
-                            <option value={2} style={{ color: '#000' }}>2x</option>
-                        </select>
-                    </Tooltip>
-
-                    {/* Loop Button */}
-                    <Tooltip title={isLooping ? 'Tắt vòng lặp' : 'Bật vòng lặp'}>
-                        <Button
-                            type="text"
-                            icon={<RetweetOutlined style={{ color: isLooping ? '#1890ff' : undefined }} />}
-                            onClick={toggleLoop}
-                            style={{ color: '#fff', fontSize: '18px', padding: '4px' }}
-                        />
-                    </Tooltip>
-
-                    {/* Mini player (PiP) - chỉ hiển thị nếu browser hỗ trợ */}
-                    {isPiPAvailable && (
-                        <Tooltip title={isMiniPlayer ? 'Thoát màn hình thu nhỏ' : 'Màn hình thu nhỏ'}>
+                        {/* Loop Button */}
+                        <Tooltip title={isLooping ? 'Tắt vòng lặp' : 'Bật vòng lặp'}>
                             <Button
                                 type="text"
-                                icon={
-                                    <svg 
-                                        width="16" 
-                                        height="16" 
-                                        viewBox="0 0 24 24" 
-                                        fill="none" 
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        style={{ color: isMiniPlayer ? '#1890ff' : '#fff' }}
-                                    >
-                                        <rect x="3" y="3" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="2" fill="none"/>
-                                        <rect x="15" y="17" width="6" height="4" rx="1" stroke="currentColor" strokeWidth="2" fill="currentColor"/>
-                                    </svg>
-                                }
-                                onClick={toggleMiniPlayer}
+                                icon={<RetweetOutlined style={{ color: isLooping ? '#1890ff' : undefined }} />}
+                                onClick={toggleLoop}
                                 style={{ color: '#fff', fontSize: '18px', padding: '4px' }}
                             />
                         </Tooltip>
-                    )}
 
-                    {/* Settings Button */}
-                    <Tooltip title="Cài đặt">
-                        <Button
-                            type="text"
-                            icon={<SettingOutlined />}
-                            style={{ color: '#fff', fontSize: '18px', padding: '4px' }}
-                        />
-                    </Tooltip>
+                        {/* Mini player (PiP) - chỉ hiển thị nếu browser hỗ trợ */}
+                        {isPiPAvailable && (
+                            <Tooltip title={isMiniPlayer ? 'Thoát màn hình thu nhỏ' : 'Màn hình thu nhỏ'}>
+                                <Button
+                                    type="text"
+                                    icon={
+                                        <svg
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            style={{ color: isMiniPlayer ? '#1890ff' : '#fff' }}
+                                        >
+                                            <rect x="3" y="3" width="18" height="12" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                                            <rect x="15" y="17" width="6" height="4" rx="1" stroke="currentColor" strokeWidth="2" fill="currentColor" />
+                                        </svg>
+                                    }
+                                    onClick={toggleMiniPlayer}
+                                    style={{ color: '#fff', fontSize: '18px', padding: '4px' }}
+                                />
+                            </Tooltip>
+                        )}
 
-                    {/* Fullscreen Button */}
-                    <Tooltip title={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}>
-                        <Button
-                            type="text"
-                            icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
-                            onClick={toggleFullscreen}
-                            style={{ color: '#fff', fontSize: '18px', padding: '4px' }}
-                        />
-                    </Tooltip>
+                        {/* Settings Button */}
+                        <Tooltip title="Cài đặt">
+                            <Button
+                                type="text"
+                                icon={<SettingOutlined />}
+                                style={{ color: '#fff', fontSize: '18px', padding: '4px' }}
+                            />
+                        </Tooltip>
+
+                        {/* Fullscreen Button */}
+                        <Tooltip title={isFullscreen ? "Thoát toàn màn hình" : "Toàn màn hình"}>
+                            <Button
+                                type="text"
+                                icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                                onClick={toggleFullscreen}
+                                style={{ color: '#fff', fontSize: '18px', padding: '4px' }}
+                            />
+                        </Tooltip>
+                    </div>
                 </div>
             </div>
-        </div>
 
-            {/* Click overlay cho play/pause - vùng click trong suốt */ }
-    {
-        showControls && (
-            <div
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: '100px',
-                    zIndex: 5
-                }}
-                onClick={togglePlay}
-                onDoubleClick={toggleFullscreen}
-            />
-        )
-    }
+            {/* Click overlay cho play/pause - vùng click trong suốt */}
+            {
+                showControls && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: '100px',
+                            zIndex: 5
+                        }}
+                        onClick={togglePlay}
+                        onDoubleClick={toggleFullscreen}
+                    />
+                )
+            }
         </div >
     );
 };

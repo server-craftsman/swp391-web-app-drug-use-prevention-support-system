@@ -1,5 +1,5 @@
 import {
-    S3Client, PutObjectCommand, DeleteObjectCommand, ObjectCannedACL,
+    S3Client, PutObjectCommand, DeleteObjectCommand,
     type PutObjectCommandInput,
 } from "@aws-sdk/client-s3";
 import { notificationMessage } from './helper';

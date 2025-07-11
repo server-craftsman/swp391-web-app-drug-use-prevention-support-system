@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Form, Input, InputNumber, Button, Space, Card } from "antd";
+import { Modal, Form, Input, InputNumber, Button, Card } from "antd";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { AnswerService } from "../../../../services/answer/answer.service";
 import { helpers } from "../../../../utils";

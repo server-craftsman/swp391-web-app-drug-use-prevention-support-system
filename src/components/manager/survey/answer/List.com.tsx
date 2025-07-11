@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Input, Card, Tag, Collapse, Empty } from "antd";
+import { Table, Button, Space, Input, Tag, Collapse, Empty } from "antd";
 import { PlusOutlined, EditOutlined, EyeOutlined, ReloadOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { AnswerResponse } from "../../../../types/answer/Answer.res.type";
@@ -25,7 +25,7 @@ interface QuestionWithAnswers {
     loading: boolean;
 }
 
-const AnswerList: React.FC<Props> = ({ questions, pageSizeDefault = 10 }) => {
+const AnswerList: React.FC<Props> = ({ questions}) => {
     const [questionsWithAnswers, setQuestionsWithAnswers] = useState<QuestionWithAnswers[]>([]);
     const [filter, setFilter] = useState("");
     const [createModalVisible, setCreateModalVisible] = useState(false);

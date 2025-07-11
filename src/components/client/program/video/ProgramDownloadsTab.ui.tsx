@@ -57,7 +57,7 @@ const ProgramDownloadsTab: React.FC<ProgramDownloadsTabProps> = ({ program }) =>
         }
     };
 
-    const formatFileSize = (url: string) => {
+    const formatFileSize = () => {
         // This is a placeholder - in real app you'd get actual file size from API
         return "~ 50 MB";
     };
@@ -125,7 +125,7 @@ const ProgramDownloadsTab: React.FC<ProgramDownloadsTabProps> = ({ program }) =>
                                         color: '#718096',
                                         marginBottom: '4px'
                                     }}>
-                                        MP4 Video • {formatFileSize(program.programVidUrl)}
+                                        MP4 Video • {formatFileSize()}
                                     </div>
                                     <div style={{
                                         fontSize: '13px',
