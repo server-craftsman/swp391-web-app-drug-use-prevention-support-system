@@ -136,4 +136,7 @@ export const API_PATH = {
     GET_REVIEW_BY_COURSE_ID: (courseId: string) => `/review/course/${courseId}`,
     GET_REVIEW_BY_USER_ID: (userId: string) => `/review/user/${userId}`,
   },
+  DASHBOARD: {
+    GET_DASHBOARD_OVERALL: "/dashboard/overall",
+  },
 };

@@ -115,6 +115,7 @@ const MyCourseDetail: React.FC = () => {
       expanded: false,
       lectures:
         session.lessonList?.map((lesson) => ({
+          id: lesson.id, // Thêm dòng này!
           title: lesson.name,
           duration: lesson.fullTime ? `${lesson.fullTime} phút` : "",
           preview: false,
@@ -125,7 +126,6 @@ const MyCourseDetail: React.FC = () => {
     })) || [];
 
   const instructorName = "Huy Nguyễn";
-  const instructorTitle = "Giảng viên khóa học";
 
   return (
     <div className="min-h-screen bg-[#f7f9fa]">
@@ -141,10 +141,7 @@ const MyCourseDetail: React.FC = () => {
               <CourseHighlights highlights={courseHighlights} />
               <CourseContent content={courseContent} />
               <CourseDescription course={course} />
-              <CourseInstructor
-                instructorName={instructorName}
-                instructorTitle={instructorTitle}
-              />
+              <CourseInstructor instructorId={course.userId} />
 
               {/* Reviews Section - cho phép tạo, xóa */}
               <CourseReviews

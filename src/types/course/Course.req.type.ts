@@ -1,4 +1,6 @@
 import type { CourseStatus } from "../../app/enums/courseStatus.enum";
+import type { CourseTargetAudience } from "../../app/enums/courseTargetAudience.enum";
+import type { RiskLevel } from "../../app/enums/riskLevel.enum";
 
 export interface CourseRequest {
   pageNumber: number;
@@ -11,7 +13,7 @@ export interface CreateCourseRequest {
   categoryId: string;
   content: string;
   status: CourseStatus;
-  targetAudience: string;
+  targetAudience: CourseTargetAudience;
   videoUrls: string[];
   imageUrls: string[];
   price: number;
@@ -19,6 +21,7 @@ export interface CreateCourseRequest {
   createdAt: string;
   updatedAt: string;
   slug: string;
+  riskLevel: RiskLevel;
 }
 
 export interface UpdateCourseRequest {
@@ -27,7 +30,7 @@ export interface UpdateCourseRequest {
   categoryId: string;
   content: string;
   status: CourseStatus;
-  targetAudience: string;
+  targetAudience: CourseTargetAudience;
   videoUrls: string[];
   imageUrls: string[];
   price: number;
@@ -35,6 +38,7 @@ export interface UpdateCourseRequest {
   updatedAt: string;
   slug: string;
   userId: string;
+  riskLevel: RiskLevel;
 }
 export interface DeleteCourseRequest {
   id: string;

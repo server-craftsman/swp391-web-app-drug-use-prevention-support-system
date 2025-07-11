@@ -5,6 +5,8 @@ import { BaseService } from "../../../app/api/base.service";
 import { CategoryService } from "../../../services/category/category.service";
 import type { Category } from "../../../types/category/Category.res.type";
 import { CourseStatus } from "../../../app/enums/courseStatus.enum";
+import { CourseTargetAudience } from "../../../app/enums/courseTargetAudience.enum";
+import { RiskLevel } from "../../../app/enums/riskLevel.enum";
 import { message } from "antd";
 
 interface UpdateCourseFormProps {
@@ -26,6 +28,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
   const [previewImage, setPreviewImage] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
+  const [riskLevel, setRiskLevel] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
   const [status, setStatus] = useState<CourseStatus>(CourseStatus.DRAFT);
@@ -42,8 +45,10 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       setVideoUrls(course.videoUrls || []);
       setCategoryId(course.categoryId || "");
       setTargetAudience(course.targetAudience || "");
+      setRiskLevel(course.riskLevel ?? "");
       setPrice(course.price || 0);
       setDiscount(course.discount || 0);
+      // Luôn lấy ảnh đầu tiên của course khi mở form
       setPreviewImage(course.imageUrls?.[0] || "");
       setStatus(course.status || CourseStatus.DRAFT);
     }
@@ -75,14 +80,22 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       setPreviewImage(URL.createObjectURL(selected));
     } else {
       setFile(null);
-      setPreviewImage(imageUrls?.[0] || "");
+      // Nếu không chọn file mới, luôn lấy ảnh đầu tiên của course
+      setPreviewImage(course.imageUrls?.[0] || "");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !content.trim() || !categoryId || !targetAudience) {
+    if (
+      !title.trim() ||
+      !content.trim() ||
+      !categoryId ||
+      !targetAudience ||
+      !riskLevel ||
+      !status
+    ) {
       message.warning("Vui lòng điền đầy đủ thông tin bắt buộc.");
       return;
     }
@@ -106,12 +119,13 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         name: title,
         content,
         categoryId,
-        targetAudience,
+        targetAudience: targetAudience as CourseTargetAudience,
+        riskLevel: riskLevel as RiskLevel,
         imageUrls: updatedImageUrls,
         videoUrls,
         price,
         discount,
-        status,
+        status: status as CourseStatus,
         updatedAt: new Date().toISOString(),
         slug: course.slug,
         userId: course.userId,
@@ -194,9 +208,29 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
           required
         >
           <option value="">-- Chọn đối tượng --</option>
-          <option value="student">Học sinh</option>
-          <option value="teacher">Giáo viên</option>
-          <option value="parent">Phụ huynh</option>
+          <option value={CourseTargetAudience.STUDENT}>Học sinh</option>
+          <option value={CourseTargetAudience.UNIVERSITY_STUDENT}>
+            Sinh viên
+          </option>
+          <option value={CourseTargetAudience.PARENT}>Phụ huynh</option>
+          <option value={CourseTargetAudience.GENERAL_PUBLIC}>Cộng đồng</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block mb-2 font-semibold text-gray-700">
+          Mức độ rủi ro
+        </label>
+        <select
+          value={riskLevel}
+          onChange={(e) => setRiskLevel(e.target.value)}
+          className="border border-gray-300 px-4 py-2 rounded-lg w-full"
+          required
+        >
+          <option value="">-- Chọn mức độ rủi ro --</option>
+          <option value={RiskLevel.LOW}>Thấp</option>
+          <option value={RiskLevel.MEDIUM}>Trung bình</option>
+          <option value={RiskLevel.HIGH}>Cao</option>
         </select>
       </div>
 

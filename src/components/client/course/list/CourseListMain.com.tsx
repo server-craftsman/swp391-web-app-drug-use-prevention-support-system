@@ -6,6 +6,7 @@ import type { CourseRequest } from "../../../../types/course/Course.req.type";
 import CourseListHero from "./CourseListHero.com.tsx";
 import CourseListFilters from "./CourseListFilters.com.tsx";
 import CourseListGrid from "./CourseListGrid.com.tsx";
+import { CourseStatus } from "../../../../app/enums/courseStatus.enum";
 
 const itemsPerPage = 12;
 
@@ -38,10 +39,15 @@ const CourseList = () => {
     }
     try {
       const res = await CourseService.getAllCourses(params);
-      // Map dữ liệu từ API về đúng interface chuẩn
       const data = res.data as any;
-      setCourses(Array.isArray(data?.data) ? data.data : []);
-      setTotal(data?.totalCount || 0);
+      // Lọc chỉ lấy course có status là "published"
+      const publishedCourses = Array.isArray(data?.data)
+        ? data.data.filter(
+            (course: any) => course.status === CourseStatus.PUBLISHED
+          )
+        : [];
+      setCourses(publishedCourses);
+      setTotal(data?.totalCount || 0); // Giữ nguyên tổng để phân trang BE nếu cần
     } catch (err) {
       setCourses([]);
       setTotal(0);

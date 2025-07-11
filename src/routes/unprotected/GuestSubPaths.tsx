@@ -10,12 +10,11 @@ import Counsel from "../../pages/client/counsel";
 import Program from "../../pages/client/program";
 import Assessment from "../../pages/client/assessment";
 import CourseDetail from "../../components/client/course/CourseDetail.com";
-import PaymentPageMain from "../../pages/client/payment";
-import PaymentResultPage from "../../pages/client/result";
 import ProgramDetail from "../../pages/client/program/detail";
 import ClientSurveyDetail from "../../pages/client/survey/detail";
 import PaymentPageMain from "../../pages/customer/payment";
-import PaymentResultPage from "../../pages/customer/result";
+import PaymentSuccess from "../../pages/customer/success";
+import PaymentFail from "../../pages/customer/cancel";
 
 //================= PUBLIC SUB PATHS =================
 const UnauthorizedPage = lazy(() => import("../../pages/auth/unauthorized"));
@@ -92,14 +91,17 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
           element: <PaymentPageMain />,
         },
         {
-          path: ROUTER_URL.CLIENT.PAYMENT_RESULT,
-          element: <PaymentResultPage />,
+          path: ROUTER_URL.CLIENT.PAYMENT_SUCCESS,
+          element: <PaymentSuccess />,
+        },
+        {
+          path: ROUTER_URL.CLIENT.PAYMENT_FAIL,
+          element: <PaymentFail />,
         },
       ],
     },
   ],
   [ROUTER_URL.CLIENT.SURVEY_DETAIL]: [
-
     {
       path: ROUTER_URL.CLIENT.SURVEY_ATTEMPT,
       element: <ClientSurveyDetail />,

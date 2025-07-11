@@ -6,13 +6,16 @@ import type { Category } from "../../../types/category/Category.res.type";
 import { message } from "antd";
 import { CategoryService } from "../../../services/category/category.service";
 import { CourseStatus } from "../../../app/enums/courseStatus.enum";
+import { CourseTargetAudience } from "../../../app/enums/courseTargetAudience.enum";
+import { RiskLevel } from "../../../app/enums/riskLevel.enum";
 
 const defaultState: CreateCourseRequest = {
   name: "",
   categoryId: "",
   content: "",
   status: CourseStatus.DRAFT,
-  targetAudience: "",
+  targetAudience: CourseTargetAudience.STUDENT,
+  riskLevel: RiskLevel.LOW,
   videoUrls: [],
   imageUrls: [],
   price: 0,
@@ -95,6 +98,16 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       return;
     }
 
+    if (!form.riskLevel) {
+      message.warning("Vui lòng chọn mức độ rủi ro!");
+      return;
+    }
+
+    if (!form.status) {
+      message.warning("Vui lòng chọn trạng thái khóa học!");
+      return;
+    }
+
     let imageUrlsList = form.imageUrls;
 
     if (file) {
@@ -109,6 +122,7 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
 
     const now = new Date().toISOString();
 
+    // Đảm bảo truyền đúng enum lên backend
     const payload: CreateCourseRequest = {
       ...form,
       imageUrls: imageUrlsList,
@@ -116,6 +130,9 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       createdAt: form.createdAt || now,
       updatedAt: form.updatedAt || now,
       slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-"),
+      targetAudience: form.targetAudience as CourseTargetAudience,
+      riskLevel: form.riskLevel as RiskLevel,
+      status: form.status as CourseStatus,
     };
 
     console.log("Payload gửi lên:", payload); // debug
@@ -257,9 +274,48 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
           required
         >
           <option value="">-- Chọn đối tượng --</option>
-          <option value="student">Học sinh</option>
-          <option value="teacher">Giáo viên</option>
-          <option value="parent">Phụ huynh</option>
+          <option value={CourseTargetAudience.STUDENT}>Học sinh</option>
+          <option value={CourseTargetAudience.UNIVERSITY_STUDENT}>
+            Sinh viên
+          </option>
+          <option value={CourseTargetAudience.PARENT}>Phụ huynh</option>
+          <option value={CourseTargetAudience.GENERAL_PUBLIC}>Cộng đồng</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block mb-2 font-semibold text-gray-700">
+          Mức độ rủi ro
+        </label>
+        <select
+          name="riskLevel"
+          value={form.riskLevel}
+          onChange={handleChange}
+          className="border border-gray-300 px-4 py-2 rounded-lg w-full"
+          required
+        >
+          <option value="">-- Chọn mức độ rủi ro --</option>
+          <option value={RiskLevel.LOW}>Thấp</option>
+          <option value={RiskLevel.MEDIUM}>Trung bình</option>
+          <option value={RiskLevel.HIGH}>Cao</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block mb-2 font-semibold text-gray-700">
+          Trạng thái khóa học
+        </label>
+        <select
+          name="status"
+          value={form.status}
+          onChange={handleChange}
+          className="border border-gray-300 px-4 py-2 rounded-lg w-full"
+          required
+        >
+          <option value="">-- Chọn trạng thái --</option>
+          <option value={CourseStatus.DRAFT}>Nháp</option>
+          <option value={CourseStatus.PUBLISHED}>Công khai</option>
+          <option value={CourseStatus.ARCHIVED}>Lưu trữ</option>
         </select>
       </div>
 
