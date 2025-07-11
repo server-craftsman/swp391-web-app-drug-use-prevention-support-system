@@ -11,7 +11,8 @@ import Community from "../../pages/client/community";
 import Assessment from "../../pages/client/assessment";
 import CourseDetail from "../../components/client/course/CourseDetail.com";
 import PaymentPageMain from "../../pages/customer/payment";
-import PaymentResultPage from "../../pages/customer/result";
+import PaymentSuccess from "../../pages/customer/success";
+import PaymentFail from "../../pages/customer/cancel";
 
 //================= PUBLIC SUB PATHS =================
 const UnauthorizedPage = lazy(() => import("../../pages/auth/unauthorized"));
@@ -80,8 +81,12 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
           element: <PaymentPageMain />,
         },
         {
-          path: ROUTER_URL.CLIENT.PAYMENT_RESULT,
-          element: <PaymentResultPage />,
+          path: ROUTER_URL.CLIENT.PAYMENT_SUCCESS,
+          element: <PaymentSuccess />,
+        },
+        {
+          path: ROUTER_URL.CLIENT.PAYMENT_FAIL,
+          element: <PaymentFail />,
         },
       ],
     },

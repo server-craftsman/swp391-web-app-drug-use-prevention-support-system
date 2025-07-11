@@ -12,6 +12,7 @@ import OrderDetailsList from "./OrderList.com";
 import OrderInfo from "./OderInfo.com";
 import { OrderStatus } from "../../../app/enums/orderStatus.enum";
 import { CreditCardOutlined, DollarCircleOutlined } from "@ant-design/icons";
+import { ROUTER_URL } from "../../../consts/router.path.const";
 
 const PaymentPage: React.FC = () => {
   const location = useLocation();
@@ -56,16 +57,19 @@ const PaymentPage: React.FC = () => {
       },
       {
         onSuccess: (res) => {
+          // Nếu là chuyển khoản và có payUrl thì redirect sang trang ngân hàng
           if (
             paymentMethod === PaymentMethod.CREDIT_CARD &&
             res?.data?.data?.payUrl
           ) {
-            // Mở tab mới khi thanh toán chuyển khoản ngân hàng
-            window.open(res.data.data.payUrl, "_blank");
-            navigate("/payment-result", { state: { isSuccess: true } });
+            window.location.href = res.data.data.payUrl;
           } else {
-            navigate("/payment-result", { state: { isSuccess: true } });
+            // Tiền mặt hoặc không có payUrl thì về trang kết quả
+            navigate(ROUTER_URL.CLIENT.PAYMENT_SUCCESS);
           }
+        },
+        onError: () => {
+          navigate(ROUTER_URL.CLIENT.PAYMENT_FAIL);
         },
       }
     );
@@ -81,7 +85,7 @@ const PaymentPage: React.FC = () => {
 
     updateOrderStatusMutation.mutate(payload, {
       onSuccess: () => {
-        navigate("/payment-result", { state: { isCancelled: true } });
+        navigate(ROUTER_URL.CLIENT.PAYMENT_FAIL);
       },
     });
   };

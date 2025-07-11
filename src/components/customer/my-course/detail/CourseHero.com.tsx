@@ -144,12 +144,6 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course }) => {
               }}
             >
               <span>
-                Được tạo bởi{" "}
-                <span style={{ color: "#20558A", fontWeight: 600 }}>
-                  Huy Nguyễn
-                </span>
-              </span>
-              <span>
                 <CalendarOutlined
                   style={{ marginRight: 4, color: "#2563eb" }}
                 />

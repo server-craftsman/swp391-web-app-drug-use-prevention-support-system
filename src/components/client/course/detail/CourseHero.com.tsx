@@ -33,7 +33,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course }) => {
     <div style={{ background: "#f7fafd", padding: "32px 0" }}>
       <div
         style={{
-          maxWidth: 1400,
+          maxWidth: 1350,
           margin: "0 auto",
           background: "#fff",
           borderRadius: 20,
@@ -143,12 +143,6 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course }) => {
                 color: "#6b7280",
               }}
             >
-              <span>
-                Được tạo bởi{" "}
-                <span style={{ color: "#20558A", fontWeight: 600 }}>
-                  Huy Nguyễn
-                </span>
-              </span>
               <span>
                 <CalendarOutlined
                   style={{ marginRight: 4, color: "#2563eb" }}

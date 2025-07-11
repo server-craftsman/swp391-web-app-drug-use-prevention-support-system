@@ -85,6 +85,7 @@ export const ROUTER_URL = {
     MY_COURSE_DETAIL: "/customer/my-course/:courseId",
     ORDER_HISTORY: "/customer/order",
     REVIEW_HISTORY: "/customer/review",
+    LESSON_DETAIL: "/customer/lesson/:lessonId",
   },
   COMMON: {
     HOME: "/",
@@ -107,6 +108,7 @@ export const ROUTER_URL = {
     FAVORITES: "/favorites",
     SETTINGS: "/settings",
     PAYMENT: "/payment",
-    PAYMENT_RESULT: "/payment-result",
+    PAYMENT_SUCCESS: "/api/payment-success",
+    PAYMENT_FAIL: "/api/payment-cancel",
   },
 };
