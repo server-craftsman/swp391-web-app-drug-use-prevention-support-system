@@ -49,7 +49,7 @@ export const AppointmentService = {
 
   /* Assign a consultant to an appointment */
   assignConsultant(params: AssignConsultantRequest) {
-    return BaseService.post<ResponseSuccess<Appointment>>({
+    return BaseService.put<ResponseSuccess<Appointment>>({
       url: API_PATH.APPOINTMENT.ASSIGN_CONSULTANT,
       payload: params,
     });

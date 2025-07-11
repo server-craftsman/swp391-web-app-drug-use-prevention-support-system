@@ -66,12 +66,13 @@ export const ROUTER_URL = {
     STAFF: "/manager/nhan-vien",
     CONSULTANTS: "/manager/tu-van-vien",
     PROGRAMS: "/manager/chuong-trinh",
+    SURVEYS: "/manager/khao-sat",
     COURSES: "/manager/khoa-hoc",
     REPORTS: "/manager/bao-cao",
-    COMPLIANCE: "/manager/bao-cao",
-    OPERATIONS: "/manager/bao-cao",
+    COMPLIANCE: "/manager/phap-luat",
+    OPERATIONS: "/manager/hoat-dong",
     SCHEDULE: "/manager/lich-hen-tu-van",
-    REVIEWS: "/manager/bao-cao",
+    REVIEWS: "/manager/danh-gia",
     SETTINGS: "/manager/cai-dat",
   },
   CUSTOMER: {
@@ -101,7 +102,11 @@ export const ROUTER_URL = {
     BLOG: "/blog",
     BLOG_DETAIL: "/blog/:blogId",
     COUNSEL: "/counseling",
-    COMMUNITY: "/community",
+    PROGRAM: "/chuong-trinh-cong-dong",
+    PROGRAM_DETAIL: "/chuong-trinh-cong-dong/:programId", // detail page
+    SURVEY_DETAIL: "/survey/:surveyId", // client survey detail
+    SURVEY_ATTEMPT: "/survey/:surveyId/attempt", // attempt quiz page
+    SURVEY: "/survey", // client survey list
     ASSESSMENT: "/assessment",
     CART: "/cart",
     APPOINTMENTS: "/appointments",

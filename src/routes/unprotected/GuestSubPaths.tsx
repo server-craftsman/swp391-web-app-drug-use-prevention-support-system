@@ -7,9 +7,13 @@ import About from "../../pages/client/about";
 import Course from "../../pages/client/course";
 import Blog from "../../pages/client/blog";
 import Counsel from "../../pages/client/counsel";
-import Community from "../../pages/client/community";
+import Program from "../../pages/client/program";
 import Assessment from "../../pages/client/assessment";
 import CourseDetail from "../../components/client/course/CourseDetail.com";
+import PaymentPageMain from "../../pages/client/payment";
+import PaymentResultPage from "../../pages/client/result";
+import ProgramDetail from "../../pages/client/program/detail";
+import ClientSurveyDetail from "../../pages/client/survey/detail";
 import PaymentPageMain from "../../pages/customer/payment";
 import PaymentSuccess from "../../pages/customer/success";
 import PaymentFail from "../../pages/customer/cancel";
@@ -65,9 +69,17 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
           element: <Counsel />,
         },
         {
-          path: ROUTER_URL.CLIENT.COMMUNITY,
-          element: <Community />,
+          path: ROUTER_URL.CLIENT.PROGRAM,
+          element: <Program />,
         },
+        {
+          path: ROUTER_URL.CLIENT.PROGRAM_DETAIL,
+          element: <ProgramDetail />,
+        },
+        // {
+        //   path: ROUTER_URL.CLIENT.SURVEY_DETAIL,
+        //   element: <ClientSurvey />,
+        // },
         {
           path: ROUTER_URL.CLIENT.ASSESSMENT,
           element: <Assessment />,
@@ -89,6 +101,13 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
           element: <PaymentFail />,
         },
       ],
+    },
+  ],
+  [ROUTER_URL.CLIENT.SURVEY_DETAIL]: [
+
+    {
+      path: ROUTER_URL.CLIENT.SURVEY_ATTEMPT,
+      element: <ClientSurveyDetail />,
     },
   ],
 

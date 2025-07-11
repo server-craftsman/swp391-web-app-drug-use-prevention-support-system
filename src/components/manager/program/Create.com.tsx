@@ -187,7 +187,14 @@ const CreateProgramModal: React.FC<CreateProps> = ({ visible, onCancel, onSucces
                         <Button icon={<VideoCameraAddOutlined />} loading={uploadingVideo}> Tải lên video </Button>
                     </Upload>
                     {vidUrl && (
-                        <video src={vidUrl} controls className="mt-2 w-40 h-28 object-cover" />
+                        <video
+                            controls
+                            className="mt-2 w-60 h-36 object-cover"
+                            playsInline
+                            crossOrigin="anonymous"
+                        >
+                            <source src={vidUrl} />
+                        </video>
                     )}
                 </Form.Item>
 

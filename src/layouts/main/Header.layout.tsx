@@ -43,7 +43,7 @@ const HeaderLayout = () => {
     { name: "Khóa Học", path: "/courses" },
     { name: "Đánh Giá Nguy Cơ", path: "/assessment" },
     { name: "Tư Vấn", path: ROUTER_URL.CLIENT.APPOINTMENTS },
-    { name: "Chương Trình Cộng Đồng", path: "/community" },
+    { name: "Chương Trình Cộng Đồng", path: ROUTER_URL.CLIENT.PROGRAM },
     { name: "Blog", path: "/blog" },
     { name: "Về Chúng Tôi", path: "/about" },
   ];
