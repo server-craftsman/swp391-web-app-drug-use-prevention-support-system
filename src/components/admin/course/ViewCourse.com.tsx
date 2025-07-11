@@ -11,6 +11,9 @@ import {
 } from "antd";
 import { CourseService } from "../../../services/course/course.service";
 import type { CourseDetailResponse } from "../../../types/course/Course.res.type";
+import { CourseStatus } from "../../../app/enums/courseStatus.enum";
+import { CourseTargetAudience } from "../../../app/enums/courseTargetAudience.enum";
+import { RiskLevel } from "../../../app/enums/riskLevel.enum";
 
 const { Title, Text } = Typography;
 
@@ -20,6 +23,25 @@ interface ViewCourseProps {
   onClose: () => void;
 }
 
+const statusColorMap: Record<string, string> = {
+  [CourseStatus.PUBLISHED]: "green",
+  [CourseStatus.ARCHIVED]: "orange",
+  [CourseStatus.DRAFT]: "gray",
+};
+
+const targetAudienceLabel: Record<string, string> = {
+  [CourseTargetAudience.STUDENT]: "Học sinh",
+  [CourseTargetAudience.UNIVERSITY_STUDENT]: "Sinh viên",
+  [CourseTargetAudience.PARENT]: "Phụ huynh",
+  [CourseTargetAudience.GENERAL_PUBLIC]: "Cộng đồng",
+};
+
+const riskLevelLabel: Record<string, string> = {
+  [RiskLevel.LOW]: "Thấp",
+  [RiskLevel.MEDIUM]: "Trung bình",
+  [RiskLevel.HIGH]: "Cao",
+};
+
 const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
   const [data, setData] = useState<CourseDetailResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -28,6 +50,7 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
     if (open && courseId) {
       fetchCourse();
     }
+    // eslint-disable-next-line
   }, [courseId, open]);
 
   const fetchCourse = async () => {
@@ -83,19 +106,17 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
             </Title>
             <div className="flex flex-wrap gap-3 items-center">
               <Tag
-                color={
-                  data.status === "published"
-                    ? "green"
-                    : data.status === "archived"
-                    ? "orange"
-                    : "gray"
-                }
+                color={statusColorMap[data.status] || "gray"}
                 className="text-sm px-3 py-1 rounded-full"
               >
                 {data.status?.toUpperCase()}
               </Tag>
               <Tag color="blue" className="text-sm px-3 py-1 rounded-full">
-                {data.targetAudience}
+                {targetAudienceLabel[data.targetAudience] ||
+                  data.targetAudience}
+              </Tag>
+              <Tag color="purple" className="text-sm px-3 py-1 rounded-full">
+                {riskLevelLabel[data.riskLevel] || data.riskLevel}
               </Tag>
               <Text type="secondary" className="text-sm text-gray-500">
                 Ngày tạo: {new Date(data.createdAt).toLocaleDateString("vi-VN")}

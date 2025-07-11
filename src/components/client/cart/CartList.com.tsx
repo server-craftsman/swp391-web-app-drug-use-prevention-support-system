@@ -1,5 +1,5 @@
 // ViewCartPage.tsx
-import React from "react";
+import React, { useEffect } from "react";
 import { Typography, Empty, Divider, Button, Spin } from "antd";
 import {
   ShoppingOutlined,
@@ -27,7 +27,14 @@ const ViewCartPage: React.FC = () => {
     totalPrice,
     selectedIds,
     setSelectedIds,
+    fetchCartItems, // lấy từ context
   } = useCart();
+
+  // Fetch lại data mỗi khi truy cập trang
+  useEffect(() => {
+    fetchCartItems();
+    // eslint-disable-next-line
+  }, []);
 
   const createOrderMutation = useCreateOrder();
 

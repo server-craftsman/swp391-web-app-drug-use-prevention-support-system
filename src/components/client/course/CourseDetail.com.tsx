@@ -158,7 +158,6 @@ const CourseDetail: React.FC = () => {
     })) || [];
 
   const instructorName = course.name || "Giảng viên";
-  const instructorTitle = course.name || "Giảng viên khóa học";
 
   return (
     <div className="min-h-screen ">
@@ -181,10 +180,7 @@ const CourseDetail: React.FC = () => {
               <CourseDescription course={course} />
 
               {/* Instructor Section */}
-              <CourseInstructor
-                instructorName={instructorName}
-                instructorTitle={instructorTitle}
-              />
+              <CourseInstructor instructorId={course.userId} />
 
               {/* Reviews Section - chỉ đọc */}
               <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>

@@ -1,4 +1,6 @@
 import type { CourseStatus } from "../../app/enums/courseStatus.enum";
+import type { CourseTargetAudience } from "../../app/enums/courseTargetAudience.enum";
+import type { RiskLevel } from "../../app/enums/riskLevel.enum";
 
 export interface Course {
   id: string;
@@ -7,13 +9,14 @@ export interface Course {
   categoryId: string;
   content: string;
   status: CourseStatus;
-  targetAudience: string;
+  targetAudience: CourseTargetAudience;
   imageUrls: string[];
   videoUrls: string[];
   price: number;
   discount: number;
   slug: string;
   createdAt: string;
+  riskLevel: RiskLevel;
 }
 
 export interface CoursePageInfo {
@@ -60,7 +63,7 @@ export interface CourseDetailResponse {
   categoryId: string;
   content: string;
   status: CourseStatus;
-  targetAudience: string;
+  targetAudience: CourseTargetAudience;
   imageUrls: string[];
   videoUrls: string[];
   price: number;
@@ -70,4 +73,5 @@ export interface CourseDetailResponse {
   isInCart: boolean;
   isPurchased: boolean;
   sessionList: CourseSession[];
+  riskLevel: RiskLevel;
 }

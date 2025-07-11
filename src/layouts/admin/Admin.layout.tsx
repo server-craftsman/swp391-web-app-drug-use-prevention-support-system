@@ -7,9 +7,6 @@ import {
   Avatar,
   Dropdown,
   Badge,
-  Card,
-  Row,
-  Col,
   Button,
   Input,
   Typography,
@@ -20,15 +17,10 @@ import {
   UserOutlined,
   LogoutOutlined,
   SettingOutlined,
-  TeamOutlined,
-  BookOutlined,
-  FileTextOutlined,
-  AlertOutlined,
   ArrowUpOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../../contexts/Auth.context";
 import { motion } from "framer-motion";
-import { cn } from "../../utils/cn";
 import FooterLayout from "../main/Footer.layout";
 
 const { Header, Content, Footer } = Layout;
@@ -38,34 +30,6 @@ const AdminLayout: React.FC = () => {
   const location = useLocation();
   const { userInfo, logout } = useAuth();
   const [notificationCount] = useState(5); // Mock notification count
-
-  // Mock stats data - in real app, this would come from API
-  const quickStats = [
-    {
-      title: "Tổng Người Dùng",
-      value: 2847,
-      icon: <TeamOutlined className="text-blue-500" />,
-      trend: "+12%",
-    },
-    {
-      title: "Khóa Học Hoạt Động",
-      value: 23,
-      icon: <BookOutlined className="text-green-500" />,
-      trend: "+3%",
-    },
-    {
-      title: "Đánh Giá Nguy Cơ",
-      value: 156,
-      icon: <FileTextOutlined className="text-orange-500" />,
-      trend: "+8%",
-    },
-    {
-      title: "Cảnh Báo Hệ Thống",
-      value: 3,
-      icon: <AlertOutlined className="text-red-500" />,
-      trend: "-2",
-    },
-  ];
 
   // Generate breadcrumb from current path
   const generateBreadcrumb = () => {
@@ -80,19 +44,14 @@ const AdminLayout: React.FC = () => {
       "manager-course": "Quản Lý Khóa Học",
       "manager-category": "Quản Lý Danh Mục",
       settings: "Cài Đặt",
-      // Analytics & Reporting
       analytics: "Thống Kê & Báo Cáo",
-      // User Management
       "staff-consultants": "Nhân Viên & Tư Vấn",
       permissions: "Phân Quyền Hệ Thống",
-      // Content & Programs
       "community-programs": "Chương Trình Cộng Đồng",
       resources: "Tài Nguyên Hỗ Trợ",
-      // Assessment & Counseling
       assessments: "Công Cụ Đánh Giá",
       consultations: "Lịch Tư Vấn",
       "emergency-support": "Hỗ Trợ Khẩn Cấp",
-      // System
       alerts: "Cảnh Báo & Thông Báo",
       messages: "Tin Nhắn & Liên Lạc",
       security: "Bảo Mật & Kiểm Soát",
@@ -217,48 +176,12 @@ const AdminLayout: React.FC = () => {
             <Breadcrumb items={generateBreadcrumb()} className="text-sm" />
           </motion.div>
 
-          {/* Quick Stats - Only show on dashboard */}
-          {location.pathname === "/admin" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="mb-8"
-            >
-              <Row gutter={[16, 16]}>
-                {quickStats.map((stat, index) => (
-                  <Col xs={24} sm={12} lg={6} key={index}>
-                    <Card
-                      className="hover:shadow-lg transition-shadow duration-300 border-0 shadow-sm"
-                      bodyStyle={{ padding: "20px" }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Text className="text-gray-500 text-sm block mb-1">
-                            {stat.title}
-                          </Text>
-                          <Title level={3} className="mb-0 text-gray-800">
-                            {stat.value.toLocaleString()}
-                          </Title>
-                          <Text
-                            className={cn(
-                              "text-sm font-medium",
-                              stat.trend.startsWith("+")
-                                ? "text-green-600"
-                                : "text-red-600"
-                            )}
-                          >
-                            {stat.trend}
-                          </Text>
-                        </div>
-                        <div className="text-3xl opacity-80">{stat.icon}</div>
-                      </div>
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
+          {/* Quick Stats - Đã bỏ mock data, chỉ render nếu có data thực tế */}
+          {/* {location.pathname === "/admin" && (
+            <motion.div ...>
+              ...Quick Stats...
             </motion.div>
-          )}
+          )} */}
 
           {/* Main Content */}
           <motion.div
