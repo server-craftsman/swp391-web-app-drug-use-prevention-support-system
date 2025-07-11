@@ -5,7 +5,7 @@ import type {
   CreateProgramRequest,
 } from "../../types/program/Program.req.type";
 import type { PaginatedProgramResponse } from "../../types/program/Program.res.type";
-import type { Program } from "../../types/program/Program.type";
+import type { Program, ProgramEnrollment } from "../../types/program/Program.type";
 import { API_PATH } from "../../consts/api.path.const";
 
 export const ProgramService = {
@@ -48,7 +48,7 @@ export const ProgramService = {
     });
   },
   programEnrollments() {
-    return BaseService.get<ResponseSuccess<Program[]>>({
+    return BaseService.get<ResponseSuccess<ProgramEnrollment[]>>({
       url: API_PATH.PROGRAM.PROGRAM_ENROLLMENTS,
     });
   },

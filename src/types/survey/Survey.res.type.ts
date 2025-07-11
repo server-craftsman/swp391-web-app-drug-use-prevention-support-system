@@ -9,6 +9,7 @@ export interface SurveyResponse {
     type?: SurveyType;
     createdAt?: string;
     questions?: QuestionResponse[];
+    isCompleted?: boolean;
 }
 
 export interface SurveySubmissionResponse {

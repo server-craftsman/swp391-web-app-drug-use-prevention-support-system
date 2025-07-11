@@ -2,7 +2,7 @@ import React from "react";
 import { Row, Col, Card, Image, Typography, Spin, Pagination, Select, Button, message, Modal } from "antd";
 import { PlayCircleOutlined, CheckCircleOutlined, LockOutlined } from "@ant-design/icons";
 import { ProgramService } from "../../../services/program/program.service";
-import type { Program } from "../../../types/program/Program.type";
+import type { Program, ProgramEnrollment } from "../../../types/program/Program.type";
 import { helpers } from "../../../utils";
 import { useNavigate } from "react-router-dom";
 import { ProgramType } from "../../../app/enums/programType.enum";
@@ -20,7 +20,7 @@ const ClientProgramPage: React.FC = () => {
   const [programs, setPrograms] = React.useState<Program[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [enrolling, setEnrolling] = React.useState<string | null>(null);
-  const [enrolledPrograms, setEnrolledPrograms] = React.useState<Set<string>>(new Set());
+  const [enrolledPrograms, setEnrolledPrograms] = React.useState<Map<string, ProgramEnrollment>>(new Map());
   const [pageNumber, setPageNumber] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(PAGE_SIZE_DEFAULT);
   const [total, setTotal] = React.useState(0);
@@ -59,19 +59,21 @@ const ClientProgramPage: React.FC = () => {
     }
   };
 
-  // Fetch user's enrolled programs
+  // Fetch user's enrolled programs with joinDate
   const fetchEnrolledPrograms = async () => {
     if (!isLoggedIn) return;
 
     try {
       const res = await ProgramService.programEnrollments();
-      if (res?.data?.data) {
-        const enrolledIds = new Set(
-          res.data.data
-            .map((p: Program) => p.id)
-            .filter((id): id is string => !!id)
-        );
-        setEnrolledPrograms(enrolledIds);
+      if (res?.data) {
+        const enrolledMap = new Map<string, ProgramEnrollment>();
+        res.data.data.forEach((program: ProgramEnrollment) => {
+          const key = program.programId || program.id;
+          if (key && program.joinDate) {
+            enrolledMap.set(key, program);
+          }
+        });
+        setEnrolledPrograms(enrolledMap);
       }
     } catch (err) {
       console.error("Error fetching enrolled programs:", err);
@@ -100,7 +102,9 @@ const ClientProgramPage: React.FC = () => {
       setEnrolling(programId);
       await ProgramService.enrollProgram(programId);
       message.success("Đã tham gia chương trình thành công!");
-      setEnrolledPrograms(prev => new Set([...prev, programId]));
+
+      // Refresh enrolled programs to get the latest joinDate
+      await fetchEnrolledPrograms();
     } catch (err: any) {
       const errorMsg = err?.response?.data?.message || "Không thể tham gia chương trình";
       message.error(errorMsg);
@@ -123,7 +127,8 @@ const ClientProgramPage: React.FC = () => {
       return;
     }
 
-    if (!enrolledPrograms.has(program.id)) {
+    const enrollmentData = enrolledPrograms.get(program.id);
+    if (!enrollmentData?.joinDate) {
       Modal.confirm({
         title: 'Tham gia chương trình',
         content: `Bạn cần tham gia chương trình "${program.name}" để xem chi tiết.`,
@@ -138,7 +143,14 @@ const ClientProgramPage: React.FC = () => {
   };
 
   const isEnrolled = (programId: string | undefined) => {
-    return programId ? enrolledPrograms.has(programId) : false;
+    if (!programId) return false;
+    const enrollmentData = enrolledPrograms.get(programId);
+    return !!enrollmentData?.joinDate;
+  };
+
+  const getEnrollmentData = (programId: string | undefined): ProgramEnrollment | undefined => {
+    if (!programId) return undefined;
+    return enrolledPrograms.get(programId);
   };
 
   return (
@@ -180,10 +192,13 @@ const ClientProgramPage: React.FC = () => {
           {programs.map((p) => {
             if (!p.id) return null; // Skip programs without ID
 
+            const enrollmentData = getEnrollmentData(p.id);
+            const isUserEnrolled = isEnrolled(p.id);
+
             return (
               <Col key={p.id} xs={24} sm={12} md={8} lg={6}>
                 <Card
-                  hoverable={isLoggedIn && isEnrolled(p.id)}
+                  hoverable={isLoggedIn && isUserEnrolled}
                   cover={
                     <div style={{ position: "relative" }}>
                       <Image
@@ -193,10 +208,10 @@ const ClientProgramPage: React.FC = () => {
                         style={{
                           height: 200,
                           objectFit: "cover",
-                          filter: !isLoggedIn || !isEnrolled(p.id) ? 'brightness(0.7)' : 'none'
+                          filter: !isLoggedIn || !isUserEnrolled ? 'brightness(0.7)' : 'none'
                         }}
                       />
-                      {p.programVidUrl && isLoggedIn && isEnrolled(p.id) && (
+                      {p.programVidUrl && isLoggedIn && isUserEnrolled && (
                         <PlayCircleOutlined
                           style={{
                             position: "absolute",
@@ -209,7 +224,7 @@ const ClientProgramPage: React.FC = () => {
                           }}
                         />
                       )}
-                      {(!isLoggedIn || !isEnrolled(p.id)) && (
+                      {(!isLoggedIn || !isUserEnrolled) && (
                         <LockOutlined
                           style={{
                             position: "absolute",
@@ -222,7 +237,7 @@ const ClientProgramPage: React.FC = () => {
                           }}
                         />
                       )}
-                      {isLoggedIn && isEnrolled(p.id) && (
+                      {isLoggedIn && isUserEnrolled && (
                         <div style={{
                           position: "absolute",
                           top: 8,
@@ -247,9 +262,14 @@ const ClientProgramPage: React.FC = () => {
                     cursor: 'pointer'
                   }}
                   actions={[
-                    isLoggedIn && isEnrolled(p.id) ? (
+                    isLoggedIn && isUserEnrolled ? (
                       <Button type="link" style={{ color: "#52c41a" }}>
                         <CheckCircleOutlined /> Đã tham gia
+                        {enrollmentData?.joinDate && (
+                          <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                            {new Date(enrollmentData.joinDate).toLocaleDateString('vi-VN')}
+                          </div>
+                        )}
                       </Button>
                     ) : (
                       <Button

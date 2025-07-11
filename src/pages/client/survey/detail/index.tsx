@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, Spin, Typography, Form, message, Radio, Space, Checkbox } from "antd";
+import { Button, Spin, Typography, Form, Radio, Space, Checkbox } from "antd";
 import { LeftOutlined, ClockCircleOutlined, LikeOutlined, DislikeOutlined, FlagOutlined } from "@ant-design/icons";
 import { SurveyService } from "../../../../services/survey/survey.service";
 import { QuestionService } from "../../../../services/question/question.service";
 import { AnswerService } from "../../../../services/answer/answer.service";
 import { SurveyType } from "../../../../app/enums/surveyType.enum";
+import { helpers } from "../../../../utils";
 
 const { Title, Text, Link } = Typography;
 
@@ -49,7 +50,7 @@ const ClientSurveyDetail: React.FC = () => {
 
                 setAnswersMap(map);
             } catch (err) {
-                message.error("Không thể tải khảo sát");
+                console.log(err);
             } finally { setLoading(false); }
         };
 
@@ -68,7 +69,7 @@ const ClientSurveyDetail: React.FC = () => {
 
     const handleSubmit = async () => {
         if (!honorCodeAccepted) {
-            message.error("Bạn phải chấp nhận cam kết trung thực để gửi bài làm");
+            helpers.notificationMessage("Bạn phải chấp nhận cam kết trung thực để gửi bài làm", "error");
             return;
         }
 
@@ -77,11 +78,11 @@ const ClientSurveyDetail: React.FC = () => {
             const answersArr = Object.keys(values).map(qId => ({ questionId: qId, answerOptionId: values[qId] }));
             setSubmitting(true);
             await SurveyService.submitSurvey({ userId, surveyId: surveyId!, answers: answersArr } as any);
-            message.success("Đã gửi khảo sát. Cảm ơn!");
+            helpers.notificationMessage("Đã gửi khảo sát. Cảm ơn!", "success");
             navigate(-1);
         } catch (err: any) {
             if (err?.errorFields) return;
-            message.error("Gửi khảo sát thất bại");
+            helpers.notificationMessage("Gửi khảo sát thất bại", "error");
         } finally { setSubmitting(false); }
     };
 
@@ -96,7 +97,7 @@ const ClientSurveyDetail: React.FC = () => {
             hour12: true
         });
         setLastSaved(`Last saved on ${timeString} +07`);
-        message.success("Đã lưu nháp");
+        helpers.notificationMessage("Đã lưu nháp", "success");
     };
 
     if (loading) {
