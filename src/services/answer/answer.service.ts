@@ -21,7 +21,7 @@ export const AnswerService = {
 
     /* Lấy answer theo question id */
     getAnswerByQuestionId(questionId: string) {
-        return BaseService.get<ResponseSuccess<AnswerResponse[]>>({
+        return BaseService.get<AnswerResponse[]>({
             url: API_PATH.ANSWER.GET_ANSWER_BY_QUESTION_ID(questionId),
         });
     },

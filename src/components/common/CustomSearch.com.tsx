@@ -40,8 +40,8 @@ const CustomSearch: React.FC<CustomSearchProps> = ({
     };
 
     return (
-        <div className={`flex items-center gap-3 ${className}`}>
-            <div className="relative">
+        <div className={`flex items-center gap-0 ${className}`}>
+            <div className="relative flex items-center shadow-lg rounded-md overflow-hidden bg-white border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-xl">
                 <Input
                     placeholder={placeholder}
                     allowClear
@@ -49,19 +49,20 @@ const CustomSearch: React.FC<CustomSearchProps> = ({
                     onChange={handleKeywordChange}
                     onKeyDown={handleEnterPress}
                     onClear={handleClear}
-                    prefix={<SearchOutlined className="text-gray-400" />}
-                    className={`${inputWidth} h-10 rounded-lg border-gray-200 focus:border-primary shadow-sm`}
+                    prefix={<SearchOutlined className="text-gray-400 ml-1" />}
+                    className={`${inputWidth} h-8 border-0 rounded-none bg-transparent focus:shadow-none hover:bg-gray-50/50 transition-colors duration-200`}
                 />
+                <Button
+                    type="primary"
+                    size="small"
+                    icon={<SearchOutlined />}
+                    loading={loading}
+                    className="h-8 border-0 bg-primary hover:bg-primary/80 px-4 text-white rounded-none shadow-none transition-all duration-300 font-medium"
+                    onClick={handleSearch}
+                >
+                    Tra cứu
+                </Button>
             </div>
-            <Button
-                type="primary"
-                size="large"
-                loading={loading}
-                className="bg-primary hover:bg-primary/80 border-0 rounded-lg px-6 h-10 shadow-md transition-all duration-200"
-                onClick={handleSearch}
-            >
-                Tìm kiếm
-            </Button>
         </div>
     );
 };

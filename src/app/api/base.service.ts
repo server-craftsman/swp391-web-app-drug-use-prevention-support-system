@@ -260,10 +260,10 @@ axiosInstance.interceptors.response.use(
         if (response) {
             switch (response.status) {
                 case HTTP_STATUS.UNAUTHORIZED:
-                    clearLocalStorage();
-                    setTimeout(() => {
-                        window.location.href = ROUTER_URL.COMMON.HOME;
-                    }, 3000);
+                    // clearLocalStorage();
+                    // setTimeout(() => {
+                    //     window.location.href = ROUTER_URL.COMMON.HOME;
+                    // }, 3000);
                     break;
                 case HTTP_STATUS.FORBIDDEN:
                     notificationMessage("Bạn không có quyền thực hiện hành động này.", "error");

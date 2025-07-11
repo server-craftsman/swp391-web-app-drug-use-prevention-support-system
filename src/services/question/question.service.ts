@@ -28,7 +28,7 @@ export const QuestionService = {
 
     /* Lấy câu hỏi theo survey id */
     getQuestionBySurveyId(surveyId: string) {
-        return BaseService.get<ResponseSuccess<QuestionResponse[]>>({
+        return BaseService.get<QuestionResponse[]>({
             url: API_PATH.QUESTION.GET_QUESTION_BY_SURVEY_ID(surveyId),
         });
     },

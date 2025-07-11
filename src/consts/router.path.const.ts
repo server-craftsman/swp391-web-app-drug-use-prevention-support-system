@@ -98,7 +98,11 @@ export const ROUTER_URL = {
     BLOG: "/blog",
     BLOG_DETAIL: "/blog/:blogId",
     COUNSEL: "/counseling",
-    COMMUNITY: "/community",
+    PROGRAM: "/chuong-trinh-cong-dong",
+    PROGRAM_DETAIL: "/chuong-trinh-cong-dong/:programId", // detail page
+    SURVEY_DETAIL: "/survey/:surveyId", // client survey detail
+    SURVEY_ATTEMPT: "/survey/:surveyId/attempt", // attempt quiz page
+    SURVEY: "/survey", // client survey list
     ASSESSMENT: "/assessment",
     CART: "/cart",
     APPOINTMENTS: "/appointments",

@@ -200,7 +200,7 @@ const AnswerList: React.FC<Props> = ({ questions, pageSizeDefault = 10 }) => {
                             header={
                                 <div className="flex justify-between items-center w-full mr-4">
                                     <div>
-                                        <strong>{question.questionContent}</strong>
+                                        <strong dangerouslySetInnerHTML={{ __html: question.questionContent }}></strong>
                                         <Tag color="blue" className="ml-2">{question.questionType}</Tag>
                                         <Tag color="orange" className="ml-1">
                                             {answers.length} đáp án

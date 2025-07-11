@@ -111,6 +111,8 @@ export const API_PATH = {
   PROGRAM: {
     GET_ALL_PROGRAMS: "/program",
     CREATE_PROGRAM: "/program/create",
+    ENROLL_PROGRAM: "/program/enroll",
+    PROGRAM_ENROLLMENTS: "/program/history",
     UPDATE_PROGRAM: (id: string) => `/program/${id}`,
     DELETE_PROGRAM: (id: string) => `/program/${id}`,
     GET_PROGRAM_BY_ID: (id: string) => `/program/${id}`,
