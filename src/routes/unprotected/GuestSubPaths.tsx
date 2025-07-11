@@ -10,8 +10,6 @@ import Counsel from "../../pages/client/counsel";
 import Program from "../../pages/client/program";
 import Assessment from "../../pages/client/assessment";
 import CourseDetail from "../../components/client/course/CourseDetail.com";
-import PaymentPageMain from "../../pages/client/payment";
-import PaymentResultPage from "../../pages/client/result";
 import ProgramDetail from "../../pages/client/program/detail";
 import ClientSurveyDetail from "../../pages/client/survey/detail";
 import PaymentPageMain from "../../pages/customer/payment";
@@ -104,7 +102,6 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
     },
   ],
   [ROUTER_URL.CLIENT.SURVEY_DETAIL]: [
-
     {
       path: ROUTER_URL.CLIENT.SURVEY_ATTEMPT,
       element: <ClientSurveyDetail />,
