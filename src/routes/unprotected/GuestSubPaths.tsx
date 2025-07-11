@@ -2,7 +2,7 @@ import { lazy } from "react";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
 
-// Client pages that should be public
+// Client pages that should be public =====
 import About from "../../pages/client/about";
 import Course from "../../pages/client/course";
 import Blog from "../../pages/client/blog";
