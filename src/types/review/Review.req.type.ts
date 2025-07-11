@@ -18,3 +18,6 @@ export interface CreateReviewRequest {
 export interface DeleteReviewRequest {
   id: string;
 }
+export interface GetReviewById {
+  id: string;
+}

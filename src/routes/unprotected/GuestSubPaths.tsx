@@ -14,7 +14,8 @@ import PaymentPageMain from "../../pages/client/payment";
 import PaymentResultPage from "../../pages/client/result";
 import ProgramDetail from "../../pages/client/program/detail";
 import ClientSurveyDetail from "../../pages/client/survey/detail";
-
+import PaymentPageMain from "../../pages/customer/payment";
+import PaymentResultPage from "../../pages/customer/result";
 
 //================= PUBLIC SUB PATHS =================
 const UnauthorizedPage = lazy(() => import("../../pages/auth/unauthorized"));

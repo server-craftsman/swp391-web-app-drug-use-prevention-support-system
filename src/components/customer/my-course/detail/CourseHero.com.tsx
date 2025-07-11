@@ -33,7 +33,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course }) => {
     <div style={{ background: "#f7fafd", padding: "32px 0" }}>
       <div
         style={{
-          maxWidth: 1400,
+          maxWidth: 1100,
           margin: "0 auto",
           background: "#fff",
           borderRadius: 20,
@@ -52,7 +52,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course }) => {
               alt={course.name}
               style={{
                 width: "100%",
-                maxWidth: 700,
+                maxWidth: 520,
                 aspectRatio: "16/9",
                 objectFit: "cover",
                 borderRadius: 16,

@@ -116,10 +116,10 @@ export const API_PATH = {
     UPDATE_PROGRAM: (id: string) => `/program/${id}`,
     DELETE_PROGRAM: (id: string) => `/program/${id}`,
     GET_PROGRAM_BY_ID: (id: string) => `/program/${id}`,
-
   },
   ORDER: {
     GET_ORDERS: "/order/all",
+    GET_ORDER_BY_USER_ID: "order/myOrders",
     CREATE_ORDER: "/order/createOrderFromCart",
     GET_ORDER_BY_ID: (orderId: string) => `/order/${orderId}`,
     CHANGE_ORDER_STATUS: (orderId: string, newStatus: string) =>
@@ -131,7 +131,7 @@ export const API_PATH = {
   REVIEW: {
     GET_ALL_REVIEWS: "/review",
     GET_REVIEW_BY_ID: (id: string) => `/review/${id}`,
-    CREATE_REVIEW: "/review/create",
+    CREATE_REVIEW: "/review/course",
     DELETE_REVIEW: (id: string) => `/review/${id}`,
     GET_REVIEW_BY_COURSE_ID: (courseId: string) => `/review/course/${courseId}`,
     GET_REVIEW_BY_USER_ID: (userId: string) => `/review/user/${userId}`,
