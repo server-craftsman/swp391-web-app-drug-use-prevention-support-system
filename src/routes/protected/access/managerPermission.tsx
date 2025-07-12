@@ -4,6 +4,7 @@ import type { RouteObject } from "react-router-dom";
 
 // Lazy load manager pages
 import StaffConsultantManagement from "../../../pages/admin/staff";
+import AppointmentDetail from "../../../components/customer/appointment/Detail.com";
 const ManagerLayout = lazy(() => import("../../../layouts/manager/Manager.layout"));
 const OverviewPage = lazy(() => import("../../../pages/admin/overview")); // Temporary, use admin overview
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
@@ -59,6 +60,10 @@ export const ManagerRoutes: RouteObject[] = [
             {
                 path: ROUTER_URL.MANAGER.SCHEDULE,
                 element: <AppointmentManagementPage />, // Temporary placeholder
+            },
+            {
+                path: ROUTER_URL.MANAGER.SCHEDULE_DETAIL,
+                element: <AppointmentDetail />,
             },
             {
                 path: ROUTER_URL.MANAGER.REVIEWS,

@@ -41,9 +41,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const [role, setRole] = useState<UserRole | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<
-    ResponseSuccess<UserResponse>["data"] | null
-  >(null);
+  // const [userInfo, setUserInfo] = useState<
+  //   ResponseSuccess<UserResponse>["data"] | null
+  // >(null);
+  const [userInfo, setUserInfo] = useState<UserResponse | null>(() => {
+    const stored = localStorage.getItem('userInfo');
+    return stored ? JSON.parse(stored) : null;
+  });
+  const [force, setForce] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load initial state from localStorage
@@ -79,6 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Set user info if it exists
         if (storedUserInfo) {
           setUserInfo(JSON.parse(storedUserInfo));
+          setForce(f => f + 1);
         }
       } catch (error) {
         console.error("Auth initialization error:", error);

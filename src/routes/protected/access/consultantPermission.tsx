@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
+import AppointmentDetail from "../../../components/customer/appointment/Detail.com";
 
 // Lazy load consultant pages
 const ConsultantLayout = lazy(() => import("../../../layouts/consultant/Consultant.layout"));
@@ -20,6 +21,10 @@ export const ConsultantRoutes: RouteObject[] = [
             {
                 path: ROUTER_URL.CONSULTANT.APPOINTMENTS,
                 element: <AppointmentPage />, // Temporary placeholder
+            },
+            {
+                path: ROUTER_URL.CONSULTANT.APPOINTMENT_DETAIL,
+                element: <AppointmentDetail />,
             },
             {
                 path: "clients",

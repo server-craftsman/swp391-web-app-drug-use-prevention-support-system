@@ -38,6 +38,22 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
         loadProvinces();
     }, []);
 
+    // Refresh form data when userInfo changes
+    useEffect(() => {
+        if (userInfo) {
+            profileForm.setFieldsValue({
+                firstName: userInfo.firstName,
+                lastName: userInfo.lastName,
+                email: userInfo.email,
+                phoneNumber: userInfo.phoneNumber,
+                gender: userInfo.gender,
+                dob: userInfo.dob ? dayjs(userInfo.dob) : null,
+            });
+            setAvatarUrl(userInfo.profilePicUrl || '');
+        }
+        console.log("userInfo after update: ", userInfo);
+    }, [userInfo, profileForm]);
+
     const loadProvinces = async () => {
         setLocationLoading(true);
         try {
@@ -152,6 +168,20 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
                 const updatedUserInfo = { ...userInfo, ...response.data.data };
                 setUserInfo(updatedUserInfo);
                 localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+
+                // Refresh form with updated data
+                profileForm.setFieldsValue({
+                    firstName: updatedUserInfo.firstName,
+                    lastName: updatedUserInfo.lastName,
+                    email: updatedUserInfo.email,
+                    phoneNumber: updatedUserInfo.phoneNumber,
+                    gender: updatedUserInfo.gender,
+                    dob: updatedUserInfo.dob ? dayjs(updatedUserInfo.dob) : null,
+                });
+
+                // Update avatar URL
+                setAvatarUrl(updatedUserInfo.profilePicUrl || '');
+
                 helpers.notificationMessage('Cập nhật hồ sơ thành công!', 'success');
             }
         } catch (error) {
