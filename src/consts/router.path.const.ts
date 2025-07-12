@@ -7,6 +7,7 @@ export const ROUTER_URL = {
     VERIFY_EMAIL: "/verify-email",
     CONFIRM_EMAIL: "/confirm-email",
     UNAUTHOZIZED: "/unauthorized",
+    NOT_FOUND: "*",
   },
   ADMIN: {
     BASE: "/admin",
