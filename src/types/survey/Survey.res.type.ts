@@ -7,6 +7,7 @@ export interface SurveyResponse {
     description: string;
     surveyType?: SurveyType;
     type?: SurveyType;
+    estimateTime?: number | null;
     createdAt?: string;
     questions?: QuestionResponse[];
     isCompleted?: boolean;

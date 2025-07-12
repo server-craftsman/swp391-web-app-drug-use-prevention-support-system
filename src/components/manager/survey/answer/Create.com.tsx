@@ -53,7 +53,11 @@ const AnswerCreateModal: React.FC<Props> = ({ open, question, onClose, onSuccess
 
     return (
         <Modal
-            title={`Tạo đáp án cho câu hỏi: ${question?.questionContent || ""}`}
+            title={
+                <div>
+                    Tạo đáp án cho câu hỏi: <span dangerouslySetInnerHTML={{ __html: question?.questionContent || "" }} />
+                </div>
+            }
             open={open}
             onOk={handleOk}
             confirmLoading={submitting}
@@ -66,7 +70,7 @@ const AnswerCreateModal: React.FC<Props> = ({ open, question, onClose, onSuccess
             {question && (
                 <Form form={form} layout="vertical">
                     <Card size="small" className="mb-4" style={{ backgroundColor: '#f0f2f5' }}>
-                        <div><strong>Câu hỏi:</strong> {question.questionContent}</div>
+                        <div><strong>Câu hỏi:</strong> <span dangerouslySetInnerHTML={{ __html: question.questionContent }} /></div>
                         <div><strong>Loại:</strong> {question.questionType}</div>
                     </Card>
 
