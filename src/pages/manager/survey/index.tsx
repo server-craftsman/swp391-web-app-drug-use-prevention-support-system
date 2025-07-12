@@ -100,6 +100,7 @@ const SurveyPageManagement: React.FC = () => {
                 surveyName={selectedSurvey?.name}
                 surveyType={selectedSurvey?.surveyType}
                 surveyDescription={selectedSurvey?.description}
+                estimateTime={selectedSurvey?.estimateTime ?? undefined}
             />
         </div>
     );
