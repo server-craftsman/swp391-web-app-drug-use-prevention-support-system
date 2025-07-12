@@ -5,7 +5,6 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   InfoCircleOutlined,
-  SearchOutlined,
   LoadingOutlined
 } from '@ant-design/icons';
 import { SurveyService } from '../../../services/survey/survey.service';
@@ -14,6 +13,7 @@ import type { SurveyResponse } from '../../../types/survey/Survey.res.type';
 import type { SearchSurveyRequest } from '../../../types/survey/Survey.req.type';
 import { SurveyType } from '../../../app/enums/surveyType.enum';
 import AssessmentCard from './AssessmentCard.com';
+import CustomSearch from '../../common/CustomSearch.com';
 
 interface AssessmentListProps {
   onStartAssessment?: (surveyId: string) => void;
@@ -27,141 +27,79 @@ interface SurveyWithQuestionCount extends SurveyResponse {
 export default function AssessmentList({ onStartAssessment, onViewResult }: AssessmentListProps) {
   const [surveys, setSurveys] = useState<SurveyWithQuestionCount[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [lastKeyword, setLastKeyword] = useState(''); // track last search keyword
 
-  const fetchSurveys = async (page: number = 1, search?: string) => {
+  const fetchSurveys = async (page: number = 1, search: string = '') => {
     try {
       setLoading(true);
       const params: SearchSurveyRequest = {
         pageNumber: page,
         pageSize: 12,
-        filterByName: search || ''
+        filterByName: search
       };
-
-      console.log('Fetching surveys with params:', params);
       const response = await SurveyService.getAllSurveys(params);
-      console.log('Survey response:', response);
 
       let surveysData: SurveyResponse[] = [];
-
-      // Handle different possible response structures
       if (response.data?.data) {
-        // Standard ResponsePaged structure: response.data.data
         surveysData = response.data.data;
-        console.log('AssessmentList: Using response.data.data structure');
       } else if (response.data && Array.isArray(response.data)) {
-        // Direct array structure: response.data
         surveysData = response.data;
-        console.log('AssessmentList: Using response.data structure');
       } else {
-        console.log('AssessmentList: No survey data in response');
         setSurveys([]);
         setTotalPages(1);
+        setTotalCount(0);
         return;
       }
 
-      console.log('AssessmentList: All surveys:', surveysData);
-
-      // Filter only Risk Assessment surveys (check both surveyType and type fields)
       const riskAssessmentSurveys = surveysData.filter(
-        (survey: SurveyResponse) => {
-          console.log('Survey:', survey.name, 'Type:', survey.surveyType, 'Type field:', survey.type);
-          return survey.surveyType === SurveyType.RISK_ASSESSMENT || survey.type === SurveyType.RISK_ASSESSMENT;
-        }
+        (survey: SurveyResponse) =>
+          survey.surveyType === SurveyType.RISK_ASSESSMENT || survey.type === SurveyType.RISK_ASSESSMENT
       );
 
-      console.log('AssessmentList: Risk assessment surveys:', riskAssessmentSurveys);
-
-      // If no risk assessment surveys, show all surveys for debugging
       if (riskAssessmentSurveys.length === 0) {
-        console.log('AssessmentList: No risk assessment surveys found, showing all surveys');
         const allSurveysWithQuestionCount = await Promise.all(
           surveysData.map(async (survey: SurveyResponse) => {
-            try {
-              // Check if questions are already included in the survey response
-              if (survey.questions && survey.questions.length > 0) {
-                return {
-                  ...survey,
-                  questionCount: survey.questions.length
-                };
-              }
-
-              // Otherwise fetch questions separately
-              const questionsResponse = await QuestionService.getQuestionBySurveyId(survey.id);
-              const questionCount = questionsResponse.data?.length || 0;
-              return {
-                ...survey,
-                questionCount
-              };
-            } catch (error) {
-              console.error(`Error fetching questions for survey ${survey.id}:`, error);
-              return {
-                ...survey,
-                questionCount: 0
-              };
+            if (survey.questions && survey.questions.length > 0) {
+              return { ...survey, questionCount: survey.questions.length };
             }
+            const questionsResponse = await QuestionService.getQuestionBySurveyId(survey.id);
+            const questionCount = questionsResponse.data?.length || 0;
+            return { ...survey, questionCount };
           })
         );
         setSurveys(allSurveysWithQuestionCount);
+        setTotalCount(response.data?.totalCount || allSurveysWithQuestionCount.length);
       } else {
-        // Fetch question count for each survey
         const surveysWithQuestionCount = await Promise.all(
           riskAssessmentSurveys.map(async (survey: SurveyResponse) => {
-            try {
-              // Check if questions are already included in the survey response
-              if (survey.questions && survey.questions.length > 0) {
-                return {
-                  ...survey,
-                  questionCount: survey.questions.length
-                };
-              }
-
-              // Otherwise fetch questions separately
-              const questionsResponse = await QuestionService.getQuestionBySurveyId(survey.id);
-              const questionCount = questionsResponse.data?.length || 0;
-              return {
-                ...survey,
-                questionCount
-              };
-            } catch (error) {
-              console.error(`Error fetching questions for survey ${survey.id}:`, error);
-              return {
-                ...survey,
-                questionCount: 0
-              };
+            if (survey.questions && survey.questions.length > 0) {
+              return { ...survey, questionCount: survey.questions.length };
             }
+            const questionsResponse = await QuestionService.getQuestionBySurveyId(survey.id);
+            const questionCount = questionsResponse.data?.length || 0;
+            return { ...survey, questionCount };
           })
         );
-
         setSurveys(surveysWithQuestionCount);
+        setTotalCount(response.data?.totalCount || surveysWithQuestionCount.length);
       }
 
       setTotalPages(response.data?.totalPages || 1);
     } catch (error) {
-      console.error('Error fetching surveys:', error);
       setSurveys([]);
       setTotalPages(1);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSurveys(1, searchTerm);
-  }, [selectedCategory, searchTerm]);
-
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-  };
-
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-    setCurrentPage(1);
-  };
+    fetchSurveys(1, '');
+  }, []);
 
   const handleStartAssessment = (surveyId: string) => {
     if (onStartAssessment) {
@@ -179,6 +117,19 @@ export default function AssessmentList({ onStartAssessment, onViewResult }: Asse
       // Default navigation logic
       console.log('Viewing result for:', surveyId);
     }
+  };
+
+  // Handle search from CustomSearch
+  const handleSearch = (keyword: string) => {
+    setCurrentPage(1);
+    setLastKeyword(keyword);
+    fetchSurveys(1, keyword);
+  };
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchSurveys(page, lastKeyword);
   };
 
   const getCategoryInfo = (category: string) => {
@@ -230,13 +181,13 @@ export default function AssessmentList({ onStartAssessment, onViewResult }: Asse
   };
 
   const filteredSurveys = surveys.filter(survey => {
-    const matchesSearch = survey.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      survey.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = survey.name.toLowerCase().includes(lastKeyword.toLowerCase()) ||
+      survey.description?.toLowerCase().includes(lastKeyword.toLowerCase());
     return matchesSearch;
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -249,39 +200,14 @@ export default function AssessmentList({ onStartAssessment, onViewResult }: Asse
           </p>
         </div>
 
-        {/* Search and Filter */}
-        <div className="mb-8 space-y-4">
+        {/* Search */}
+        <div className="mb-8">
           {/* Search Bar */}
           <div className="relative max-w-md mx-auto">
-            <input
-              type="text"
+            <CustomSearch
               placeholder="Tìm kiếm bài đánh giá rủi ro..."
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              onSearch={handleSearch}
             />
-            <SearchOutlined className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-2">
-            {[
-              { key: 'all', label: 'Tất cả' },
-              { key: 'screening', label: 'Sàng lọc' },
-              { key: 'comprehensive', label: 'Toàn diện' },
-              { key: 'specialized', label: 'Chuyên biệt' }
-            ].map((category) => (
-              <button
-                key={category.key}
-                onClick={() => handleCategoryChange(category.key)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${selectedCategory === category.key
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                  }`}
-              >
-                {category.label}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -331,15 +257,15 @@ export default function AssessmentList({ onStartAssessment, onViewResult }: Asse
 
         {/* Pagination */}
         {!loading && totalPages > 1 && (
-          <div className="flex justify-center mt-8">
+          <div className="flex flex-col items-center mt-8">
+            <span className="text-sm text-gray-500 mb-2">
+              Trang {currentPage} / {totalPages} &nbsp;|&nbsp; Tổng số: {totalCount}
+            </span>
             <div className="flex space-x-2">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
-                  onClick={() => {
-                    setCurrentPage(page);
-                    fetchSurveys(page, searchTerm);
-                  }}
+                  onClick={() => handlePageChange(page)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${currentPage === page
                     ? 'bg-blue-600 text-white'
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
