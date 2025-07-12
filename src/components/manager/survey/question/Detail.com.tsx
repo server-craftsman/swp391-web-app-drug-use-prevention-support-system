@@ -81,7 +81,7 @@ const QuestionDetailDrawer: React.FC<Props> = ({ open, questionData, surveys, on
 
                         <Descriptions.Item label="Khảo sát">
                             <Tag color="blue" className="text-sm">
-                                {getSurveyName(questionData.surveyId)}
+                                {getSurveyName(questionData.surveyId || '')}
                             </Tag>
                         </Descriptions.Item>
 

@@ -72,8 +72,24 @@ const CourseDetail: React.FC = () => {
     setLoadingReviews(true);
     try {
       const res = await ReviewService.getReviewByCourseId({ courseId });
-      setReviews(res.data?.data || []);
+      console.log('Reviews response:', res);
+
+      // Ensure reviews is always an array
+      let reviewsData = [];
+      if (res.data?.data) {
+        if (Array.isArray(res.data.data)) {
+          reviewsData = res.data.data;
+        } else if (res.data.data && typeof res.data.data === 'object') {
+          // If it's an object, try to extract array from it
+          const dataObj = res.data.data as any;
+          reviewsData = dataObj.reviews || dataObj.data || [];
+        }
+      }
+
+      console.log('Processed reviews data:', reviewsData);
+      setReviews(reviewsData);
     } catch (err) {
+      console.error('Error fetching reviews:', err);
       message.error("Không thể tải đánh giá!");
       setReviews([]);
     } finally {
@@ -103,7 +119,7 @@ const CourseDetail: React.FC = () => {
                 profilePicUrl: res.data.data.profilePicUrl,
               };
             }
-          } catch {}
+          } catch { }
         })
       );
       setUserMap(newUserMap);
@@ -189,7 +205,7 @@ const CourseDetail: React.FC = () => {
                 </Typography.Title>
                 {loadingReviews ? (
                   <Spin />
-                ) : reviews.length === 0 ? (
+                ) : !Array.isArray(reviews) || reviews.length === 0 ? (
                   <div className="text-gray-500">
                     Chưa có đánh giá nào cho khóa học này.
                   </div>
@@ -197,24 +213,22 @@ const CourseDetail: React.FC = () => {
                   reviews.map((review, index) => (
                     <div
                       key={review.id}
-                      className={`border-b border-gray-200 pb-6 mb-4 ${
-                        index === reviews.length - 1 ? "last:border-b-0" : ""
-                      }`}
+                      className={`border-b border-gray-200 pb-6 mb-4 ${index === reviews.length - 1 ? "last:border-b-0" : ""
+                        }`}
                     >
                       <div className="flex items-start space-x-3 mb-2">
                         <Avatar
                           size={40}
                           src={userMap[review.userId]?.profilePicUrl}
-                          className={`${
-                            review.avatarColor || "bg-blue-600"
-                          } flex-shrink-0`}
+                          className={`${review.avatarColor || "bg-blue-600"
+                            } flex-shrink-0`}
                         >
                           {userMap[review.userId]?.fullName
                             ? userMap[review.userId].fullName
-                                .split(" ")
-                                .map((name: string) => name[0])
-                                .join("")
-                                .toUpperCase()
+                              .split(" ")
+                              .map((name: string) => name[0])
+                              .join("")
+                              .toUpperCase()
                             : "U"}
                         </Avatar>
                         <div>

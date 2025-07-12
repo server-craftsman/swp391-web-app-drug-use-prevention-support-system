@@ -21,3 +21,16 @@ export interface DeleteReviewRequest {
 export interface GetReviewById {
   id: string;
 }
+
+export interface ReviewAppointmentRequest {
+  appointmentId: string;
+  userId: string;
+  rating: number;
+  comment: string;
+}
+
+export interface UpdateReviewRequest {
+  id: string;
+  rating: number;
+  comment: string;
+}

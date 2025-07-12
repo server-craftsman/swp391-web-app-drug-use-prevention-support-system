@@ -330,7 +330,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
                                 <Form.Item
                                     label="Tỉnh/Thành phố"
                                     name="province"
-                                    rules={[{ required: true, message: 'Vui lòng chọn tỉnh thành!' }]}
                                 >
                                     <Select
                                         size="large"
@@ -354,7 +353,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
                                 <Form.Item
                                     label="Quận/Huyện"
                                     name="district"
-                                    rules={[{ required: true, message: 'Vui lòng chọn quận huyện!' }]}
                                 >
                                     <Select
                                         size="large"
@@ -379,7 +377,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
                                 <Form.Item
                                     label="Phường/Xã"
                                     name="ward"
-                                    rules={[{ required: true, message: 'Vui lòng chọn phường xã!' }]}
                                 >
                                     <Select
                                         size="large"
@@ -405,7 +402,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ loading, setLoading }) => {
                         <Form.Item
                             label="Địa chỉ chi tiết"
                             name="addressDetails"
-                            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ chi tiết!' }]}
                         >
                             <Input.TextArea
                                 size="large"

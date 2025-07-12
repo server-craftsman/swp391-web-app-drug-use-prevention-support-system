@@ -43,7 +43,19 @@ const QuestionDeleteButton: React.FC<Props> = ({ question, onSuccess, disabled =
     return (
         <Popconfirm
             title="Xác nhận xóa câu hỏi"
-            description={`Bạn có chắc chắn muốn xóa câu hỏi "${question.questionContent.length > 50 ? question.questionContent.substring(0, 50) + "..." : question.questionContent}"?`}
+            description={
+                <div>
+                    Bạn có chắc chắn muốn xóa câu hỏi "
+                    <span
+                        dangerouslySetInnerHTML={{
+                            __html: question.questionContent.length > 50
+                                ? question.questionContent.substring(0, 50) + "..."
+                                : question.questionContent
+                        }}
+                    />
+                    "?
+                </div>
+            }
             onConfirm={handleDelete}
             okText="Xóa"
             cancelText="Hủy"
