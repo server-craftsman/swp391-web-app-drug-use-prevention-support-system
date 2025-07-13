@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { ROUTER_URL } from "../../../consts/router.path.const";
 import { Button, Space, Table, Tag, Tooltip, Select, DatePicker, Avatar, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import type { Appointment } from "../../../types/appointment/Appointment.res.type";
@@ -40,6 +42,7 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
     onFilterChange,
     onRefresh,
 }) => {
+    const navigate = useNavigate();
     const statusColorMap: Record<string, string> = {
         [AppointmentStatus.PENDING]: "orange",
         [AppointmentStatus.CONFIRMED]: "blue",
@@ -284,6 +287,20 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
         },
     ];
 
+    const handleRowClick = (record: Appointment) => {
+        let detailUrl: string;
+        
+        if (role === UserRole.MANAGER) {
+            detailUrl = ROUTER_URL.MANAGER.SCHEDULE_DETAIL.replace(":appointmentId", record.id);
+        } else if (role === UserRole.CUSTOMER) {
+            detailUrl = ROUTER_URL.CUSTOMER.APPOINTMENT_DETAIL.replace(":appointmentId", record.id);
+        } else {
+            detailUrl = ROUTER_URL.CONSULTANT.APPOINTMENT_DETAIL.replace(":appointmentId", record.id);
+        }
+            
+        navigate(detailUrl, { state: { appointment: record } });
+    };
+
     return (
         <>
             <div className="flex flex-wrap gap-4 mb-4 items-center">
@@ -311,6 +328,9 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
                 dataSource={appointments}
                 rowKey="id"
                 loading={loading}
+                onRow={(record) => ({
+                    onClick: () => handleRowClick(record),
+                })}
                 pagination={{
                     total,
                     current: currentPage,

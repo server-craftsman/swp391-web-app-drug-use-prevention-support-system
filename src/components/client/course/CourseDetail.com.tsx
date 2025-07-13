@@ -75,11 +75,28 @@ const CourseDetail: React.FC = () => {
     setLoadingReviews(true);
     try {
       const res = await ReviewService.getReviewByCourseId({ courseId });
+      console.log("Reviews response:", res);
+
+      // Ensure reviews is always an array
+      let reviewsData = [];
+      if (res.data?.data) {
+        if (Array.isArray(res.data.data)) {
+          reviewsData = res.data.data;
+        } else if (res.data.data && typeof res.data.data === "object") {
+          // If it's an object, try to extract array from it
+          const dataObj = res.data.data as any;
+          reviewsData = dataObj.reviews || dataObj.data || [];
+        }
+      }
+
+      console.log("Processed reviews data:", reviewsData);
+      setReviews(reviewsData);
       const pageInfo = res.data?.data;
       setReviews(Array.isArray(pageInfo?.reviews) ? pageInfo.reviews : []);
       setTotalReviews(pageInfo?.totalReviews || 0);
       setAverageRating(pageInfo?.averageRating || 0);
     } catch (err) {
+      console.error("Error fetching reviews:", err);
       message.error("Không thể tải đánh giá!");
       setReviews([]);
       setTotalReviews(0);

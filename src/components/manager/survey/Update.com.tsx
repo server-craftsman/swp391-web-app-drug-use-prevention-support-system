@@ -47,6 +47,7 @@ const SurveyUpdateModal: React.FC<Props> = ({ open, initialData, onClose, onSucc
                 name: surveyData.name,
                 description: surveyData.description,
                 surveyType: normalizedSurveyType,
+                estimateTime: surveyData.estimateTime || 5,
             });
         }
     }, [surveyData, loading, form]);
@@ -83,7 +84,8 @@ const SurveyUpdateModal: React.FC<Props> = ({ open, initialData, onClose, onSucc
             let processedValues = {
                 name: (values.name || "").trim(),
                 description: values.description || "",
-                surveyType: values.surveyType || SurveyType.RISK_ASSESSMENT
+                surveyType: values.surveyType || SurveyType.RISK_ASSESSMENT,
+                estimateTime: Number(values.estimateTime) || 5,
             };
 
             if (!processedValues.name) {
@@ -193,6 +195,13 @@ const SurveyUpdateModal: React.FC<Props> = ({ open, initialData, onClose, onSucc
                                 </Select.Option>
                             ))}
                         </Select>
+                    </Form.Item>
+                    <Form.Item
+                        name="estimateTime"
+                        label="Thời gian ước tính (phút)"
+                        rules={[{ required: true, message: 'Vui lòng nhập thời gian ước tính' }]}
+                    >
+                        <Input type="number" min={1} placeholder="Nhập số phút" />
                     </Form.Item>
                 </Form>
             ) : (

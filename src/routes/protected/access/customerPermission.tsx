@@ -6,6 +6,9 @@ import CustomerLayout from "../../../layouts/customer/Customer.layout";
 import MyCoursePage from "../../../pages/customer/my-course";
 import OrderHistory from "../../../pages/customer/order";
 import ReviewHistory from "../../../pages/customer/review";
+import MyCourseDetail from "../../../components/customer/my-course/MyCourseDetail.com";
+import LessonDetailPage from "../../../pages/customer/lesson";
+import AppointmentDetail from "../../../components/customer/appointment/Detail.com";
 // Lazy load customer pages
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 const AppointmentPage = lazy(
@@ -25,6 +28,10 @@ export const CustomerRoutes: RouteObject[] = [
       {
         path: ROUTER_URL.CUSTOMER.APPOINTMENTS,
         element: <AppointmentPage />,
+      },
+      {
+        path: ROUTER_URL.CUSTOMER.APPOINTMENT_DETAIL,
+        element: <AppointmentDetail />,
       },
       {
         path: ROUTER_URL.CUSTOMER.SETTINGS,

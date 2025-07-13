@@ -9,12 +9,14 @@ export interface CreateSurveyRequest {
     name: string;
     description: string;
     surveyType: SurveyType;
+    estimateTime: number;
 }
 
 export interface UpdateSurveyRequest {
     name: string;
     description: string;
     surveyType: SurveyType;
+    estimateTime: number;
 }
 
 export interface DeleteSurveyRequest {
