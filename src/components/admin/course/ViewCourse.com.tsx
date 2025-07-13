@@ -140,7 +140,7 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
               </Text>{" "}
               {data.discount > 0 ? (
                 <Tag color="red" className="text-sm px-3 py-1 rounded-full">
-                  -{Math.round(data.discount * 100)}%
+                  -{data.discount}%
                 </Tag>
               ) : (
                 <Text className="text-gray-500">Không</Text>

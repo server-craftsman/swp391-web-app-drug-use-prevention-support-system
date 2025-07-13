@@ -29,11 +29,9 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
   const [isLiked, setIsLiked] = useState(false);
 
   // Calculate final price and discount percentage
-  const finalPrice = course.price - course.discount;
-  const discountPercentage =
-    course.discount > 0
-      ? Math.round((course.discount / course.price) * 100)
-      : 0;
+  const finalPrice = course.price * (1 - course.discount / 100);
+  const discountPercentage = course.discount;
+  const savingAmount = course.price * (course.discount / 100);
 
   const handleBuyNow = () => {
     message.success("Chuyển hướng đến trang thanh toán...");
@@ -105,9 +103,17 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
                 )}
               </div>
               {course.discount > 0 && (
-                <Text className="text-red-500 text-sm font-medium">
-                  Tiết kiệm {formatCurrency(course.discount)}
-                </Text>
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <Text className="text-red-500 text-sm font-medium">
+                    Tiết kiệm {formatCurrency(savingAmount)}
+                  </Text>
+                  <Tag
+                    color="red"
+                    className="text-xs font-bold px-2 py-1 rounded-full"
+                  >
+                    -{discountPercentage}%
+                  </Tag>
+                </div>
               )}
             </div>
 

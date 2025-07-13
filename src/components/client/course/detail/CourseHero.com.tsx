@@ -7,9 +7,10 @@ const { Text } = Typography;
 
 interface CourseHeroProps {
   course: Course;
+  averageRating: number; // thêm prop này
 }
 
-const CourseHero: React.FC<CourseHeroProps> = ({ course }) => {
+const CourseHero: React.FC<CourseHeroProps> = ({ course, averageRating }) => {
   const getTargetAudienceLabel = (audience: string) => {
     const map: Record<string, string> = {
       student: "Học sinh",
@@ -115,7 +116,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course }) => {
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Rate
                   disabled
-                  value={5}
+                  value={averageRating}
                   allowHalf
                   style={{ color: "#faad14", fontSize: 22 }}
                 />
@@ -126,7 +127,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course }) => {
                     fontSize: 20,
                   }}
                 >
-                  5.0
+                  {averageRating.toFixed(1)}
                 </span>
               </div>
               <span style={{ color: "#64748b", fontSize: 18 }}>

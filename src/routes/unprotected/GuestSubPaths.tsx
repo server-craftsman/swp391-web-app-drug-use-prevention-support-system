@@ -99,6 +99,10 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
           path: ROUTER_URL.CLIENT.PAYMENT_FAIL,
           element: <PaymentFail />,
         },
+        {
+          path: ROUTER_URL.CUSTOMER.LESSON_DETAIL,
+          element: <LessonDetailPage />,
+        },
       ],
     },
   ],

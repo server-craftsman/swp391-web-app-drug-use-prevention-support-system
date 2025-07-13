@@ -42,20 +42,12 @@ export const CustomerRoutes: RouteObject[] = [
         element: <MyCoursePage />,
       },
       {
-        path: ROUTER_URL.CUSTOMER.MY_COURSE_DETAIL,
-        element: <MyCourseDetail />,
-      },
-      {
         path: ROUTER_URL.CUSTOMER.ORDER_HISTORY,
         element: <OrderHistory />,
       },
       {
         path: ROUTER_URL.CUSTOMER.REVIEW_HISTORY,
         element: <ReviewHistory />,
-      },
-      {
-        path: ROUTER_URL.CUSTOMER.LESSON_DETAIL,
-        element: <LessonDetailPage />,
       },
     ],
   },

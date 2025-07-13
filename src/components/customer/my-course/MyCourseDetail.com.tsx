@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Row, Col, Spin, Button, Typography, message } from "antd";
+import { Row, Col, Button, Typography } from "antd";
 import type { CourseDetailResponse } from "../../../types/course/Course.res.type";
-import { CourseService } from "../../../services/course/course.service";
 import { ReviewService } from "../../../services/review/review.service";
 import CourseHero from "./detail/CourseHero.com";
 import CourseHighlights from "./detail/CourseHighlights.com";
@@ -14,14 +13,18 @@ import CourseReviews from "./detail/CourseReviews.com";
 
 const { Title } = Typography;
 
-const MyCourseDetail: React.FC = () => {
+interface MyCourseDetailProps {
+  course: CourseDetailResponse;
+}
+
+const MyCourseDetail: React.FC<MyCourseDetailProps> = ({ course }) => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
-  const [course, setCourse] = useState<CourseDetailResponse | null>(null);
-  const [loading, setLoading] = useState(true);
 
   // State cho review
   const [reviews, setReviews] = useState<any[]>([]);
+  const [totalReviews, setTotalReviews] = useState<number>(0);
+  const [averageRating, setAverageRating] = useState<number>(0);
   const [loadingReviews, setLoadingReviews] = useState(false);
 
   // Lấy userId từ localStorage userInfo
@@ -36,37 +39,20 @@ const MyCourseDetail: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      setLoading(true);
-      try {
-        if (courseId) {
-          const res = await CourseService.getCourseById({ id: courseId });
-          if (res.data && res.data.success && res.data.data) {
-            setCourse(res.data.data as CourseDetailResponse);
-          } else {
-            setCourse(null);
-          }
-        }
-      } catch (err) {
-        setCourse(null);
-        message.error("Không thể tải chi tiết khóa học!");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourse();
-  }, [courseId]);
-
   // Lấy review theo courseId
   const fetchReviews = async () => {
     if (!courseId) return;
     setLoadingReviews(true);
     try {
       const res = await ReviewService.getReviewByCourseId({ courseId });
-      setReviews(res.data?.data || []);
+      const pageInfo = res.data?.data;
+      setReviews(Array.isArray(pageInfo?.reviews) ? pageInfo.reviews : []);
+      setTotalReviews(pageInfo?.totalReviews || 0);
+      setAverageRating(pageInfo?.averageRating || 0);
     } catch (err) {
       setReviews([]);
+      setTotalReviews(0);
+      setAverageRating(0);
     } finally {
       setLoadingReviews(false);
     }
@@ -81,14 +67,6 @@ const MyCourseDetail: React.FC = () => {
   const handleReviewChanged = () => {
     fetchReviews();
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   if (!course) {
     return (
@@ -115,7 +93,7 @@ const MyCourseDetail: React.FC = () => {
       expanded: false,
       lectures:
         session.lessonList?.map((lesson) => ({
-          id: lesson.id, // Thêm dòng này!
+          id: lesson.id,
           title: lesson.name,
           duration: lesson.fullTime ? `${lesson.fullTime} phút` : "",
           preview: false,
@@ -130,7 +108,7 @@ const MyCourseDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f7f9fa]">
       {/* Hero Section */}
-      <CourseHero course={course} />
+      <CourseHero course={course} averageRating={averageRating} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -149,6 +127,8 @@ const MyCourseDetail: React.FC = () => {
                 userId={userId}
                 reviews={reviews}
                 loading={loadingReviews}
+                totalReviews={totalReviews}
+                averageRating={averageRating}
                 onReviewChanged={handleReviewChanged}
               />
 

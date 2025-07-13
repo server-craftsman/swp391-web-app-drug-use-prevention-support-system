@@ -1,6 +1,6 @@
 // ViewCartPage.tsx
 import React, { useEffect } from "react";
-import { Typography, Empty, Divider, Button, Spin } from "antd";
+import { Typography, Empty, Button, Spin } from "antd";
 import {
   ShoppingOutlined,
   CreditCardOutlined,
@@ -228,13 +228,6 @@ const ViewCartPage: React.FC = () => {
                     </div>
 
                     <div className="space-y-4">
-                      <div className="flex justify-between text-gray-600">
-                        <span>Tổng số khóa học:</span>
-                        <span className="font-medium">{cartItems.length}</span>
-                      </div>
-
-                      <Divider className="my-4" />
-
                       <div className="flex justify-between items-center">
                         <span className="text-lg font-semibold text-gray-800">
                           Tổng cộng:

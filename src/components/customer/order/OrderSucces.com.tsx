@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, message, Button, Modal, Spin, Tooltip } from "antd";
+import { Table, message, Button, Modal, Spin, Tooltip, Tag } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 import { OrderService } from "../../../services/order/order.service";
 import type { OrderResponse } from "../../../types/order/Order.res.type";
@@ -24,6 +24,7 @@ const OrderSuccessList: React.FC = () => {
   // Search state
   const [search, setSearch] = useState("");
 
+  // Lấy userId từ localStorage (chỉ dùng để fetch, không render ra UI)
   let userId = "";
   const userInfoStr = localStorage.getItem("userInfo");
   if (userInfoStr) {
@@ -48,12 +49,14 @@ const OrderSuccessList: React.FC = () => {
         allOrders = allOrders.filter(
           (order: OrderResponse) => order.orderStatus === OrderStatus.PAID
         );
-        // Filter by search (mã đơn hàng hoặc ngày đặt)
+        // Filter by search (theo tên khóa học hoặc ngày đặt)
         let filtered = allOrders;
         if (search) {
           filtered = allOrders.filter(
             (order: OrderResponse) =>
-              order.orderId.toLowerCase().includes(search.toLowerCase()) ||
+              order.orderDetails?.some((d) =>
+                d.courseName?.toLowerCase().includes(search.toLowerCase())
+              ) ||
               (order.orderDate &&
                 new Date(order.orderDate)
                   .toLocaleDateString("vi-VN")
@@ -93,11 +96,7 @@ const OrderSuccessList: React.FC = () => {
   };
 
   const columns = [
-    {
-      title: "Mã đơn hàng",
-      dataIndex: "orderId",
-      key: "orderId",
-    },
+    // KHÔNG hiển thị orderId
     {
       title: "Ngày đặt",
       dataIndex: "orderDate",
@@ -106,19 +105,33 @@ const OrderSuccessList: React.FC = () => {
         date ? new Date(date).toLocaleDateString("vi-VN") : "",
     },
     {
+      title: "Khóa học",
+      dataIndex: "orderDetails",
+      key: "orderDetails",
+      render: (details: any[]) =>
+        details && details.length > 0 ? (
+          details.map((d) => (
+            <Tag key={d.courseId} color="blue">
+              {d.courseName}
+            </Tag>
+          ))
+        ) : (
+          <span>Không có</span>
+        ),
+    },
+    {
       title: "Trạng thái",
       dataIndex: "orderStatus",
       key: "orderStatus",
-      render: () => "Đã mua",
+      render: () => <Tag color="green">Đã mua</Tag>,
     },
-
     {
       title: "Tổng tiền",
       dataIndex: "totalAmount",
       key: "totalAmount",
       render: (amount: number) => (
         <div className="flex justify-end">
-          {amount?.toLocaleString() + " đ"}
+          {amount?.toLocaleString("vi-VN") + " đ"}
         </div>
       ),
     },
@@ -143,7 +156,7 @@ const OrderSuccessList: React.FC = () => {
     <>
       <div style={{ marginBottom: 16 }}>
         <CustomSearch
-          placeholder="Tìm kiếm theo mã đơn hoặc ngày đặt"
+          placeholder="Tìm kiếm theo tên khóa học hoặc ngày đặt"
           onSearch={setSearch}
           loading={loading}
           inputWidth="w-64"
@@ -187,67 +200,71 @@ const OrderSuccessList: React.FC = () => {
             Đóng
           </Button>,
         ]}
-        width={400}
+        width={420}
         style={{ top: 40 }}
         bodyStyle={{
           padding: 32,
-          background: "#f5f6fa",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          background: "#fff", // Đổi về trắng cho đồng nhất
+          borderRadius: 12,
         }}
         centered
       >
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: 12,
-            padding: 24,
-            minWidth: 260,
-            maxWidth: 360,
-            margin: "0 auto",
-            boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
-            fontSize: 16,
-            width: "100%",
-          }}
-        >
-          {viewLoading ? (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: 80,
-              }}
-            >
-              <Spin />
+        {viewLoading ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: 80,
+            }}
+          >
+            <Spin />
+          </div>
+        ) : selectedOrder ? (
+          <div style={{ fontSize: 16 }}>
+            {/* KHÔNG hiển thị orderId */}
+            <div style={{ marginBottom: 10 }}>
+              <b>Ngày đặt:</b>{" "}
+              {selectedOrder.orderDate
+                ? new Date(selectedOrder.orderDate).toLocaleDateString("vi-VN")
+                : ""}
             </div>
-          ) : selectedOrder ? (
-            <>
-              <div style={{ marginBottom: 12 }}>
-                <b>Mã đơn hàng:</b> {selectedOrder.orderId}
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <b>Ngày đặt:</b>{" "}
-                {selectedOrder.orderDate
-                  ? new Date(selectedOrder.orderDate).toLocaleDateString(
-                      "vi-VN"
-                    )
-                  : ""}
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <b>Tổng tiền:</b> {selectedOrder.totalAmount?.toLocaleString()}{" "}
-                đ
-              </div>
-
-              <div>
-                <b>Thanh toán:</b> {selectedOrder.paymentStatus}
-              </div>
-            </>
-          ) : (
-            <div>Không tìm thấy dữ liệu đơn hàng.</div>
-          )}
-        </div>
+            <div style={{ marginBottom: 10 }}>
+              <b>Người mua:</b> {selectedOrder.userName || "Bạn"}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <b>Khóa học đã mua:</b>
+              <ul style={{ margin: 0, paddingLeft: 18 }}>
+                {selectedOrder.orderDetails?.map((d) => (
+                  <li key={d.courseId}>
+                    {d.courseName}{" "}
+                    <span style={{ color: "#888", fontSize: 13 }}>
+                      ({d.amount?.toLocaleString("vi-VN")} đ)
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <b>Tổng tiền:</b>{" "}
+              {selectedOrder.totalAmount?.toLocaleString("vi-VN")} đ
+            </div>
+            <div>
+              <b>Thanh toán:</b>{" "}
+              <Tag
+                color={
+                  selectedOrder.paymentStatus === "Success" ? "green" : "red"
+                }
+              >
+                {selectedOrder.paymentStatus === "Success"
+                  ? "Thành công"
+                  : selectedOrder.paymentStatus}
+              </Tag>
+            </div>
+          </div>
+        ) : (
+          <div>Không tìm thấy dữ liệu đơn hàng.</div>
+        )}
       </Modal>
     </>
   );

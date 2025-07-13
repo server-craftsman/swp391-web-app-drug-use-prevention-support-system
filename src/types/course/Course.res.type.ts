@@ -17,6 +17,7 @@ export interface Course {
   slug: string;
   createdAt: string;
   riskLevel: RiskLevel;
+  isPurchased?: boolean;
 }
 
 export interface CoursePageInfo {

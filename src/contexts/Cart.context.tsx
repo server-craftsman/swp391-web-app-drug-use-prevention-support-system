@@ -39,7 +39,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Calculate total price for selected items
   const totalPrice = cartItems.reduce((acc, item) => {
     return selectedIds.includes(item.cartId)
-      ? acc + item.price * (1 - item.discount)
+      ? acc + item.price * (1 - item.discount / 100)
       : acc;
   }, 0);
 
