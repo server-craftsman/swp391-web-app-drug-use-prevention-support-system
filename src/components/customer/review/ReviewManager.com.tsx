@@ -10,13 +10,14 @@ import {
   Select,
   Typography,
 } from "antd";
-import { EyeOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EyeOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { ReviewService } from "../../../services/review/review.service";
 import { CourseService } from "../../../services/course/course.service";
 import type { Review } from "../../../types/review/Review.res.type";
 import DeleteReview from "../../client/review/DeleteReview.com";
 import CustomSearch from "../../common/CustomSearch.com";
 import { formatDate } from "../../../utils/helper";
+import UpdateReview from "../../client/review/UpdateReview.com";
 
 const PAGE_SIZE = 8;
 
@@ -29,6 +30,11 @@ const ReviewManager: React.FC = () => {
   const [viewModal, setViewModal] = useState(false);
   const [viewLoading, setViewLoading] = useState(false);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+
+  // State cho update review
+  const [updateModal, setUpdateModal] = useState(false);
+  const [selectedUpdateReview, setSelectedUpdateReview] =
+    useState<Review | null>(null);
 
   // Filter state
   const [search, setSearch] = useState("");
@@ -175,6 +181,17 @@ const ReviewManager: React.FC = () => {
               onClick={() => handleView(record.id)}
             />
           </Tooltip>
+          <Tooltip title="Sửa">
+            <Button
+              icon={<EditOutlined />}
+              shape="circle"
+              size="small"
+              onClick={() => {
+                setSelectedUpdateReview(record);
+                setUpdateModal(true);
+              }}
+            />
+          </Tooltip>
           <Tooltip title="Xóa">
             <DeleteReview
               reviewId={record.id}
@@ -200,7 +217,7 @@ const ReviewManager: React.FC = () => {
         padding: 32,
         width: "100%",
         boxSizing: "border-box",
-        paddingBottom: 48, // Thêm padding dưới nếu muốn
+        paddingBottom: 48,
       }}
     >
       <div style={{ marginBottom: 24 }}>
@@ -262,6 +279,7 @@ const ReviewManager: React.FC = () => {
         }}
       />
 
+      {/* Modal xem chi tiết */}
       <Modal
         open={viewModal}
         title={
@@ -279,61 +297,56 @@ const ReviewManager: React.FC = () => {
         style={{ top: 40 }}
         bodyStyle={{
           padding: 32,
-          background: "#f5f6fa",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          background: "#fff",
+          borderRadius: 12,
         }}
         centered
       >
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: 12,
-            padding: 24,
-            minWidth: 260,
-            maxWidth: 360,
-            margin: "0 auto",
-            boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
-            fontSize: 16,
-            width: "100%",
-          }}
-        >
-          {viewLoading ? (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: 80,
-              }}
-            >
-              <Spin />
+        {viewLoading ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: 80,
+            }}
+          >
+            <Spin />
+          </div>
+        ) : selectedReview ? (
+          <div style={{ fontSize: 16 }}>
+            <div style={{ marginBottom: 10 }}>
+              <b>Khóa học:</b>{" "}
+              {courseMap[selectedReview.courseId] || selectedReview.courseId}
             </div>
-          ) : selectedReview ? (
-            <>
-              <div style={{ marginBottom: 12 }}>
-                <b>Khóa học:</b>{" "}
-                {courseMap[selectedReview.courseId] || selectedReview.courseId}
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <b>Số sao:</b> <Rate disabled value={selectedReview.rating} />
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <b>Bình luận:</b> {selectedReview.comment}
-              </div>
-              <div>
-                <b>Ngày đánh giá:</b>{" "}
-                {selectedReview.createdAt
-                  ? formatDate(new Date(selectedReview.createdAt))
-                  : ""}
-              </div>
-            </>
-          ) : (
-            <div>Không tìm thấy dữ liệu đánh giá.</div>
-          )}
-        </div>
+            <div style={{ marginBottom: 10 }}>
+              <b>Số sao:</b> <Rate disabled value={selectedReview.rating} />
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <b>Bình luận:</b> {selectedReview.comment}
+            </div>
+            <div>
+              <b>Ngày đánh giá:</b>{" "}
+              {selectedReview.createdAt
+                ? formatDate(new Date(selectedReview.createdAt))
+                : ""}
+            </div>
+          </div>
+        ) : (
+          <div>Không tìm thấy dữ liệu đánh giá.</div>
+        )}
       </Modal>
+
+      {/* Modal cập nhật đánh giá */}
+      <UpdateReview
+        open={updateModal}
+        onClose={() => setUpdateModal(false)}
+        review={selectedUpdateReview}
+        onSuccess={() => {
+          setUpdateModal(false);
+          fetchReviews();
+        }}
+      />
     </div>
   );
 };

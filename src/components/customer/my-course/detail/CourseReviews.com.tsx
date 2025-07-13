@@ -10,22 +10,12 @@ import {
   Form,
 } from "antd";
 import DeleteReview from "../../../client/review/DeleteReview.com";
+import UpdateReview from "../../../client/review/UpdateReview.com";
 import { useCreateReview } from "../../../../hooks/useReview";
 import { UserService } from "../../../../services/user/user.service";
-
+import { EditOutlined } from "@ant-design/icons";
+import type { Review } from "../../../../types/review/Review.res.type"; // Thêm dòng này
 const { Title, Text, Paragraph } = Typography;
-
-interface Review {
-  id: string;
-  userName?: string;
-  userAvatar?: string;
-  rating: number;
-  timeAgo?: string;
-  comment: string;
-  avatarColor?: string;
-  createdAt?: string;
-  userId: string;
-}
 
 interface CourseReviewsProps {
   courseId: string;
@@ -99,6 +89,10 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
     }
   };
 
+  const [updateModal, setUpdateModal] = useState(false);
+  const [selectedUpdateReview, setSelectedUpdateReview] =
+    useState<Review | null>(null);
+
   return (
     <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>
       <div className="mb-6">
@@ -139,9 +133,7 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
                   <Avatar
                     size={40}
                     src={userMap[review.userId]?.profilePicUrl}
-                    className={`${
-                      review.avatarColor || "bg-blue-600"
-                    } flex-shrink-0`}
+                    style={{ backgroundColor: "#20558A" }}
                   >
                     {userMap[review.userId]?.fullName
                       ? userMap[review.userId].fullName
@@ -157,23 +149,32 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
                     </Text>
                     <Rate
                       disabled
-                      defaultValue={review.rating}
+                      value={review.rating}
                       className="text-yellow-400"
                       style={{ fontSize: "12px" }}
                     />
                     <Text className="text-gray-500 text-xs ml-2">
-                      {review.timeAgo ||
-                        (review.createdAt
-                          ? new Date(review.createdAt).toLocaleDateString()
-                          : "")}
+                      {review.createdAt
+                        ? new Date(review.createdAt).toLocaleDateString()
+                        : ""}
                     </Text>
                   </div>
                 </div>
                 {review.userId === userId && (
-                  <DeleteReview
-                    reviewId={review.id}
-                    onDeleted={onReviewChanged}
-                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="small"
+                      icon={<EditOutlined />}
+                      onClick={() => {
+                        setSelectedUpdateReview(review);
+                        setUpdateModal(true);
+                      }}
+                    />
+                    <DeleteReview
+                      reviewId={review.id}
+                      onDeleted={onReviewChanged}
+                    />
+                  </div>
                 )}
               </div>
               <Paragraph className="text-gray-700 text-sm mb-3">
@@ -223,6 +224,16 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
       ) : (
         <div className="mb-8 text-red-500">Bạn cần đăng nhập để đánh giá.</div>
       )}
+
+      <UpdateReview
+        open={updateModal}
+        onClose={() => setUpdateModal(false)}
+        review={selectedUpdateReview}
+        onSuccess={() => {
+          setUpdateModal(false);
+          onReviewChanged(); // fetch lại data
+        }}
+      />
     </Card>
   );
 };

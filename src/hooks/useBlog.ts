@@ -17,7 +17,7 @@ export const useCreateBlog = () => {
   return useMutation({
     mutationFn: (data: CreateBlogRequest) => BlogService.createBlog(data),
     onSuccess: () => {
-      helpers.notificationMessage("Blog created successfully", "success");
+      helpers.notificationMessage("Tạo Blog thành công", "success");
       navigate(ROUTER_URL.ADMIN.MANAGER_BLOG);
     },
     onError: (error) => {
@@ -35,7 +35,7 @@ export const useUpdateBlog = () => {
   return useMutation({
     mutationFn: (data: UpdateBlogRequest) => BlogService.updateBlog(data),
     onSuccess: () => {
-      helpers.notificationMessage("Blog updated successfully", "success");
+      helpers.notificationMessage("Cập nhập Blog thành công", "success");
       navigate(ROUTER_URL.ADMIN.MANAGER_BLOG);
     },
     onError: (error) => {

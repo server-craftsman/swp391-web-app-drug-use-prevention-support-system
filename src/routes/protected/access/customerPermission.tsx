@@ -6,8 +6,6 @@ import CustomerLayout from "../../../layouts/customer/Customer.layout";
 import MyCoursePage from "../../../pages/customer/my-course";
 import OrderHistory from "../../../pages/customer/order";
 import ReviewHistory from "../../../pages/customer/review";
-import MyCourseDetail from "../../../components/customer/my-course/MyCourseDetail.com";
-import LessonDetailPage from "../../../pages/customer/lesson";
 import AppointmentDetail from "../../../components/customer/appointment/Detail.com";
 // Lazy load customer pages
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));

@@ -16,6 +16,7 @@ import PaymentPageMain from "../../pages/customer/payment";
 import PaymentSuccess from "../../pages/customer/success";
 import PaymentFail from "../../pages/customer/cancel";
 import NotFoundPage from "../../pages/auth/not_found";
+import LessonDetailPage from "../../pages/customer/lesson";
 
 //================= PUBLIC SUB PATHS =================
 const UnauthorizedPage = lazy(() => import("../../pages/auth/unauthorized"));
