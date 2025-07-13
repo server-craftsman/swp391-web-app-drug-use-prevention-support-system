@@ -6,3 +6,8 @@ export interface Review {
   comment: string;
   createdAt: string;
 }
+export interface ReviewPageInfo {
+  totalReviews: number;
+  averageRating: number;
+  reviews: Review[];
+}

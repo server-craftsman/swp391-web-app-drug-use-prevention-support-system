@@ -6,12 +6,14 @@ export interface BlogRequest {
 export interface CreateBlogRequest {
   content: string;
   blogImgUrl: string;
+  title: string;
 }
 
 export interface UpdateBlogRequest {
   id: string;
   content: string;
   blogImgUrl: string;
+  title: string;
 }
 export interface DeleteBlogRequest {
   id: string;

@@ -23,10 +23,24 @@ const CourseList = () => {
 
   const fetchCourses = async (page = 1, size = itemsPerPage) => {
     setLoading(true);
+
+    // Lấy userId từ localStorage
+    let userId = undefined;
+    const userInfoStr = localStorage.getItem("userInfo");
+    if (userInfoStr) {
+      try {
+        const userInfo = JSON.parse(userInfoStr);
+        userId = userInfo.id;
+      } catch {
+        userId = undefined;
+      }
+    }
+
     const params: CourseRequest = {
       pageNumber: page,
       pageSize: size,
       filterByName: searchTerm,
+      userId, // truyền userId lên BE để check isPurchased
     };
     if (selectedCategory) {
       (params as any).CategoryId = selectedCategory;
@@ -72,6 +86,10 @@ const CourseList = () => {
     targetAudience,
     searchTerm,
   ]);
+
+  useEffect(() => {
+    console.log("courses:", courses);
+  }, [courses]);
 
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);

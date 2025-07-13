@@ -6,6 +6,7 @@ import {
   StarFilled,
   HeartOutlined,
   ShareAltOutlined,
+  CheckCircleTwoTone,
 } from "@ant-design/icons";
 import type { Course } from "../../../../types/course/Course.res.type";
 import { formatCurrency } from "../../../../utils/helper";
@@ -19,7 +20,7 @@ interface CourseCardHoverProps {
 
 const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
   // Calculate final price after discount
-  const finalPrice = course.price - course.discount;
+  const finalPrice = course.price * (1 - course.discount / 100);
 
   // Format creation date
   const formatDate = (dateString: string) => {
@@ -117,27 +118,46 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
           {/* Price */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <div className="flex items-center space-x-2">
-                <Text className="text-2xl font-bold text-blue-600">
-                  {formatCurrency(finalPrice)}
-                </Text>
-                {course.discount > 0 && (
-                  <Text delete className="text-gray-400">
-                    {formatCurrency(course.price)}
+              {course.isPurchased === true ? (
+                <span className="flex items-center text-green-600 font-bold text-base">
+                  <CheckCircleTwoTone twoToneColor="#52c41a" className="mr-2" />
+                  Đã sở hữu
+                </span>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Text className="text-2xl font-bold text-blue-600">
+                    {formatCurrency(finalPrice)}
                   </Text>
-                )}
-              </div>
-              {course.discount > 0 && (
-                <Text className="text-red-500 text-sm font-medium">
-                  Giảm {Math.round((course.discount / course.price) * 100)}%
-                </Text>
+                  {course.discount > 0 && (
+                    <Text delete className="text-gray-400">
+                      {formatCurrency(course.price)}
+                    </Text>
+                  )}
+                  {course.discount > 0 && (
+                    <Text className="text-red-500 text-sm font-medium">
+                      -{course.discount}%
+                    </Text>
+                  )}
+                </div>
               )}
             </div>
           </div>
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            <AddToCartButton courseId={course.id} />
+            {course.isPurchased === true ? (
+              <Button
+                type="primary"
+                icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                block
+                disabled
+                className="bg-green-500 border-0"
+              >
+                Đã sở hữu
+              </Button>
+            ) : (
+              <AddToCartButton courseId={course.id} />
+            )}
 
             <div className="flex space-x-2">
               <Button

@@ -100,6 +100,13 @@ const AdminBlogManager = () => {
         ),
     },
     {
+      title: "Tiêu đề",
+      dataIndex: "title",
+      key: "title",
+      render: (text: string) => <span style={{ fontWeight: 600 }}>{text}</span>,
+      width: 180,
+    },
+    {
       title: "Nội dung",
       dataIndex: "content",
       key: "content",
@@ -248,6 +255,12 @@ const AdminBlogManager = () => {
           <div>Đang tải...</div>
         ) : viewingBlog ? (
           <div className="space-y-4">
+            <div>
+              <strong>Tiêu đề:</strong>
+              <div style={{ fontWeight: 600, fontSize: 18 }}>
+                {viewingBlog.title}
+              </div>
+            </div>
             <div>
               <strong>Nội dung:</strong>
               <div style={{ whiteSpace: "pre-line" }}>

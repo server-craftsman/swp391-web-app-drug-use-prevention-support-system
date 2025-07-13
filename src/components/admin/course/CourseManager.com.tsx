@@ -117,7 +117,7 @@ const AdminCourseManager = () => {
       key: "discount",
       render: (discount: number) =>
         discount > 0 ? (
-          <Tag color="red">-{discount?.toLocaleString("vi-VN")}₫</Tag>
+          <Tag color="red">-{discount?.toLocaleString("vi-VN")}%</Tag>
         ) : (
           <span>Không</span>
         ),

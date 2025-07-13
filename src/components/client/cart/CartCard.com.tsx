@@ -89,14 +89,14 @@ const CartCard: React.FC<CartCardProps> = ({
                 {item.discount > 0 ? (
                   <div className="flex items-center space-x-3">
                     <div className="text-2xl font-bold text-primary">
-                      {formatCurrency(item.price * (1 - item.discount))}
+                      {formatCurrency(item.price * (1 - item.discount / 100))}
                     </div>
                     <div className="flex items-center space-x-2">
                       <Text type="secondary" delete className="text-base">
                         {formatCurrency(item.price)}
                       </Text>
                       <div className="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-medium">
-                        -{Math.round(item.discount * 100)}%
+                        -{item.discount}%
                       </div>
                     </div>
                   </div>

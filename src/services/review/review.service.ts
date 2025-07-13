@@ -8,7 +8,10 @@ import type {
   GetReviewByUserIdRequest,
   GetReviewById,
 } from "../../types/review/Review.req.type";
-import type { Review } from "../../types/review/Review.res.type";
+import type {
+  Review,
+  ReviewPageInfo,
+} from "../../types/review/Review.res.type";
 import { API_PATH } from "../../consts/api.path.const";
 
 export const ReviewService = {
@@ -31,7 +34,7 @@ export const ReviewService = {
     });
   },
   getReviewByCourseId(params: GetReviewByCourseIdRequest) {
-    return BaseService.get<ResponseSuccess<Review[]>>({
+    return BaseService.get<ResponseSuccess<ReviewPageInfo>>({
       url: API_PATH.REVIEW.GET_REVIEW_BY_COURSE_ID(params.courseId),
       payload: params,
     });

@@ -1,20 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Row,
-  Col,
-  Spin,
-  Button,
-  Typography,
-  message,
-  Card,
-  Avatar,
-  Rate,
-} from "antd";
+import { Row, Col, Spin, Button, Typography, message } from "antd";
 import type { CourseDetailResponse } from "../../../types/course/Course.res.type";
 import { CourseService } from "../../../services/course/course.service";
 import { ReviewService } from "../../../services/review/review.service";
 import { UserService } from "../../../services/user/user.service";
+import type { Review } from "../../../types/review/Review.res.type";
 // Import detail components
 import CourseHero from "./detail/CourseHero.com.tsx";
 import CourseHighlights from "./detail/CourseHighlights.com.tsx";
@@ -23,6 +14,8 @@ import CourseDescription from "./detail/CourseDescription.com.tsx";
 import CourseInstructor from "./detail/CourseInstructor.com.tsx";
 import CoursePurchaseCard from "./detail/CoursePurchaseCard.com.tsx";
 import MoreCourses from "./detail/MoreCourses.com.tsx";
+import CourseReviews from "./detail/CourseReviews.com.tsx";
+import MyCourseDetail from "../../customer/my-course/MyCourseDetail.com.tsx";
 
 const { Title } = Typography;
 
@@ -38,11 +31,17 @@ const CourseDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   // State cho review
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [totalReviews, setTotalReviews] = useState<number>(0);
+  const [averageRating, setAverageRating] = useState<number>(0);
   const [loadingReviews, setLoadingReviews] = useState(false);
 
   // State cho user info
   const [userMap, setUserMap] = useState<Record<string, UserInfo>>({});
+
+  // Lấy userId từ localStorage (nên lấy từ object userInfo nếu có)
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "{}");
+  const userId = userInfo.id || localStorage.getItem("userId");
 
   // Lấy course
   useEffect(() => {
@@ -50,7 +49,11 @@ const CourseDetail: React.FC = () => {
       setLoading(true);
       try {
         if (courseId) {
-          const res = await CourseService.getCourseById({ id: courseId });
+          // Truyền thêm userId vào request để API trả về isPurchased đúng cho user hiện tại
+          const res = await CourseService.getCourseById({
+            id: courseId,
+            userId: userId ? userId : undefined,
+          });
           if (res.data && res.data.success && res.data.data) {
             setCourse(res.data.data as CourseDetailResponse);
           } else {
@@ -64,7 +67,7 @@ const CourseDetail: React.FC = () => {
       }
     };
     fetchCourse();
-  }, [courseId]);
+  }, [courseId, userId]);
 
   // Lấy review theo courseId
   const fetchReviews = async () => {
@@ -72,10 +75,15 @@ const CourseDetail: React.FC = () => {
     setLoadingReviews(true);
     try {
       const res = await ReviewService.getReviewByCourseId({ courseId });
-      setReviews(res.data?.data || []);
+      const pageInfo = res.data?.data;
+      setReviews(Array.isArray(pageInfo?.reviews) ? pageInfo.reviews : []);
+      setTotalReviews(pageInfo?.totalReviews || 0);
+      setAverageRating(pageInfo?.averageRating || 0);
     } catch (err) {
       message.error("Không thể tải đánh giá!");
       setReviews([]);
+      setTotalReviews(0);
+      setAverageRating(0);
     } finally {
       setLoadingReviews(false);
     }
@@ -91,10 +99,15 @@ const CourseDetail: React.FC = () => {
   // Lấy thông tin user cho từng review
   useEffect(() => {
     const fetchUsers = async () => {
+      // Lấy danh sách userId duy nhất từ reviews
       const ids = Array.from(new Set(reviews.map((r) => r.userId)));
-      const newUserMap: Record<string, UserInfo> = {};
+      // Chỉ lấy những userId chưa có trong userMap
+      const missingIds = ids.filter((id) => !(id in userMap));
+      if (missingIds.length === 0) return;
+
+      const newUserMap: Record<string, UserInfo> = { ...userMap };
       await Promise.all(
-        ids.map(async (id) => {
+        missingIds.map(async (id) => {
           try {
             const res = await UserService.getUserById({ userId: id });
             if (res.data?.success && res.data?.data) {
@@ -108,7 +121,8 @@ const CourseDetail: React.FC = () => {
       );
       setUserMap(newUserMap);
     };
-    if (reviews.length > 0) fetchUsers();
+    if (Array.isArray(reviews) && reviews.length > 0) fetchUsers();
+    // eslint-disable-next-line
   }, [reviews]);
 
   // Loading state
@@ -130,6 +144,11 @@ const CourseDetail: React.FC = () => {
         </Button>
       </div>
     );
+  }
+
+  // Nếu đã mua thì render MyCourseDetail, chưa mua thì render giao diện cũ
+  if (course.isPurchased) {
+    return <MyCourseDetail course={course} />;
   }
 
   // Highlights từ data thật
@@ -162,7 +181,7 @@ const CourseDetail: React.FC = () => {
   return (
     <div className="min-h-screen ">
       {/* Hero Section */}
-      <CourseHero course={course} />
+      <CourseHero course={course} averageRating={averageRating} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -182,65 +201,14 @@ const CourseDetail: React.FC = () => {
               {/* Instructor Section */}
               <CourseInstructor instructorId={course.userId} />
 
-              {/* Reviews Section - chỉ đọc */}
-              <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>
-                <Typography.Title level={4} className="mb-4">
-                  Đánh giá khóa học
-                </Typography.Title>
-                {loadingReviews ? (
-                  <Spin />
-                ) : reviews.length === 0 ? (
-                  <div className="text-gray-500">
-                    Chưa có đánh giá nào cho khóa học này.
-                  </div>
-                ) : (
-                  reviews.map((review, index) => (
-                    <div
-                      key={review.id}
-                      className={`border-b border-gray-200 pb-6 mb-4 ${
-                        index === reviews.length - 1 ? "last:border-b-0" : ""
-                      }`}
-                    >
-                      <div className="flex items-start space-x-3 mb-2">
-                        <Avatar
-                          size={40}
-                          src={userMap[review.userId]?.profilePicUrl}
-                          className={`${
-                            review.avatarColor || "bg-blue-600"
-                          } flex-shrink-0`}
-                        >
-                          {userMap[review.userId]?.fullName
-                            ? userMap[review.userId].fullName
-                                .split(" ")
-                                .map((name: string) => name[0])
-                                .join("")
-                                .toUpperCase()
-                            : "U"}
-                        </Avatar>
-                        <div>
-                          <Typography.Text className="font-semibold text-gray-900 block">
-                            {userMap[review.userId]?.fullName || "Người dùng"}
-                          </Typography.Text>
-                          <Rate
-                            disabled
-                            defaultValue={review.rating}
-                            className="text-yellow-400"
-                            style={{ fontSize: "12px" }}
-                          />
-                          <Typography.Text className="text-gray-500 text-xs ml-2">
-                            {review.createdAt
-                              ? new Date(review.createdAt).toLocaleDateString()
-                              : ""}
-                          </Typography.Text>
-                        </div>
-                      </div>
-                      <Typography.Paragraph className="text-gray-700 text-sm mb-0">
-                        {review.comment}
-                      </Typography.Paragraph>
-                    </div>
-                  ))
-                )}
-              </Card>
+              {/* Reviews Section */}
+              <CourseReviews
+                reviews={reviews}
+                loading={loadingReviews}
+                userMap={userMap}
+                totalReviews={totalReviews}
+                averageRating={averageRating}
+              />
 
               {/* More Courses Section */}
               <MoreCourses instructorName={instructorName} />

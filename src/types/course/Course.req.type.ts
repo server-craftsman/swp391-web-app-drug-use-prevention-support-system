@@ -7,6 +7,7 @@ export interface CourseRequest {
   pageSize: number;
   filterByName?: string;
   keyword?: string;
+  userId?: string;
 }
 export interface CreateCourseRequest {
   name: string;
@@ -46,6 +47,7 @@ export interface DeleteCourseRequest {
 
 export interface CourseDetailRequest {
   id: string;
+  userId?: string; // Optional, for fetching user-specific data like purchase status
 }
 export interface MyCoursesRequest {
   userId: string;

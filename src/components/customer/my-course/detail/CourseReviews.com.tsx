@@ -34,6 +34,7 @@ interface CourseReviewsProps {
   totalReviews?: number;
   reviews?: Review[];
   loading: boolean;
+  averageRating: number; // thêm dòng này
   onReviewChanged: () => void;
 }
 
@@ -48,6 +49,8 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
   reviews = [],
   loading,
   onReviewChanged,
+  averageRating,
+  totalReviews,
 }) => {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
@@ -102,6 +105,20 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
         <Title level={3} className="text-gray-900 mb-2">
           Tất cả đánh giá
         </Title>
+        <div className="flex items-center mb-2 gap-4">
+          <Rate
+            disabled
+            allowHalf
+            value={averageRating}
+            style={{ fontSize: 20 }}
+          />
+          <span className="font-semibold text-lg text-[#20558A]">
+            {averageRating.toFixed(1)} / 5.0
+          </span>
+          <span className="text-gray-500 text-base">
+            ({totalReviews} đánh giá)
+          </span>
+        </div>
       </div>
 
       <div className="space-y-6">

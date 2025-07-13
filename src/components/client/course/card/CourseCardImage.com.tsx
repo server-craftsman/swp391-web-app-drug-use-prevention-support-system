@@ -9,20 +9,23 @@ interface CourseCardImageProps {
 
 const CourseCardImage: React.FC<CourseCardImageProps> = ({ course }) => {
   // Calculate discount percentage
-  const discountPercentage =
-    course.discount > 0
-      ? Math.round((course.discount / course.price) * 100)
-      : 0;
+  const discountPercentage = course.discount;
 
   return (
     <div className="relative overflow-hidden h-56">
-      {course.discount > 0 && (
+      {course.isPurchased === true ? (
+        <Badge.Ribbon
+          text="Đã mua"
+          color="green"
+          className="absolute top-0 right-0 z-10"
+        />
+      ) : course.discount > 0 ? (
         <Badge.Ribbon
           text={`-${discountPercentage}%`}
           color="red"
           className="absolute top-0 right-0 z-10"
         />
-      )}
+      ) : null}
       <img
         alt={course.name}
         src={course.imageUrls?.[0] || "/no-image.png"}
