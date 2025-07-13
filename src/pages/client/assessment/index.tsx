@@ -1,5 +1,9 @@
-import AssessmentList from "../../../components/client/assessment/AssessmentList.com";
+import AssessmentContainer from "../../../components/client/assessment/AssessmentContainer.com";
 
 export default function Assessment() {
-  return <AssessmentList />;
+  return (
+    <div>
+      <AssessmentContainer />
+    </div>
+  );
 }

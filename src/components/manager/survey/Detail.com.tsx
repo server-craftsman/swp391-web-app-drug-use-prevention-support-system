@@ -12,11 +12,12 @@ interface DetailProps {
     surveyName?: string;
     surveyType?: SurveyType;
     surveyDescription?: string;
+    estimateTime?: number;
     open: boolean;
     onClose: () => void;
 }
 
-const SurveyDetailDrawer: React.FC<DetailProps> = ({ surveyId, surveyName, surveyType, surveyDescription, open, onClose }) => {
+const SurveyDetailDrawer: React.FC<DetailProps> = ({ surveyId, surveyName, surveyType, surveyDescription, estimateTime, open, onClose }) => {
     const [loading, setLoading] = useState(false);
     const [questions, setQuestions] = useState<QuestionResponse[]>([]);
     const [answersMap, setAnswersMap] = useState<Record<string, AnswerResponse[]>>({});
@@ -80,6 +81,9 @@ const SurveyDetailDrawer: React.FC<DetailProps> = ({ surveyId, surveyName, surve
                         <Descriptions.Item label="Số câu hỏi">{questions.length}</Descriptions.Item>
                         <Descriptions.Item label="Mô tả">
                             <div dangerouslySetInnerHTML={{ __html: surveyDescription || '' }} />
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Thời gian ước tính">
+                            {estimateTime ? `${estimateTime} phút` : 'Không xác định'}
                         </Descriptions.Item>
                     </Descriptions>
 

@@ -135,6 +135,8 @@ export const API_PATH = {
     DELETE_REVIEW: (id: string) => `/review/${id}`,
     GET_REVIEW_BY_COURSE_ID: (courseId: string) => `/review/course/${courseId}`,
     GET_REVIEW_BY_USER_ID: (userId: string) => `/review/user/${userId}`,
+    REVIEW_APPOINTMENT: "/review/appointment",
+    GET_REVIEW_BY_APPOINTMENT_ID: (appointmentId: string) => `/review/appointment/${appointmentId}`,
   },
   DASHBOARD: {
     GET_DASHBOARD_OVERALL: "/dashboard/overall",
