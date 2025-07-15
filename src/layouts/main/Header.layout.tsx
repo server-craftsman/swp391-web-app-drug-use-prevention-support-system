@@ -40,12 +40,12 @@ const HeaderLayout = () => {
 
   const navItems = [
     { name: "Trang Chủ", path: "/" },
-    { name: "Khóa Học", path: "/courses" },
-    { name: "Đánh Giá Nguy Cơ", path: "/assessment" },
+    { name: "Khóa Học", path: ROUTER_URL.CLIENT.COURSE },
+    { name: "Đánh Giá Nguy Cơ", path: ROUTER_URL.CLIENT.ASSESSMENT },
     { name: "Tư Vấn", path: ROUTER_URL.CLIENT.APPOINTMENTS },
     { name: "Chương Trình Cộng Đồng", path: ROUTER_URL.CLIENT.PROGRAM },
-    { name: "Blog", path: "/blog" },
-    { name: "Về Chúng Tôi", path: "/about" },
+    { name: "Blog", path: ROUTER_URL.CLIENT.BLOG },
+    { name: "Về Chúng Tôi", path: ROUTER_URL.COMMON.ABOUT },
   ];
 
   const handleLogout = () => {
@@ -423,13 +423,13 @@ const HeaderLayout = () => {
           ) : (
             <div className="flex gap-2">
               <Link
-                to="/login"
+                to={ROUTER_URL.AUTH.LOGIN}
                 className="px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-colors"
               >
                 Đăng Nhập
               </Link>
               <Link
-                to="/register"
+                to={ROUTER_URL.AUTH.SIGN_UP}
                 className="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-colors"
               >
                 Đăng Ký

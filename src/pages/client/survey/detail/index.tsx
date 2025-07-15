@@ -225,8 +225,9 @@ const ClientSurveyDetail: React.FC = () => {
                                             fontSize: '16px',
                                             color: '#1a1a1a',
                                             lineHeight: '1.5'
-                                        }}>
-                                            {question.questionText || question.questionContent || 'Câu hỏi không có nội dung'}
+                                        }}
+                                        >
+                                            <span dangerouslySetInnerHTML={{ __html: question.questionText || question.questionContent || 'Câu hỏi không có nội dung' }} />
                                         </Text>
                                         {/* Hide score display */}
                                         {/* <div style={{ 

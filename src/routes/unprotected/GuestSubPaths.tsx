@@ -30,6 +30,7 @@ const CartPage = lazy(() => import("../../pages/client/cart"));
 const ResetPasswordPage = lazy(() => import("../../pages/auth/reset_password"));
 const ConfirmEmailPage = lazy(() => import("../../pages/auth/confirm_email"));
 const AppointmentPage = lazy(() => import("../../pages/client/appointment"));
+const AssessmentResult = lazy(() => import("../../pages/client/assessment/result"));
 //======================================================
 
 // Export public sub paths - Only truly public routes here
@@ -82,6 +83,10 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
         {
           path: ROUTER_URL.CLIENT.ASSESSMENT,
           element: <Assessment />,
+        },
+        {
+          path: ROUTER_URL.CLIENT.ASSESSMENT_RESULT,
+          element: <AssessmentResult />,
         },
         {
           path: ROUTER_URL.CLIENT.APPOINTMENTS,
