@@ -10,6 +10,7 @@ interface UpdateBlogFormProps {
 
 const UpdateBlogForm: React.FC<UpdateBlogFormProps> = ({ blog, onSuccess }) => {
   const { mutate: updateBlog, isPending } = useUpdateBlog();
+  const [title, setTitle] = useState(blog.title || ""); // Thêm state cho title
   const [content, setContent] = useState(blog.content);
   const [blogImgUrl, setBlogImgUrl] = useState(blog.blogImgUrl);
   const [file, setFile] = useState<File | null>(null);
@@ -17,6 +18,7 @@ const UpdateBlogForm: React.FC<UpdateBlogFormProps> = ({ blog, onSuccess }) => {
 
   // Cập nhật lại state khi blog prop đổi
   useEffect(() => {
+    setTitle(blog.title || "");
     setContent(blog.content);
     setBlogImgUrl(blog.blogImgUrl);
     setPreviewImage(blog.blogImgUrl);
@@ -38,6 +40,11 @@ const UpdateBlogForm: React.FC<UpdateBlogFormProps> = ({ blog, onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!title.trim()) {
+      alert("Vui lòng nhập tiêu đề blog");
+      return;
+    }
+
     if (!content.trim()) {
       alert("Vui lòng nhập nội dung blog");
       return;
@@ -58,10 +65,9 @@ const UpdateBlogForm: React.FC<UpdateBlogFormProps> = ({ blog, onSuccess }) => {
     }
 
     updateBlog(
-      { id: blog.id, content, blogImgUrl: imgUrl },
+      { id: blog.id, title, content, blogImgUrl: imgUrl }, // Thêm title vào payload
       {
         onSuccess: () => {
-          alert("Cập nhật blog thành công!");
           if (onSuccess) onSuccess();
         },
         onError: () => {
@@ -79,6 +85,20 @@ const UpdateBlogForm: React.FC<UpdateBlogFormProps> = ({ blog, onSuccess }) => {
       <h2 className="text-2xl font-bold text-blue-900 mb-2 text-center">
         Cập nhật blog
       </h2>
+
+      <div>
+        <label className="block mb-2 font-semibold text-gray-700">
+          Tiêu đề Blog
+        </label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="border border-gray-300 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+          placeholder="Nhập tiêu đề blog..."
+          required
+        />
+      </div>
 
       <div>
         <label className="block mb-2 font-semibold text-gray-700">

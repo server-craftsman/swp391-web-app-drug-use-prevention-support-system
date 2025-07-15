@@ -8,6 +8,7 @@ interface CreateBlogFormProps {
 
 const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
   const { mutate: createBlog, isPending } = useCreateBlog();
+  const [title, setTitle] = useState(""); // Thêm state cho title
   const [content, setContent] = useState("");
   const [blogImgUrl, setBlogImgUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -29,6 +30,11 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!title.trim()) {
+      alert("Vui lòng nhập tiêu đề blog");
+      return;
+    }
+
     if (!content.trim()) {
       alert("Vui lòng nhập nội dung blog");
       return;
@@ -49,10 +55,11 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
     }
 
     createBlog(
-      { content, blogImgUrl: imgUrl },
+      { title, content, blogImgUrl: imgUrl }, // Thêm title vào payload
       {
         onSuccess: () => {
           alert("Tạo blog thành công!");
+          setTitle("");
           setContent("");
           setBlogImgUrl("");
           setFile(null);
@@ -76,6 +83,20 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
       <h2 className="text-2xl font-bold text-[#20558A] mb-2 text-center">
         Tạo blog mới
       </h2>
+
+      <div>
+        <label className="block mb-2 font-semibold text-gray-700">
+          Tiêu đề Blog
+        </label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="border border-gray-300 px-4 py-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+          placeholder="Nhập tiêu đề blog..."
+          required
+        />
+      </div>
 
       <div>
         <label className="block mb-2 font-semibold text-gray-700">

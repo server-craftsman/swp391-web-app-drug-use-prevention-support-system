@@ -38,7 +38,16 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => (
         </div>
       </div>
     </div>
-
+    {/* Nội dung */}
+    <div className="px-5 py-4">
+      {/* Thêm tiêu đề blog */}
+      <div className="font-bold text-xl text-[#20558A] mb-2">
+        {blog.title || "Không có tiêu đề"}
+      </div>
+      <p className="text-gray-800 text-base whitespace-pre-line break-words">
+        {blog.content || "Không có nội dung"}
+      </p>
+    </div>
     {/* Ảnh blog */}
     {blog.blogImgUrl && (
       <div
@@ -56,13 +65,6 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => (
         />
       </div>
     )}
-
-    {/* Nội dung */}
-    <div className="px-5 py-4">
-      <p className="text-gray-800 text-base whitespace-pre-line break-words">
-        {blog.content || "Không có nội dung"}
-      </p>
-    </div>
   </Card>
 );
 

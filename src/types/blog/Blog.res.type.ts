@@ -8,6 +8,7 @@ export interface Blog {
   isDeleted: boolean;
   fullName: string;
   userAvatar: string;
+  title: string;
 }
 
 export interface BlogPageInfo {

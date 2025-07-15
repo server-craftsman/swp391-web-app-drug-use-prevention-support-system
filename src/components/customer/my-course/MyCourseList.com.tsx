@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Typography, message, Row, Col, Spin, Empty } from "antd";
+import { Typography, message, Spin, Empty, Table, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import { CourseService } from "../../../services/course/course.service";
 import type { Course } from "../../../types/course/Course.res.type";
-import MyCourseCard from "./MyCourseCard.com";
 
 const { Title } = Typography;
 
@@ -12,7 +11,7 @@ const MyCourseList: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Lấy userId từ localStorage userInfo
+  // Lấy userId từ localStorage
   let userId = "";
   const userInfoStr = localStorage.getItem("userInfo");
   if (userInfoStr) {
@@ -39,6 +38,87 @@ const MyCourseList: React.FC = () => {
     };
     fetchMyCourses();
   }, [userId]);
+
+  const columns = [
+    {
+      title: "Ảnh",
+      dataIndex: "imageUrls",
+      key: "imageUrls",
+      render: (images: string[]) =>
+        images && images.length > 0 ? (
+          <img
+            src={images[0]}
+            alt="course"
+            style={{
+              width: 64,
+              height: 64,
+              objectFit: "cover",
+              borderRadius: 12,
+              border: "1px solid #eee",
+              background: "#fafafa",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 12,
+              background: "#eee",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#aaa",
+              fontSize: 24,
+            }}
+          >
+            ?
+          </div>
+        ),
+      width: 80,
+    },
+    {
+      title: "Tên khóa học",
+      dataIndex: "name",
+      key: "name",
+      render: (text: string) => (
+        <span style={{ fontWeight: 600, color: "#20558A" }}>{text}</span>
+      ),
+    },
+    {
+      title: "Mức độ rủi ro",
+      dataIndex: "riskLevel",
+      key: "riskLevel",
+      render: (risk: string) => {
+        let color = "#faad14";
+        if (risk === "High") color = "#ff4d4f";
+        if (risk === "Low") color = "#52c41a";
+        return (
+          <span style={{ color, fontWeight: 500 }}>
+            {risk === "High"
+              ? "Cao"
+              : risk === "Medium"
+              ? "Trung bình"
+              : "Thấp"}
+          </span>
+        );
+      },
+      width: 120,
+    },
+    {
+      title: "Hành động",
+      key: "action",
+      render: (_: any, record: Course) => (
+        <Button
+          type="primary"
+          onClick={() => navigate(`/courses/${record.id}`)}
+        >
+          Vào học
+        </Button>
+      ),
+      width: 120,
+    },
+  ];
 
   return (
     <div
@@ -71,6 +151,7 @@ const MyCourseList: React.FC = () => {
         >
           Khóa học của tôi
         </Title>
+
         {loading ? (
           <div
             style={{
@@ -83,19 +164,18 @@ const MyCourseList: React.FC = () => {
           </div>
         ) : courses.length === 0 ? (
           <div style={{ padding: "48px 0" }}>
-            <Empty description="Bạn chưa có khóa học nào" />
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="Bạn chưa có khóa học nào. Hãy khám phá và bắt đầu học!"
+            />
           </div>
         ) : (
-          <Row gutter={[32, 32]}>
-            {courses.map((course) => (
-              <Col xs={24} sm={12} md={8} lg={6} key={course.id}>
-                <MyCourseCard
-                  course={course}
-                  onClick={() => navigate(`/customer/my-course/${course.id}`)}
-                />
-              </Col>
-            ))}
-          </Row>
+          <Table
+            columns={columns}
+            dataSource={courses}
+            rowKey="id"
+            pagination={{ pageSize: 8 }}
+          />
         )}
       </div>
     </div>
