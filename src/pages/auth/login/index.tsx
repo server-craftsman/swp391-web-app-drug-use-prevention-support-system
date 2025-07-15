@@ -154,7 +154,7 @@ const LoginPage = () => {
 
           <div className="text-center">
             <p className="text-gray-600">
-              Bạn chưa có tài khoản? <Link to="/register" className="text-primary hover:underline font-medium transition-colors duration-300">Đăng ký tài khoản</Link>
+              Bạn chưa có tài khoản? <Link to={ROUTER_URL.AUTH.SIGN_UP} className="text-primary hover:underline font-medium transition-colors duration-300">Đăng ký tài khoản</Link>
             </p>
           </div>
         </div>
