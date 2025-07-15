@@ -1,5 +1,6 @@
 import { Result, Button } from "antd";
 import { useNavigate } from "react-router-dom";
+import { ROUTER_URL } from "../../../consts/router.path.const";
 
 export default function PaymentFail() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export default function PaymentFail() {
             type="primary"
             size="large"
             className="bg-gradient-to-r from-[#D7263D] to-red-400 font-semibold px-8 py-2 rounded-lg shadow hover:from-red-700 hover:to-red-500 transition"
-            onClick={() => navigate("/courses")}
+            onClick={() => navigate(ROUTER_URL.CLIENT.COURSE)}
           >
             Quay lại trang khóa học
           </Button>
