@@ -47,6 +47,7 @@ export const API_PATH = {
     UPDATE_SURVEY: (id: string) => `/survey/${id}`,
     DELETE_SURVEY: (id: string) => `/survey/${id}`,
     GET_SURVEY_BY_ID: (id: string) => `/survey/${id}`,
+    SURVEY_RESULT: (id: string) => `/survey/survey-result/${id}`,
   },
   QUESTION: {
     GET_ALL_QUESTIONS: "/question/paged",
