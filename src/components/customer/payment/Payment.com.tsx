@@ -121,7 +121,7 @@ const PaymentPage: React.FC = () => {
     return (
       <div className="text-center mt-10">
         <Typography.Title level={3}>Không tìm thấy đơn hàng</Typography.Title>
-        <Button type="primary" onClick={() => navigate("/courses")}>
+        <Button type="primary" onClick={() => navigate(ROUTER_URL.CLIENT.COURSE)}>
           Quay lại trang khóa học
         </Button>
       </div>

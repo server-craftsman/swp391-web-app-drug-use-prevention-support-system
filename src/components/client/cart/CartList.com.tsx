@@ -59,7 +59,7 @@ const ViewCartPage: React.FC = () => {
       {
         onSuccess: (res) => {
           if (res?.data?.data.orderId) {
-            navigate("/payment", {
+            navigate(ROUTER_URL.CLIENT.PAYMENT, {
               state: { orderId: res.data.data.orderId },
             });
           } else {
@@ -156,7 +156,7 @@ const ViewCartPage: React.FC = () => {
                   <Button
                     type="primary"
                     size="large"
-                    onClick={() => navigate("/courses")}
+                    onClick={() => navigate(ROUTER_URL.CLIENT.COURSE)}
                     className="bg-primary hover:bg-secondary border-0 rounded-xl px-8 h-12"
                   >
                     Khám phá khóa học

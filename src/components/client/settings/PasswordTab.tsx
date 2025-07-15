@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Form, Input, Button, Divider, message } from 'antd';
+import { Card, Form, Input, Button, Divider } from 'antd';
+import { helpers } from '../../../utils';
 import { LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { API_PATH } from '../../../consts/api.path.const';
@@ -35,13 +36,13 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ loading, setLoading }) => {
             });
 
             if (response.ok) {
-                message.success('Đổi mật khẩu thành công!');
+                helpers.notificationMessage('Đổi mật khẩu thành công!', 'success');
                 passwordForm.resetFields();
             } else {
-                message.error('Đổi mật khẩu thất bại!');
+                helpers.notificationMessage('Đổi mật khẩu thất bại!', 'error');
             }
         } catch (error) {
-            message.error('Đổi mật khẩu thất bại!');
+            helpers.notificationMessage('Đổi mật khẩu thất bại!', 'error');
         } finally {
             setLoading(false);
         }

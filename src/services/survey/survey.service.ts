@@ -57,6 +57,12 @@ export const SurveyService = {
             payload: params,
         });
     },
+
+    surveyResult(id: string) {
+        return BaseService.get<any>({
+            url: API_PATH.SURVEY.SURVEY_RESULT(id),
+        });
+    }
 };
 
 

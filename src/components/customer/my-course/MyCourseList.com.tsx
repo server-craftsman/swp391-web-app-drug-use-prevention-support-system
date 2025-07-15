@@ -3,6 +3,7 @@ import { Typography, message, Spin, Empty, Table, Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import { CourseService } from "../../../services/course/course.service";
 import type { Course } from "../../../types/course/Course.res.type";
+import { ROUTER_URL } from "../../../consts/router.path.const";
 
 const { Title } = Typography;
 
@@ -98,8 +99,8 @@ const MyCourseList: React.FC = () => {
             {risk === "High"
               ? "Cao"
               : risk === "Medium"
-              ? "Trung bình"
-              : "Thấp"}
+                ? "Trung bình"
+                : "Thấp"}
           </span>
         );
       },
@@ -111,7 +112,7 @@ const MyCourseList: React.FC = () => {
       render: (_: any, record: Course) => (
         <Button
           type="primary"
-          onClick={() => navigate(`/courses/${record.id}`)}
+          onClick={() => navigate(ROUTER_URL.CLIENT.COURSE_DETAIL.replace(":courseId", record.id))}
         >
           Vào học
         </Button>

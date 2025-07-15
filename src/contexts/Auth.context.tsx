@@ -15,6 +15,7 @@ import { HttpException } from "../app/exceptions";
 import type { UserResponse } from "../types/user/User.res.type";
 import type { ResponseSuccess } from "../app/interface";
 import { helpers } from "../utils";
+import { ROUTER_URL } from "../consts/router.path.const";
 
 interface AuthContextType {
   role: UserRole | null;
@@ -111,7 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("userInfo");
-    navigate("/login", { replace: true });
+    navigate(ROUTER_URL.AUTH.LOGIN, { replace: true });
     helpers.notificationMessage("Đăng xuất thành công!", "success");
   }, [navigate]);
 
