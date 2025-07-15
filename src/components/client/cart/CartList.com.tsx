@@ -59,7 +59,7 @@ const ViewCartPage: React.FC = () => {
       {
         onSuccess: (res) => {
           if (res?.data?.data.orderId) {
-            navigate("/payment", {
+            navigate(ROUTER_URL.CLIENT.PAYMENT, {
               state: { orderId: res.data.data.orderId },
             });
           } else {
