@@ -10,7 +10,7 @@ import { AppointmentService } from "../../../services/appointment/appointment.se
 import { UserRole } from "../../../app/enums";
 import { helpers } from "../../../utils";
 import dayjs from "dayjs";
-import { CloseCircleOutlined } from "@ant-design/icons";
+import { CloseCircleOutlined, EyeOutlined } from "@ant-design/icons";
 
 interface DisplayProps {
     appointments: Appointment[];
@@ -142,6 +142,20 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
         AppointmentStatus.CANCELLED,
     ].includes(st as AppointmentStatus);
 
+    const handleRowClick = (record: Appointment) => {
+        let detailUrl: string;
+        
+        if (role === UserRole.MANAGER) {
+            detailUrl = ROUTER_URL.MANAGER.SCHEDULE_DETAIL.replace(":appointmentId", record.id);
+        } else if (role === UserRole.CUSTOMER) {
+            detailUrl = ROUTER_URL.CUSTOMER.APPOINTMENT_DETAIL.replace(":appointmentId", record.id);
+        } else {
+            detailUrl = ROUTER_URL.CONSULTANT.APPOINTMENT_DETAIL.replace(":appointmentId", record.id);
+        }
+            
+        navigate(detailUrl, { state: { appointment: record } });
+    };
+
     const columns: ColumnsType<Appointment> = [
         {
             title: "Khách hàng",
@@ -269,37 +283,32 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
             dataIndex: "action",
             key: "action",
             render: (_, record) => {
-                if (role === UserRole.CUSTOMER && !isFinalStatus(record.status)) {
-                    return (
-                        <Tooltip title="Huỷ lịch hẹn">
+                return (
+                    <Space>
+                        <Tooltip title="Xem chi tiết">
                             <Button
-                                danger
                                 type="text"
                                 shape="circle"
-                                icon={<CloseCircleOutlined />}
-                                onClick={() => handleCancel(record)}
+                                icon={<EyeOutlined />}
+                                onClick={() => handleRowClick(record)}
                             />
                         </Tooltip>
-                    );
-                }
-                return null;
+                        {role === UserRole.CUSTOMER && !isFinalStatus(record.status) && (
+                            <Tooltip title="Huỷ lịch hẹn">
+                                <Button
+                                    danger
+                                    type="text"
+                                    shape="circle"
+                                    icon={<CloseCircleOutlined />}
+                                    onClick={() => handleCancel(record)}
+                                />
+                            </Tooltip>
+                        )}
+                    </Space>
+                );
             },
         },
     ];
-
-    const handleRowClick = (record: Appointment) => {
-        let detailUrl: string;
-        
-        if (role === UserRole.MANAGER) {
-            detailUrl = ROUTER_URL.MANAGER.SCHEDULE_DETAIL.replace(":appointmentId", record.id);
-        } else if (role === UserRole.CUSTOMER) {
-            detailUrl = ROUTER_URL.CUSTOMER.APPOINTMENT_DETAIL.replace(":appointmentId", record.id);
-        } else {
-            detailUrl = ROUTER_URL.CONSULTANT.APPOINTMENT_DETAIL.replace(":appointmentId", record.id);
-        }
-            
-        navigate(detailUrl, { state: { appointment: record } });
-    };
 
     return (
         <>
@@ -328,9 +337,9 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
                 dataSource={appointments}
                 rowKey="id"
                 loading={loading}
-                onRow={(record) => ({
-                    onClick: () => handleRowClick(record),
-                })}
+                // onRow={(record) => ({
+                //     onClick: () => handleRowClick(record),
+                // })}
                 pagination={{
                     total,
                     current: currentPage,
