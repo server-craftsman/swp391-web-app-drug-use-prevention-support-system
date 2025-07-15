@@ -17,7 +17,7 @@ export const useCreateCategory = () => {
     mutationFn: (data: CreateCategoryRequest) =>
       CategoryService.createCategory(data),
     onSuccess: () => {
-      helpers.notificationMessage("Category created successfully", "success");
+      helpers.notificationMessage("Tạo Category thành công", "success");
       navigate(ROUTER_URL.ADMIN.MANAGER_CATEGORY);
     },
     onError: (error) => {
