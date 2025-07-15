@@ -120,7 +120,7 @@ const LoginPage = () => {
                 {isSubmitting ? "Đang xử lý..." : "Đăng nhập"}
               </button>
 
-              <Link to="/forgot-password" className="text-gray-600 hover:text-gray-800 text-sm hover:underline transition-colors duration-300">
+              <Link to={ROUTER_URL.AUTH.FORGOT_PASSWORD} className="text-gray-600 hover:text-gray-800 text-sm hover:underline transition-colors duration-300">
                 Quên mật khẩu
               </Link>
             </div>
