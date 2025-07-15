@@ -10,6 +10,7 @@ import Counsel from "../../pages/client/counsel";
 import Program from "../../pages/client/program";
 import Assessment from "../../pages/client/assessment";
 import CourseDetail from "../../components/client/course/CourseDetail.com";
+import LessonDetailPage from "../../pages/customer/lesson";
 import ProgramDetail from "../../pages/client/program/detail";
 import ClientSurveyDetail from "../../pages/client/survey/detail";
 import PaymentPageMain from "../../pages/customer/payment";
