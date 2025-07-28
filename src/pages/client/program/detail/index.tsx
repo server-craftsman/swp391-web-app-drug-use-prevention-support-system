@@ -1,19 +1,20 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Spin, Typography, Button, Layout, Drawer, Breadcrumb } from "antd";
-import { MenuUnfoldOutlined, HomeOutlined } from "@ant-design/icons";
-import type { Program, ProgramEnrollment } from "../../../../types/program/Program.type";
+import React, { useState, useEffect, useRef } from "react";
+import { Layout, Typography, Spin, Button, Drawer, Breadcrumb } from "antd";
 import { ProgramService } from "../../../../services/program/program.service";
-import { helpers } from "../../../../utils";
 import { SurveyService } from "../../../../services/survey/survey.service";
+import type { Program, ProgramEnrollment } from "../../../../types/program/Program.type";
+import type { SurveyResponse } from "../../../../types/survey/Survey.res.type";
+import { helpers } from "../../../../utils";
+import { debugAPI } from "../../../../utils/debug";
+import { useParams, useNavigate } from "react-router-dom";
 import { SurveyType } from "../../../../app/enums/surveyType.enum";
 import { ROUTER_URL } from "../../../../consts/router.path.const";
-import type { SurveyResponse } from "../../../../types/survey/Survey.res.type";
+import ProgramSidebar from "../../../../components/client/program/ProgramSidebar.ui";
+import { MenuUnfoldOutlined, HomeOutlined } from "@ant-design/icons";
 
 // Import the new components
 import ProgramMediaBanner from "../../../../components/client/program/ProgramMediaBanner.ui";
 import ProgramVideoTabs from "../../../../components/client/program/video/ProgramVideoTabs.com";
-import ProgramSidebar from "../../../../components/client/program/ProgramSidebar.ui";
 
 const { Title } = Typography;
 
@@ -49,6 +50,7 @@ const ProgramDetail: React.FC = () => {
 
     // Check if user is logged in
     const userInfo = localStorage.getItem("userInfo");
+    const userInfoObj = userInfo ? JSON.parse(userInfo) : null;
     const isLoggedIn = !!userInfo;
 
     useEffect(() => {
@@ -75,17 +77,21 @@ const ProgramDetail: React.FC = () => {
 
             try {
                 const res = await ProgramService.programEnrollments();
+                debugAPI.logProgramEnrollments(res); // Debug log
+
                 if (res?.data) {
                     const enrolledProgram = res.data.data.find(
-                        (p: ProgramEnrollment) => (p.programId === programId || p.id === programId) && p.joinDate
+                        (p: ProgramEnrollment) => (p.programId === programId || p.id === programId)
                     );
 
                     if (enrolledProgram) {
                         setEnrollmentData(enrolledProgram);
                         setIsEnrolled(true);
+                        console.log("Found enrolled program:", enrolledProgram); // Debug log
                     } else {
                         setIsEnrolled(false);
                         setEnrollmentData(null);
+                        console.log("Program not enrolled"); // Debug log
                     }
                 }
             } catch (err) {
@@ -102,7 +108,7 @@ const ProgramDetail: React.FC = () => {
     useEffect(() => {
         const fetchSurveys = async () => {
             try {
-                const res = await SurveyService.getAllSurveys({ pageNumber: 1, pageSize: 1000, filterByName: "" } as any);
+                const res = await SurveyService.getAllSurveys({ userId: userInfoObj?.id, pageNumber: 1, pageSize: 1000, filterByName: "" } as any);
                 const surveys = res?.data?.data ?? [];
 
                 // Only categorize PRE and POST feedback surveys
@@ -153,30 +159,35 @@ const ProgramDetail: React.FC = () => {
         // This effect can be removed if not needed for sidebar functionality
     }, [selectedSurvey]);
 
-    // Intersection Observer to detect when program section is viewed
+    // Sử dụng Intersection Observer để phát hiện khi người dùng đã xem phần chương trình
     useEffect(() => {
+        // Tìm phần tử HTML có id "program-section"
         const programSection = document.getElementById("program-section");
         if (!programSection) return;
 
+        // Tạo observer để theo dõi khi phần tử xuất hiện trong viewport
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
+                    // Kiểm tra nếu phần tử đang hiển thị và chiếm ít nhất 30% diện tích
                     if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
-                        // User has viewed at least 30% of the program section
+                        // Đánh dấu người dùng đã xem ít nhất 30% phần chương trình
                         setIsProgramViewed(true);
-                        // Save to localStorage for persistence
+                        // Lưu trạng thái đã xem vào localStorage để duy trì giữa các phiên
                         localStorage.setItem(`program-viewed-${programId}`, 'true');
                     }
                 });
             },
             {
-                threshold: [0.3], // Trigger when 30% of the element is visible
-                rootMargin: '-50px 0px' // Add some margin to ensure actual viewing
+                threshold: [0.3], // Kích hoạt khi 30% phần tử hiển thị trong viewport
+                rootMargin: '-50px 0px' // Thêm margin để đảm bảo người dùng thực sự đang xem
             }
         );
 
+        // Bắt đầu theo dõi phần tử
         observer.observe(programSection);
 
+        // Cleanup function: ngắt kết nối observer khi component unmount
         return () => {
             observer.disconnect();
         };
@@ -212,8 +223,8 @@ const ProgramDetail: React.FC = () => {
         }
     };
 
-    // Check if user can access the program (has joinDate)
-    const canAccessProgram = isLoggedIn && isEnrolled && enrollmentData?.joinDate;
+    // Check if user can access the program (is enrolled)
+    const canAccessProgram = isLoggedIn && isEnrolled;
 
     // Sidebar content with Coursera-inspired design
     const sidebarContent = programId && canAccessProgram ? (

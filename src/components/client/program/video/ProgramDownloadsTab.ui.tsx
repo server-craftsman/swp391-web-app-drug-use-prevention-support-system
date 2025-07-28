@@ -13,46 +13,68 @@ const ProgramDownloadsTab: React.FC<ProgramDownloadsTabProps> = ({ program }) =>
     const [downloadLoading, setDownloadLoading] = useState(false);
 
     const handleVideoDownload = async () => {
+        // Kiểm tra xem có URL video không, nếu không có thì thoát luôn
         if (!program.programVidUrl) return;
 
+        // Bật trạng thái loading để hiển thị spinner
         setDownloadLoading(true);
         try {
+            // Hiển thị thông báo cho người dùng biết đang chuẩn bị tải
             message.info('Đang chuẩn bị tải video...');
 
-            // Fetch video như blob để download trực tiếp
+            // Gửi HTTP request để lấy video từ URL
+            // fetch() trả về một Promise chứa response
             const response = await fetch(program.programVidUrl);
+            
+            // Kiểm tra xem request có thành công không (status 200-299)
             if (!response.ok) throw new Error('Không thể tải video');
 
+            // Chuyển response thành blob (binary data) để có thể download
+            // blob là dạng dữ liệu nhị phân, phù hợp cho file video
             const blob = await response.blob();
+            
+            // Tạo một URL tạm thời từ blob data trong bộ nhớ trình duyệt
             const url = window.URL.createObjectURL(blob);
 
-            // Tạo link download và trigger
+            // Tạo một thẻ <a> ảo để kích hoạt việc download
             const link = document.createElement('a');
-            link.href = url;
+            link.href = url; // Gán URL tạm thời vào href
+            
+            // Tạo tên file download, thay thế ký tự đặc biệt bằng dấu gạch dưới
             link.download = `${(program.name || 'video').replace(/[^a-z0-9]/gi, '_').toLowerCase()}_video.mp4`;
+            
+            // Thêm link vào DOM để có thể click
             document.body.appendChild(link);
+            
+            // Kích hoạt download bằng cách click vào link
             link.click();
 
-            // Cleanup
+            // Dọn dẹp: xóa link khỏi DOM
             document.body.removeChild(link);
+            
+            // Giải phóng bộ nhớ bằng cách xóa URL tạm thời
             window.URL.revokeObjectURL(url);
 
+            // Hiển thị thông báo thành công
             message.success('Video đã được tải về thành công!');
         } catch (error) {
+            // Nếu có lỗi, ghi log để debug
             console.error('Download failed:', error);
             message.error('Không thể tải video. Vui lòng thử lại sau.');
 
-            // Fallback to simple link download
+            // Phương án dự phòng: thử download trực tiếp bằng link
             try {
                 const link = document.createElement('a');
-                link.href = program.programVidUrl;
+                link.href = program.programVidUrl; // Dùng URL gốc
                 link.download = `${program.name || 'video'}_video.mp4`;
-                link.target = '_blank';
+                link.target = '_blank'; // Mở trong tab mới
                 link.click();
             } catch (fallbackError) {
+                // Nếu phương án dự phòng cũng thất bại
                 console.error('Fallback download failed:', fallbackError);
             }
         } finally {
+            // Luôn tắt loading state, dù thành công hay thất bại
             setDownloadLoading(false);
         }
     };
