@@ -144,7 +144,7 @@ const AdminCreateStaffForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       onFinish={handleSubmit}
       className="bg-white p-6 rounded-xl shadow-md max-w-2xl mx-auto mt-6"
     >
-      <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">
+      <h2 className="text-2xl font-bold mb-6 text-center text-[#20558A]">
         Tạo Nhân Viên Mới
       </h2>
 
@@ -327,7 +327,7 @@ const AdminCreateStaffForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           type="primary"
           htmlType="submit"
           loading={isPending}
-          className="w-full h-11 font-semibold"
+          className="w-full h-11 font-semibold bg-[#20558A] hover:bg-blue-700 text-white rounded"
         >
           Tạo nhân viên
         </Button>

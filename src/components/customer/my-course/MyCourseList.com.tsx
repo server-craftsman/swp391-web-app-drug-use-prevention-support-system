@@ -99,8 +99,8 @@ const MyCourseList: React.FC = () => {
             {risk === "High"
               ? "Cao"
               : risk === "Medium"
-                ? "Trung bình"
-                : "Thấp"}
+              ? "Trung bình"
+              : "Thấp"}
           </span>
         );
       },
@@ -112,7 +112,12 @@ const MyCourseList: React.FC = () => {
       render: (_: any, record: Course) => (
         <Button
           type="primary"
-          onClick={() => navigate(ROUTER_URL.CLIENT.COURSE_DETAIL.replace(":courseId", record.id))}
+          className="bg-[#20558A] hover:bg-blue-700 text-white"
+          onClick={() =>
+            navigate(
+              ROUTER_URL.CLIENT.COURSE_DETAIL.replace(":courseId", record.id)
+            )
+          }
         >
           Vào học
         </Button>
