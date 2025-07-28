@@ -2,61 +2,52 @@ import React from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const Loading: React.FC = () => {
-  const text = "Phòng chống Ma túy...";
-
   return (
     <div
+      role="status"
+      aria-live="polite"
       style={{
-        zIndex: 2147483647,
+        zIndex: 9999,
         position: 'fixed',
       }}
-      className="fixed inset-0 h-screen w-full flex flex-col justify-center items-center backdrop-blur-sm bg-white/50"
+      className="fixed inset-0 h-screen w-full flex flex-col justify-center items-center bg-gradient-to-br from-blue-50/30 via-white/30 to-indigo-50/30"
     >
-      <DotLottieReact
-        src="https://lottie.host/820b9650-929d-48e4-88f8-9eb3ef18eddb/sWzRIbqGz8.lottie"
-        loop
-        autoplay
-        style={{ opacity: 0.8, width: '300px', height: '300px' }}
-      />
-      {/* Animated text */}
-      <div className="text-center mt-4">
-        <h1
-          style={{
-            fontSize: 30,
-            fontWeight: 600,
-            color: '#20558A',
-            letterSpacing: '1px'
-          }}
-        >
-          {text.split('').map((char, index) => (
-            <span
-              key={index}
-              style={{
-                display: 'inline-block',
-                animation: `charFadeIn 0.8s ease-in-out ${index * 0.01}s both`,
-                opacity: 0
-              }}
-            >
-              {char === ' ' ? '\u00A0' : char}
-            </span>
-          ))}
-        </h1>
+      {/* Screen reader only text */}
+      <span className="sr-only">Đang tải nội dung. Vui lòng chờ.</span>
+
+      {/* Background overlay with subtle pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/2 via-transparent to-indigo-500/2" />
+
+      {/* Static background elements - no animation to reduce visual noise */}
+      <div className="absolute top-10 left-10 w-32 h-32 bg-blue-400/3 rounded-full blur-xl" />
+      <div className="absolute bottom-20 right-20 w-40 h-40 bg-indigo-400/3 rounded-full blur-xl" />
+      <div className="absolute top-1/3 right-10 w-24 h-24 bg-emerald-400/3 rounded-full blur-xl" />
+
+      {/* Main content container */}
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Logo container with subtle glow effect */}
+        <div className="relative mb-8">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full blur-2xl opacity-5" />
+          <DotLottieReact
+            src="https://lottie.host/820b9650-929d-48e4-88f8-9eb3ef18eddb/sWzRIbqGz8.lottie"
+            loop
+            autoplay
+            style={{ width: '300px', height: '300px' }}
+          />
+        </div>
       </div>
 
       <style>{`
-        @keyframes charFadeIn {
-          0% {
-            opacity: 0;
-            transform: translateY(20px) scale(0.8);
-          }
-          50% {
-            opacity: 1;
-            transform: translateY(-5px) scale(1.1);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
         }
       `}</style>
     </div>

@@ -8,7 +8,7 @@ import type {
   GetReviewByUserIdRequest,
   GetReviewById,
   ReviewAppointmentRequest,
-  UpdateReviewRequest
+  UpdateReviewRequest,
 } from "../../types/review/Review.req.type";
 import type {
   Review,
