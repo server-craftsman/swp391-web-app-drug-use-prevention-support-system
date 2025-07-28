@@ -20,7 +20,6 @@ import { RiskLevel } from "../../../app/enums/riskLevel.enum";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/Auth.context";
-import { debugAPI } from "../../../utils/debug";
 
 interface AssessmentResultProps {
     surveyResult: any;
@@ -299,7 +298,7 @@ export default function AssessmentResult({
     const riskInfo = getRiskLevelInfo(riskLevel);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="min-h-screen to-purple-50">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header */}
                 <div className="text-center mb-12">
@@ -496,7 +495,7 @@ export default function AssessmentResult({
                                                             handleCourseClick(item);
                                                         }
                                                     }}
-                                                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium flex items-center justify-center group"
+                                                    className="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary-dark transition-all duration-200 text-sm font-medium flex items-center justify-center group"
                                                     disabled={enrolling === item.id}
                                                 >
                                                     {enrolling === item.id ? (
