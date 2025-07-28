@@ -13,7 +13,7 @@ export const useCreatePayment = () => {
   return useMutation({
     mutationFn: (data: PaymentRequest) => PaymentService.createPayment(data),
     onSuccess: () => {
-      helpers.notificationMessage("Payment created successfully", "success");
+      helpers.notificationMessage("Thanh Toán Thành công", "success");
       navigate(ROUTER_URL.CLIENT.COURSE);
     },
     onError: (error) => {

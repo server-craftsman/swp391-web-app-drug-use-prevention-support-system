@@ -153,7 +153,6 @@ const AdminManagerCategory = () => {
         open={showCreateModal}
         onCancel={() => setShowCreateModal(false)}
         footer={null}
-        title="Tạo danh mục mới"
         width={500}
       >
         <CreateCategoryForm onSuccess={handleCategoryCreated} />

@@ -31,7 +31,9 @@ const CartPage = lazy(() => import("../../pages/client/cart"));
 const ResetPasswordPage = lazy(() => import("../../pages/auth/reset_password"));
 const ConfirmEmailPage = lazy(() => import("../../pages/auth/confirm_email"));
 const AppointmentPage = lazy(() => import("../../pages/client/appointment"));
-const AssessmentResult = lazy(() => import("../../pages/client/assessment/result"));
+const AssessmentResult = lazy(
+  () => import("../../pages/client/assessment/result")
+);
 //======================================================
 
 // Export public sub paths - Only truly public routes here

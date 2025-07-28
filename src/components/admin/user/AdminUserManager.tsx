@@ -239,7 +239,6 @@ const AdminUserManager = () => {
         open={createModalOpen}
         onCancel={() => setCreateModalOpen(false)}
         footer={null}
-        title="Thêm khách hàng mới"
         width={700}
       >
         <AdminCreateUserForm

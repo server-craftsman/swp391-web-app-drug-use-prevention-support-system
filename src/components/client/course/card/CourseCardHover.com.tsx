@@ -3,7 +3,6 @@ import { Card, Typography, Button, Divider } from "antd";
 import { motion } from "framer-motion";
 import {
   ClockCircleOutlined,
-  StarFilled,
   HeartOutlined,
   ShareAltOutlined,
   CheckCircleTwoTone,
@@ -102,18 +101,6 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
           </div>
 
           <Divider className="my-4" />
-
-          {/* Rating and Students */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                <StarFilled className="text-yellow-400 mr-1" />
-                <Text className="font-medium">4.8</Text>
-                <Text className="text-gray-500 text-sm ml-1">(2,345)</Text>
-              </div>
-              <Text className="text-gray-500 text-sm">1,234 học viên</Text>
-            </div>
-          </div>
 
           {/* Price */}
           <div className="flex items-center justify-between mb-6">

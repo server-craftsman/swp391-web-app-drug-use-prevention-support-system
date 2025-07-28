@@ -18,11 +18,11 @@ export const useCreateSession = () => {
     mutationFn: (data: CreateSessionRequest) =>
       SessionService.createSession(data),
     onSuccess: () => {
-      helpers.notificationMessage("Session created successfully", "success");
+      helpers.notificationMessage("Tạo buổi học thành công", "success");
       navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
     },
     onError: (error) => {
-      console.error("Lỗi tạo khóa học:", error);
+      console.error("Lỗi tạo buổi học:", error);
       helpers.notificationMessage(error.message, "error");
     },
   });
@@ -38,7 +38,7 @@ export const useUpdateSession = () => {
     mutationFn: (data: UpdateSessionRequest) =>
       SessionService.updateSession(data),
     onSuccess: () => {
-      helpers.notificationMessage("Session updated successfully", "success");
+      helpers.notificationMessage("Cập nhập buổi học thành công", "success");
       navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
     },
     onError: (error) => {

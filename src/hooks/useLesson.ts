@@ -16,7 +16,7 @@ export const useCreateLesson = () => {
   return useMutation({
     mutationFn: (data: CreateLessonRequest) => LessonService.createLesson(data),
     onSuccess: () => {
-      helpers.notificationMessage("Lesson created successfully", "success");
+      helpers.notificationMessage("Tạo bài học thành công", "success");
       navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
     },
     onError: (error) => {
@@ -33,7 +33,7 @@ export const useUpdateLesson = () => {
   return useMutation({
     mutationFn: (data: UpdateLessonRequest) => LessonService.updateLesson(data),
     onSuccess: () => {
-      helpers.notificationMessage("Lesson updated successfully", "success");
+      helpers.notificationMessage("Cập nhập bài học thành công", "success");
       navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
     },
     onError: (error) => {

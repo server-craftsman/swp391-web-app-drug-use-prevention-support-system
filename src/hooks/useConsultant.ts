@@ -17,7 +17,10 @@ export const useUpdateConsultant = () => {
     mutationFn: (data: UpdateConsultantRequest) =>
       ConsultantService.updateConsultant(data),
     onSuccess: () => {
-      helpers.notificationMessage("Consultant updated successfully", "success");
+      helpers.notificationMessage(
+        "Cập nhập Chuyên viên tư vấn thành công",
+        "success"
+      );
       navigate(ROUTER_URL.ADMIN.STAFF_CONSULTANTS);
     },
     onError: (error) => {
@@ -35,7 +38,10 @@ export const useCreateConsultant = () => {
     mutationFn: (data: CreateConsultantRequest) =>
       ConsultantService.createConsultant(data),
     onSuccess: () => {
-      helpers.notificationMessage("Consultant created successfully", "success");
+      helpers.notificationMessage(
+        "Tạo Chuyên viên tư vấn thành công",
+        "success"
+      );
       navigate(ROUTER_URL.ADMIN.STAFF_CONSULTANTS);
     },
     onError: (error) => {

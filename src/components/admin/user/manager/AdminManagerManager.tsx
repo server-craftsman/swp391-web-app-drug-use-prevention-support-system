@@ -238,8 +238,6 @@ const AdminManagerManager = () => {
         open={createModalOpen}
         onCancel={() => setCreateModalOpen(false)}
         footer={null}
-        title="Thêm quản lý viên mới"
-        destroyOnClose
         width={700}
       >
         <AdminCreateManagerForm

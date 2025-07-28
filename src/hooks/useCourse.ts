@@ -17,7 +17,7 @@ export const useCreateCourse = () => {
   return useMutation({
     mutationFn: (data: CreateCourseRequest) => CourseService.createCourse(data),
     onSuccess: () => {
-      helpers.notificationMessage("Course created successfully", "success");
+      helpers.notificationMessage("Tạo Khóa học thành công", "success");
       navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
     },
     onError: (error) => {
@@ -31,7 +31,7 @@ export const useUpdateCourse = () => {
   return useMutation({
     mutationFn: (data: UpdateCourseRequest) => CourseService.updateCourse(data),
     onSuccess: () => {
-      helpers.notificationMessage("Course updated successfully", "success");
+      helpers.notificationMessage("Cập nhập Khóa học thành công", "success");
       navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
     },
     onError: (error) => {

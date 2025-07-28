@@ -149,7 +149,7 @@ const AdminCreateConsultantForm: React.FC<{ onSuccess?: () => void }> = ({
           <Button
             type="primary"
             htmlType="submit"
-            className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded"
+            className="w-full h-11 bg-[#20558A] hover:bg-blue-700 text-white font-semibold rounded"
             loading={isPending}
           >
             Tạo chuyên viên tư vấn
