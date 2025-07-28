@@ -1,25 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
+import { Modal, message } from "antd";
 import {
     CheckCircleOutlined,
+    LoadingOutlined,
+    ArrowRightOutlined,
     ExclamationCircleOutlined,
     InfoCircleOutlined,
     BookOutlined,
     TeamOutlined,
-    ArrowRightOutlined,
-    LoadingOutlined,
-    ClockCircleOutlined,
+    PlayCircleOutlined,
     LockOutlined,
-    PlayCircleOutlined
-} from '@ant-design/icons';
-import { CourseService } from '../../../services/course/course.service';
-import { ProgramService } from '../../../services/program/program.service';
-import { useAuth } from '../../../contexts/Auth.context';
-import { useNavigate } from 'react-router-dom';
-import { Modal, message } from 'antd';
-import type { Course } from '../../../types/course/Course.res.type';
-import type { Program } from '../../../types/program/Program.type';
-import { RiskLevel } from '../../../app/enums/riskLevel.enum';
-import { ROUTER_URL } from '../../../consts/router.path.const';
+    ClockCircleOutlined
+} from "@ant-design/icons";
+import { ProgramService } from "../../../services/program/program.service";
+import { CourseService } from "../../../services/course/course.service";
+import type { Program } from "../../../types/program/Program.type";
+import type { Course } from "../../../types/course/Course.res.type";
+import { RiskLevel } from "../../../app/enums/riskLevel.enum";
+import { ROUTER_URL } from "../../../consts/router.path.const";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/Auth.context";
+import { debugAPI } from "../../../utils/debug";
 
 interface AssessmentResultProps {
     surveyResult: any;
@@ -60,7 +61,6 @@ export default function AssessmentResult({
     const calculateRiskLevel = (result: any): RiskLevel => {
         // If API provides riskLevel, use it directly
         if (result.riskLevel) {
-            console.log('AssessmentResult: Using riskLevel from API:', result.riskLevel);
             switch (result.riskLevel.toLowerCase()) {
                 case 'none':
                     return RiskLevel.NONE;
@@ -79,7 +79,6 @@ export default function AssessmentResult({
         }
 
         // Fallback to calculation if no riskLevel provided
-        console.log('AssessmentResult: Calculating risk level from totalScore:', result.totalScore);
         const totalScore = result.totalScore || result.answers?.reduce((sum: number, answer: any) => {
             return sum + (answer.score || 0);
         }, 0) || 0;
@@ -144,11 +143,13 @@ export default function AssessmentResult({
 
         try {
             const res = await ProgramService.programEnrollments();
+
             if (res?.data) {
                 const enrolledMap = new Map<string, any>();
                 res.data.data.forEach((program: any) => {
                     const key = program.programId || program.id;
-                    if (key && program.joinDate) {
+
+                    if (key) {
                         enrolledMap.set(key, program);
                     }
                 });
@@ -171,7 +172,6 @@ export default function AssessmentResult({
 
             const riskLevel = calculateRiskLevel(surveyResult);
 
-            // Fetch courses and programs that match the risk level
             const [coursesResponse, programsResponse] = await Promise.all([
                 CourseService.getAllCourses({ pageNumber: 1, pageSize: 10 }),
                 ProgramService.getAllPrograms({ pageNumber: 1, pageSize: 10 })
@@ -270,7 +270,7 @@ export default function AssessmentResult({
         }
 
         const enrollmentData = enrolledPrograms.get(program.id);
-        if (!enrollmentData?.joinDate) {
+        if (!enrollmentData) {
             Modal.confirm({
                 title: 'Tham gia chương trình',
                 content: `Bạn cần tham gia chương trình "${program.name}" để xem chi tiết.`,
@@ -286,7 +286,9 @@ export default function AssessmentResult({
 
     const isEnrolled = (programId: string) => {
         const enrollmentData = enrolledPrograms.get(programId);
-        return !!enrollmentData?.joinDate;
+        // Consider enrolled if program exists in enrollment list
+        // joinDate might not be set immediately after enrollment
+        return !!enrollmentData;
     };
 
     const getEnrollmentData = (programId: string) => {

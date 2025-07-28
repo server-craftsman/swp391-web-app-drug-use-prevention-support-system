@@ -1,14 +1,16 @@
 import React from "react";
-import { Row, Col, Card, Image, Typography, Spin, Pagination, Select, Button, message, Modal } from "antd";
+import { Row, Col, Card, Image, Typography, Spin, Pagination, Select, Button, Modal } from "antd";
 import { PlayCircleOutlined, CheckCircleOutlined, LockOutlined } from "@ant-design/icons";
 import { ProgramService } from "../../../services/program/program.service";
 import type { Program, ProgramEnrollment } from "../../../types/program/Program.type";
 import { helpers } from "../../../utils";
+import { debugAPI } from "../../../utils/debug";
 import { useNavigate } from "react-router-dom";
 import { ProgramType } from "../../../app/enums/programType.enum";
 import { RiskLevel } from "../../../app/enums/riskLevel.enum";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 import CustomSearch from "../../../components/common/CustomSearch.com";
+import type { PaginatedProgramResponse } from "../../../types/program/Program.res.type";
 
 const { Meta } = Card;
 const { Title, Paragraph } = Typography;
@@ -41,7 +43,7 @@ const ClientProgramPage: React.FC = () => {
         pageSize,
         filterByName: searchName,
       } as any);
-      const resp: any = res?.data ?? {};
+      const resp: PaginatedProgramResponse = res?.data ?? {};
       const list: Program[] = resp.data ?? [];
       // Client-side filters
       const filtered = list.filter(p => {
@@ -65,15 +67,22 @@ const ClientProgramPage: React.FC = () => {
 
     try {
       const res = await ProgramService.programEnrollments();
+      debugAPI.logProgramEnrollments(res); // Debug log
+
       if (res?.data) {
         const enrolledMap = new Map<string, ProgramEnrollment>();
         res.data.data.forEach((program: ProgramEnrollment) => {
           const key = program.programId || program.id;
-          if (key && program.joinDate) {
+          console.log("Processing enrollment:", { key, program }); // Debug log
+
+          if (key) {
+            // Consider enrolled if program exists in enrollment list
+            // joinDate might not be set immediately after enrollment
             enrolledMap.set(key, program);
           }
         });
         setEnrolledPrograms(enrolledMap);
+        console.log("Final enrolled map:", enrolledMap); // Debug log
       }
     } catch (err) {
       console.error("Error fetching enrolled programs:", err);
@@ -101,13 +110,13 @@ const ClientProgramPage: React.FC = () => {
     try {
       setEnrolling(programId);
       await ProgramService.enrollProgram(programId);
-      message.success("Đã tham gia chương trình thành công!");
+      helpers.notificationMessage("Đã tham gia chương trình thành công!", "success");
 
       // Refresh enrolled programs to get the latest joinDate
       await fetchEnrolledPrograms();
     } catch (err: any) {
       const errorMsg = err?.response?.data?.message || "Không thể tham gia chương trình";
-      message.error(errorMsg);
+      helpers.notificationMessage(errorMsg, "error");
     } finally {
       setEnrolling(null);
     }
@@ -128,7 +137,7 @@ const ClientProgramPage: React.FC = () => {
     }
 
     const enrollmentData = enrolledPrograms.get(program.id);
-    if (!enrollmentData?.joinDate) {
+    if (!enrollmentData) {
       Modal.confirm({
         title: 'Tham gia chương trình',
         content: `Bạn cần tham gia chương trình "${program.name}" để xem chi tiết.`,
@@ -145,7 +154,9 @@ const ClientProgramPage: React.FC = () => {
   const isEnrolled = (programId: string | undefined) => {
     if (!programId) return false;
     const enrollmentData = enrolledPrograms.get(programId);
-    return !!enrollmentData?.joinDate;
+    // Consider enrolled if program exists in enrollment list
+    // joinDate might not be set immediately after enrollment
+    return !!enrollmentData;
   };
 
   const getEnrollmentData = (programId: string | undefined): ProgramEnrollment | undefined => {
