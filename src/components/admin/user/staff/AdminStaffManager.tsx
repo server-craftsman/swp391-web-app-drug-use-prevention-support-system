@@ -240,7 +240,6 @@ const AdminStaffManager = () => {
         open={createModalOpen}
         onCancel={() => setCreateModalOpen(false)}
         footer={null}
-        title="Thêm nhân viên mới"
         width={700}
       >
         <AdminCreateStaffForm

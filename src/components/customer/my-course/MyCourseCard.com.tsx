@@ -16,7 +16,7 @@ const MyCourseCard: React.FC<MyCourseCardProps> = ({ course, onClick }) => (
     className="my-course-card"
     style={{
       borderRadius: 18,
-      minHeight: 340,
+      minHeight: 480, // Tăng từ 400 lên 480
       cursor: "pointer",
       boxShadow: "0 6px 32px 0 rgba(32,85,138,0.10)",
       border: "none",
@@ -39,7 +39,7 @@ const MyCourseCard: React.FC<MyCourseCardProps> = ({ course, onClick }) => (
           src={course.imageUrls[0]}
           style={{
             borderRadius: "18px 18px 0 0",
-            height: 180,
+            height: 320, // Tăng từ 250 lên 320
             objectFit: "cover",
             width: "100%",
             boxShadow: "0 2px 12px 0 rgba(32,85,138,0.08)",
@@ -49,7 +49,7 @@ const MyCourseCard: React.FC<MyCourseCardProps> = ({ course, onClick }) => (
       ) : (
         <div
           style={{
-            height: 180,
+            height: 320, // Tăng từ 240 lên 320
             background: "#f3f4f6",
             borderRadius: "18px 18px 0 0",
             display: "flex",

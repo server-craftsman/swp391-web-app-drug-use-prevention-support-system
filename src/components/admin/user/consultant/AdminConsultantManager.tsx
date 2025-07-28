@@ -209,12 +209,10 @@ const AdminConsultantManager = () => {
       />
 
       <Modal
-        title="Thêm tư vấn viên"
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={null}
         width={600}
-        destroyOnClose
       >
         <AdminCreateConsultantForm
           onSuccess={() => {

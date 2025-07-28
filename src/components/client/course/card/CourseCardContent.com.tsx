@@ -3,7 +3,6 @@ import { Typography, Tag } from "antd";
 import {
   ClockCircleOutlined,
   UserOutlined,
-  StarFilled,
   CheckCircleTwoTone,
 } from "@ant-design/icons";
 import type { Course } from "../../../../types/course/Course.res.type";
@@ -85,13 +84,6 @@ const CourseCardContent: React.FC<CourseCardContentProps> = ({ course }) => {
                 {formatCurrency(course.price)}
               </span>
             )}
-          </div>
-
-          <div className="flex items-center space-x-1 text-yellow-400">
-            {[...Array(5)].map((_, i) => (
-              <StarFilled key={i} className="text-xs" />
-            ))}
-            <span className="text-gray-500 text-sm ml-2">4.8</span>
           </div>
         </div>
 

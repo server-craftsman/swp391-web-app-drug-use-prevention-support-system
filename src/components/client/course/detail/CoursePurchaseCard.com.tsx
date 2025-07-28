@@ -33,10 +33,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
   const discountPercentage = course.discount;
   const savingAmount = course.price * (course.discount / 100);
 
-  const handleBuyNow = () => {
-    message.success("Chuyển hướng đến trang thanh toán...");
-  };
-
   const handleLike = () => {
     setIsLiked(!isLiked);
     message.success(isLiked ? "Đã bỏ yêu thích" : "Đã thêm vào yêu thích");
@@ -120,16 +116,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
             {/* Action Buttons */}
             <div className="space-y-3 mb-6">
               <AddToCartButton courseId={course.id} />
-
-              <Button
-                type="default"
-                size="large"
-                block
-                className="h-12 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold rounded-xl"
-                onClick={handleBuyNow}
-              >
-                Mua ngay
-              </Button>
             </div>
 
             {/* Money Back Guarantee */}

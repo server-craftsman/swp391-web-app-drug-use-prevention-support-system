@@ -225,7 +225,6 @@ const AdminBlogManager = () => {
         open={showModal}
         onCancel={() => setShowModal(false)}
         footer={null}
-        title="Tạo blog mới"
         width={600}
       >
         <CreateBlogForm onSuccess={handleBlogCreated} />
