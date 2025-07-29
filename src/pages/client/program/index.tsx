@@ -31,9 +31,10 @@ const ClientProgramPage: React.FC = () => {
   const [typeFilter, setTypeFilter] = React.useState<ProgramType | undefined>();
   const [riskFilter, setRiskFilter] = React.useState<RiskLevel | undefined>();
 
-  // Check if user is logged in
-  const userInfo = localStorage.getItem("userInfo");
-  const isLoggedIn = !!userInfo;
+  // Check if user is logged in with token and userInfo
+  const token = localStorage.getItem("token");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
+  const isLoggedIn = token && userInfo;
 
   const fetchPrograms = async () => {
     try {
@@ -91,19 +92,16 @@ const ClientProgramPage: React.FC = () => {
 
   React.useEffect(() => {
     fetchPrograms();
-    fetchEnrolledPrograms();
+    if (isLoggedIn) {
+      fetchEnrolledPrograms();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageNumber, pageSize, typeFilter, riskFilter, searchName]);
 
   const handleEnrollProgram = async (programId: string) => {
     if (!isLoggedIn) {
-      Modal.confirm({
-        title: 'Đăng nhập để tham gia',
-        content: 'Bạn cần đăng nhập để tham gia chương trình này.',
-        okText: 'Đăng nhập',
-        cancelText: 'Hủy',
-        onOk: () => navigate(ROUTER_URL.AUTH.LOGIN),
-      });
+      helpers.notificationMessage("Bạn cần đăng nhập để tham gia chương trình", "warning");
+      navigate?.(ROUTER_URL.AUTH.LOGIN);
       return;
     }
 
@@ -126,13 +124,8 @@ const ClientProgramPage: React.FC = () => {
     if (!program.id) return;
 
     if (!isLoggedIn) {
-      Modal.confirm({
-        title: 'Đăng nhập để xem chi tiết',
-        content: 'Bạn cần đăng nhập để xem chi tiết chương trình này.',
-        okText: 'Đăng nhập',
-        cancelText: 'Hủy',
-        onOk: () => navigate(ROUTER_URL.AUTH.LOGIN),
-      });
+      helpers.notificationMessage("Bạn cần đăng nhập để truy cập trang này", "warning");
+      navigate(ROUTER_URL.AUTH.LOGIN);
       return;
     }
 
@@ -223,7 +216,7 @@ const ClientProgramPage: React.FC = () => {
         {/* Hyperspeed Lines */}
         <div className="hyperspeed-lines">
           {Array.from({ length: 200 }, (_, i) => (
-            <div key={i} className="hyperspeed-line" style={{ 
+            <div key={i} className="hyperspeed-line" style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 2}s`,
@@ -261,7 +254,7 @@ const ClientProgramPage: React.FC = () => {
               </Title>
               <div className="hero-title-glow"></div>
             </div>
-            
+
             <div className="hero-subtitle-container">
               <Paragraph className="!text-white/90 !text-xl !mb-8 max-w-3xl mx-auto hero-subtitle">
                 Tham gia hành trình phát triển bản thân với các chương trình chất lượng cao,
@@ -271,9 +264,9 @@ const ClientProgramPage: React.FC = () => {
 
             {/* Floating Action Button */}
             <div className="floating-cta">
-              <Button 
-                type="primary" 
-                size="large" 
+              <Button
+                type="primary"
+                size="large"
                 className="bg-primary border-0 px-8 py-6 h-auto text-lg font-semibold rounded-full shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300"
               >
                 Bắt đầu ngay
