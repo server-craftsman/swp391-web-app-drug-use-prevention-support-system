@@ -8,7 +8,6 @@ import CourseHighlights from "./detail/CourseHighlights.com";
 import CourseContent from "./detail/CourseContent.com";
 import CourseDescription from "./detail/CourseDescription.com";
 import CourseInstructor from "./detail/CourseInstructor.com";
-import MoreCourses from "./detail/MoreCourses.com";
 import CourseReviews from "./detail/CourseReviews.com";
 
 const { Title } = Typography;
@@ -103,8 +102,6 @@ const MyCourseDetail: React.FC<MyCourseDetailProps> = ({ course }) => {
         })) || [],
     })) || [];
 
-  const instructorName = "Huy Nguyễn";
-
   return (
     <div className="min-h-screen bg-[#f7f9fa]">
       {/* Hero Section */}
@@ -131,8 +128,6 @@ const MyCourseDetail: React.FC<MyCourseDetailProps> = ({ course }) => {
                 averageRating={averageRating}
                 onReviewChanged={handleReviewChanged}
               />
-
-              <MoreCourses instructorName={instructorName} />
             </div>
           </Col>
 

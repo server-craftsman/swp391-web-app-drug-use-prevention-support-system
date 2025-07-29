@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CourseService } from "../../../../services/course/course.service";
 import type { Course } from "../../../../types/course/Course.res.type";
-import type { CourseRequest } from "../../../../types/course/Course.req.type";
 import CourseListHero from "./CourseListHero.com.tsx";
 import CourseListFilters from "./CourseListFilters.com.tsx";
 import CourseListGrid from "./CourseListGrid.com.tsx";
@@ -36,32 +35,80 @@ const CourseList = () => {
       }
     }
 
-    const params: CourseRequest = {
-      pageNumber: page,
-      pageSize: size,
-      filterByName: searchTerm,
-      userId, // truyền userId lên BE để check isPurchased
+    // CHỈ GỬI CÁC PARAM CƠ BẢN LÊN API
+    const params: any = {
+      pageNumber: 1, // Lấy tất cả từ page 1
+      pageSize: 1000, // Lấy nhiều để có đủ data filter
+      userId,
     };
-    if (selectedCategory) {
-      (params as any).CategoryId = selectedCategory;
-    }
-    if (priceSort) {
-      (params as any).SortByPrice = priceSort;
-    }
-    if (targetAudience) {
-      (params as any).TargetAudience = targetAudience;
-    }
+
     try {
       const res = await CourseService.getAllCourses(params);
       const data = res.data as any;
+
       // Lọc chỉ lấy course có status là "published"
-      const publishedCourses = Array.isArray(data?.data)
+      let filteredCourses = Array.isArray(data?.data)
         ? data.data.filter(
             (course: any) => course.status === CourseStatus.PUBLISHED
           )
         : [];
-      setCourses(publishedCourses);
-      setTotal(data?.totalCount || 0); // Giữ nguyên tổng để phân trang BE nếu cần
+
+      // FRONTEND FILTERING
+      // 1. Filter by search term
+      if (searchTerm && searchTerm.trim() !== "") {
+        const searchLower = searchTerm.toLowerCase().trim();
+        filteredCourses = filteredCourses.filter(
+          (course: any) =>
+            course.name?.toLowerCase().includes(searchLower) ||
+            course.description?.toLowerCase().includes(searchLower)
+        );
+      }
+
+      // 2. Filter by category
+      if (selectedCategory && selectedCategory !== "") {
+        filteredCourses = filteredCourses.filter(
+          (course: any) => course.categoryId === selectedCategory
+        );
+      }
+
+      // 3. Filter by target audience
+      if (targetAudience && targetAudience !== "") {
+        filteredCourses = filteredCourses.filter(
+          (course: any) => course.targetAudience === targetAudience
+        );
+      }
+
+      // 4. Sort by price
+      if (priceSort && priceSort !== "") {
+        filteredCourses.sort((a: any, b: any) => {
+          const priceA = a.price || 0;
+          const priceB = b.price || 0;
+
+          if (priceSort === "ASC") {
+            return priceA - priceB; // Tăng dần
+          } else if (priceSort === "DESC") {
+            return priceB - priceA; // Giảm dần
+          }
+          return 0;
+        });
+      }
+
+      // PAGINATION Ở FRONTEND
+      const totalFiltered = filteredCourses.length;
+      const startIndex = (page - 1) * size;
+      const endIndex = startIndex + size;
+      const paginatedCourses = filteredCourses.slice(startIndex, endIndex);
+
+      console.log("🎯 Frontend filtering results:", {
+        totalFromAPI: data?.data?.length || 0,
+        afterStatusFilter: filteredCourses.length,
+        afterPagination: paginatedCourses.length,
+        currentPage: page,
+        pageSize: size,
+      });
+
+      setCourses(paginatedCourses);
+      setTotal(totalFiltered); // Set total theo số lượng đã filter
     } catch (err) {
       setCourses([]);
       setTotal(0);
@@ -71,13 +118,9 @@ const CourseList = () => {
     }
   };
 
+  // SỬA USEFFECT: Bỏ debounce vì không cần thiết khi filter frontend
   useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      fetchCourses(current, pageSize);
-    }, 500);
-
-    return () => clearTimeout(debounceTimer);
-    // eslint-disable-next-line
+    fetchCourses(current, pageSize);
   }, [
     current,
     pageSize,
@@ -86,10 +129,6 @@ const CourseList = () => {
     targetAudience,
     searchTerm,
   ]);
-
-  useEffect(() => {
-    console.log("courses:", courses);
-  }, [courses]);
 
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);
@@ -110,9 +149,9 @@ const CourseList = () => {
   };
 
   const handleClearFilters = () => {
-    setSelectedCategory("all");
-    setTargetAudience("all");
-    setPriceSort("default");
+    setSelectedCategory(""); // SỬA: "" thay vì "all"
+    setTargetAudience(""); // SỬA: "" thay vì "all"
+    setPriceSort(""); // SỬA: "" thay vì "default"
     setSearchTerm("");
     setCurrent(1);
   };
