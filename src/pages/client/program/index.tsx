@@ -218,22 +218,68 @@ const ClientProgramPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Hero Section */}
-      <div className="relative bg-primary overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
+      {/* Hero Section with Hyperspeed Effect */}
+      <div className="relative h-[500px] bg-black overflow-hidden hyperspeed-container">
+        {/* Hyperspeed Lines */}
+        <div className="hyperspeed-lines">
+          {Array.from({ length: 200 }, (_, i) => (
+            <div key={i} className="hyperspeed-line" style={{ 
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${0.5 + Math.random() * 1}s`
+            }}></div>
+          ))}
+        </div>
 
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-32 -translate-y-32 blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full translate-x-48 translate-y-48 blur-3xl"></div>
+        {/* Floating Stars */}
+        <div className="stars">
+          {Array.from({ length: 100 }, (_, i) => (
+            <div key={i} className="star" style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 2}s`
+            }}></div>
+          ))}
+        </div>
 
-        <div className="relative px-6 py-16 max-w-screen-xl mx-auto text-center">
-          <Title level={1} className="!text-white !mb-4 !text-4xl !font-bold">
-            🌟 Khám Phá Chương Trình Nổi Bật
-          </Title>
-          <Paragraph className="!text-white/90 !text-lg !mb-8 max-w-2xl mx-auto">
-            Tham gia hành trình phát triển bản thân với các chương trình chất lượng cao,
-            được thiết kế đặc biệt để giúp bạn đạt được mục tiêu của mình.
-          </Paragraph>
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-indigo-900/80"></div>
+
+        {/* Center Glow Effect */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 flex items-center justify-center h-full px-6">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="hero-title-container mb-6">
+              <Title level={1} className="!text-white !mb-0 !text-5xl !font-bold hero-title">
+                Khám Phá Chương Trình Nổi Bật
+              </Title>
+              <div className="hero-title-glow"></div>
+            </div>
+            
+            <div className="hero-subtitle-container">
+              <Paragraph className="!text-white/90 !text-xl !mb-8 max-w-3xl mx-auto hero-subtitle">
+                Tham gia hành trình phát triển bản thân với các chương trình chất lượng cao,
+                được thiết kế đặc biệt để giúp bạn đạt được mục tiêu của mình.
+              </Paragraph>
+            </div>
+
+            {/* Floating Action Button */}
+            <div className="floating-cta">
+              <Button 
+                type="primary" 
+                size="large" 
+                className="bg-primary border-0 px-8 py-6 h-auto text-lg font-semibold rounded-full shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300"
+              >
+                Bắt đầu ngay
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -475,6 +521,145 @@ const ClientProgramPage: React.FC = () => {
       </div>
 
       <style>{`
+        /* Hyperspeed Effect Styles */
+        .hyperspeed-container {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .hyperspeed-lines {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .hyperspeed-line {
+          position: absolute;
+          width: 2px;
+          height: 100px;
+          background: linear-gradient(to topo bottom, transparent, #60a5fa, transparent);
+          transform: rotate(45deg);
+          animation: hyperspeed-move infinite linear;
+          opacity: 0.8;
+        }
+
+        @keyframes hyperspeed-move {
+          0% {
+            transform: translateX(-100vw) translateY(-100vh) rotate(45deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(100vw) translateY(100vh) rotate(45deg);
+            opacity: 0;
+          }
+        }
+
+        .stars {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .star {
+          position: absolute;
+          width: 2px;
+          height: 2px;
+          background: white;
+          border-radius: 50%;
+          animation: star-twinkle infinite ease-in-out;
+        }
+
+        @keyframes star-twinkle {
+          0%, 100% {
+            opacity: 0;
+            transform: scale(0);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .hero-title-container {
+          position: relative;
+        }
+
+        .hero-title {
+          position: relative;
+          z-index: 2;
+          text-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+          animation: hero-title-glow 3s ease-in-out infinite alternate;
+        }
+
+        .hero-title-glow {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+          filter: blur(20px);
+          opacity: 0.3;
+          animation: hero-glow-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes hero-title-glow {
+          0% {
+            text-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+          }
+          100% {
+            text-shadow: 0 0 30px rgba(96, 165, 250, 0.8), 0 0 40px rgba(139, 92, 246, 0.3);
+          }
+        }
+
+        @keyframes hero-glow-pulse {
+          0%, 100% {
+            opacity: 0.3;
+            transform: translateX(-50%) scale(1);
+          }
+          50% {
+            opacity: 0.5;
+            transform: translateX(-50%) scale(1.05);
+          }
+        }
+
+        .hero-subtitle {
+          animation: hero-subtitle-fade 1s ease-out 0.5s both;
+        }
+
+        @keyframes hero-subtitle-fade {
+          0% {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .floating-cta {
+          animation: floating-cta-appear 1s ease-out 1s both;
+        }
+
+        @keyframes floating-cta-appear {
+          0% {
+            opacity: 0;
+            transform: translateY(30px) scale(0.8);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
         .custom-pagination .ant-pagination-item {
           border-radius: 8px;
           border: 1px solid #e5e7eb;
@@ -552,7 +737,7 @@ const ClientProgramPage: React.FC = () => {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          min-height: 120px;
+          min-height: 60px;
         }
         
         /* Đảm bảo title có chiều cao cố định */
