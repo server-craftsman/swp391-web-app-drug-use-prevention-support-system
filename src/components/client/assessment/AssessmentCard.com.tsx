@@ -124,7 +124,7 @@ export default function AssessmentCard({
                 ) : (
                     <button
                         onClick={() => handleStartAssessment(survey.id)}
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium flex items-center justify-center group"
+                        className="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary-dark transition-all duration-200 text-sm font-medium flex items-center justify-center group"
                     >
                         Bắt đầu khảo sát
                         <RightOutlined className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />

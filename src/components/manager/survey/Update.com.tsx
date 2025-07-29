@@ -1,10 +1,11 @@
 import React from "react";
-import { Modal, Form, Input, Select, Spin, Tag } from "antd";
+import { Modal, Form, Input, Select, Spin, Tag, Divider } from "antd";
 import { SurveyType } from "../../../app/enums/surveyType.enum";
 import { SurveyService } from "../../../services/survey/survey.service";
 import type { SurveyResponse } from "../../../types/survey/Survey.res.type";
-import { helpers, color } from "../../../utils";
+import { helpers } from "../../../utils";
 import Editor from "../../common/Editor.com";
+import { EditOutlined, ClockCircleOutlined, FileTextOutlined, BarChartOutlined, SaveOutlined } from "@ant-design/icons";
 
 interface Props {
     open: boolean;
@@ -51,6 +52,33 @@ const SurveyUpdateModal: React.FC<Props> = ({ open, initialData, onClose, onSucc
             });
         }
     }, [surveyData, loading, form]);
+
+    const getSurveyTypeIcon = (type: SurveyType) => {
+        const iconMap = {
+            [SurveyType.RISK_ASSESSMENT]: "⚠️",
+            [SurveyType.PRE_FEEDBACK]: "🚀",
+            [SurveyType.POST_FEEDBACK]: "✅",
+        };
+        return iconMap[type] || "📊";
+    };
+
+    const getSurveyTypeColor = (type: SurveyType) => {
+        const colorMap = {
+            [SurveyType.RISK_ASSESSMENT]: "orange",
+            [SurveyType.PRE_FEEDBACK]: "green",
+            [SurveyType.POST_FEEDBACK]: "purple",
+        };
+        return colorMap[type] || "default";
+    };
+
+    const getSurveyTypeDisplayName = (type: SurveyType) => {
+        const nameMap = {
+            [SurveyType.RISK_ASSESSMENT]: "Đánh giá Rủi ro",
+            [SurveyType.PRE_FEEDBACK]: "Phản hồi Trước",
+            [SurveyType.POST_FEEDBACK]: "Phản hồi Sau",
+        };
+        return nameMap[type] || type;
+    };
 
     const fetchSurveyById = async (id: string) => {
         try {
@@ -125,88 +153,184 @@ const SurveyUpdateModal: React.FC<Props> = ({ open, initialData, onClose, onSucc
 
     return (
         <Modal
-            title="Cập nhật khảo sát"
+            title={
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
+                        <EditOutlined className="text-white text-lg" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-800 mb-1">Cập nhật khảo sát</h2>
+                        <p className="text-sm text-gray-500">Chỉnh sửa thông tin khảo sát</p>
+                    </div>
+                </div>
+            }
             open={open}
             onOk={handleOk}
             confirmLoading={submitting}
             onCancel={onClose}
             destroyOnClose
-            width={600}
-            style={{
-                position: 'absolute',
-                right: 0,
-                top: 0,
-                margin: 0,
-                height: '100vh',
-                maxWidth: '600px'
+            width={700}
+            okText="Lưu thay đổi"
+            cancelText="Hủy bỏ"
+            okButtonProps={{
+                className: "bg-green-500 hover:bg-green-600 border-0 shadow-sm hover:shadow-md transition-all duration-200 h-10 px-6 rounded-lg",
+                size: "large",
+                icon: <SaveOutlined />
             }}
-            bodyStyle={{
-                height: 'calc(100vh - 110px)',
-                overflowY: 'auto',
-                padding: '24px'
+            cancelButtonProps={{
+                className: "border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-all duration-200 h-10 px-6 rounded-lg",
+                size: "large"
             }}
-            maskStyle={{
-                backgroundColor: 'rgba(0, 0, 0, 0.3)'
+            className="survey-update-modal"
+            styles={{
+                body: {
+                    padding: '24px 32px'
+                },
+                content: {
+                    borderRadius: '16px',
+                    background: 'white'
+                },
+                header: {
+                    background: 'white',
+                    borderBottom: '1px solid #f0f0f0',
+                    padding: '24px 32px 0'
+                }
             }}
         >
             {loading ? (
-                <div className="flex justify-center items-center py-8">
+                <div className="flex items-center justify-center h-64">
                     <Spin size="large" />
                 </div>
             ) : surveyData ? (
-                <Form form={form} layout="vertical" key={surveyData.id}>
-                    <Form.Item
-                        name="name"
-                        label="Tên"
-                        rules={[{ required: true, whitespace: true, message: "Vui lòng nhập tên" }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="description"
-                        label="Mô tả"
-                        rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
-                    >
-                        <Editor placeholder="Nhập mô tả khảo sát..." height={300} />
-                    </Form.Item>
-                    <Form.Item
-                        name="surveyType"
-                        label="Loại"
-                        rules={[{ required: true, message: "Vui lòng chọn loại" }]}
-                    >
-                        <Select placeholder="Chọn loại" allowClear optionLabelProp="label">
-                            {Object.values(SurveyType).map((t) => (
-                                <Select.Option
-                                    key={t}
-                                    value={t}
-                                    label={
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <Tag color={color.getSurveyTypeColor(t)} style={{ margin: 0, fontSize: '12px' }}>
-                                                {t}
-                                            </Tag>
-                                        </div>
-                                    }
+                <div className="space-y-6">
+                    {/* Survey Preview Card */}
+
+                    <Form form={form} layout="vertical" className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Form.Item
+                                name="name"
+                                label={
+                                    <span className="font-semibold text-gray-700">
+                                        <FileTextOutlined className="mr-2" />
+                                        Tên khảo sát
+                                    </span>
+                                }
+                                rules={[{ required: true, whitespace: true, message: "Vui lòng nhập tên khảo sát" }]}
+                            >
+                                <Input
+                                    placeholder="Nhập tên khảo sát..."
+                                    className="h-11 rounded-lg border-gray-200 hover:border-green-300 focus:border-green-500 transition-all duration-200"
+                                    size="large"
+                                />
+                            </Form.Item>
+
+                            <Form.Item
+                                name="surveyType"
+                                label={
+                                    <span className="font-semibold text-gray-700">
+                                        <BarChartOutlined className="mr-2" />
+                                        Loại khảo sát
+                                    </span>
+                                }
+                                rules={[{ required: true, message: "Vui lòng chọn loại khảo sát" }]}
+                            >
+                                <Select
+                                    placeholder="Chọn loại khảo sát"
+                                    allowClear
+                                    optionLabelProp="label"
+                                    className="h-11 rounded-lg"
+                                    size="large"
                                 >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Tag color={color.getSurveyTypeColor(t)} style={{ margin: 0, fontSize: '12px' }}>
-                                            {t}
-                                        </Tag>
-                                    </div>
-                                </Select.Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
-                    <Form.Item
-                        name="estimateTime"
-                        label="Thời gian ước tính (phút)"
-                        rules={[{ required: true, message: 'Vui lòng nhập thời gian ước tính' }]}
-                    >
-                        <Input type="number" min={1} placeholder="Nhập số phút" />
-                    </Form.Item>
-                </Form>
+                                    {Object.values(SurveyType).map((t) => (
+                                        <Select.Option
+                                            key={t}
+                                            value={t}
+                                            label={
+                                                <div className="flex items-center gap-2">
+                                                    <span>{getSurveyTypeIcon(t)}</span>
+                                                    <span>{getSurveyTypeDisplayName(t)}</span>
+                                                </div>
+                                            }
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Tag
+                                                    color={getSurveyTypeColor(t)}
+                                                    className="px-2 py-1 rounded-full font-medium border-0"
+                                                    style={{ margin: 0 }}
+                                                >
+                                                    {getSurveyTypeIcon(t)} {getSurveyTypeDisplayName(t)}
+                                                </Tag>
+                                            </div>
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                        </div>
+
+                        <Form.Item
+                            name="estimateTime"
+                            label={
+                                <span className="font-semibold text-gray-700">
+                                    <ClockCircleOutlined className="mr-2" />
+                                    Thời gian ước tính (phút)
+                                </span>
+                            }
+                            rules={[{ required: true, message: 'Vui lòng nhập thời gian ước tính' }]}
+                        >
+                            <Input
+                                type="number"
+                                min={1}
+                                placeholder="Nhập số phút..."
+                                className="h-11 rounded-lg border-gray-200 hover:border-green-300 focus:border-green-500 transition-all duration-200"
+                                size="large"
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            name="description"
+                            label={
+                                <span className="font-semibold text-gray-700">
+                                    <FileTextOutlined className="mr-2" />
+                                    Mô tả khảo sát
+                                </span>
+                            }
+                            rules={[{ required: true, message: "Vui lòng nhập mô tả khảo sát" }]}
+                        >
+                            <Editor
+                                placeholder="Nhập mô tả chi tiết về khảo sát..."
+                                height={200}
+                            />
+                        </Form.Item>
+                    </Form>
+
+                    <Divider />
+
+                    {/* Changes Preview */}
+                    <div className="bg-green-50 rounded-lg p-4">
+                        <h4 className="font-semibold text-gray-700 mb-3">Xem trước thay đổi</h4>
+                        <div className="space-y-2 text-sm text-gray-600">
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                <span>Thông tin sẽ được cập nhật sau khi lưu</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                <span>Các câu hỏi hiện tại sẽ được giữ nguyên</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                <span>Khảo sát sẽ sẵn sàng để sử dụng</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             ) : (
-                <div className="flex justify-center items-center py-8">
-                    <p>Không thể tải dữ liệu khảo sát</p>
+                <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                        <div className="text-gray-400 text-4xl mb-4">⚠️</div>
+                        <p className="text-gray-600 font-medium">Không thể tải dữ liệu khảo sát</p>
+                        <p className="text-sm text-gray-500 mt-2">Vui lòng thử lại hoặc liên hệ hỗ trợ</p>
+                    </div>
                 </div>
             )}
         </Modal>

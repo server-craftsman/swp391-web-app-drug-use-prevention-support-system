@@ -28,15 +28,10 @@ export default function AssessmentQuiz({ surveyId, onComplete, onBack }: Assessm
     const [error, setError] = useState<string | null>(null);
     const { userInfo } = useAuth();
 
-    console.log('AssessmentQuiz: Mounted with surveyId:', surveyId);
-    console.log('AssessmentQuiz: User info:', userInfo);
-
     useEffect(() => {
-        console.log('AssessmentQuiz: useEffect triggered with surveyId:', surveyId);
         if (surveyId) {
             fetchSurveyData();
         } else {
-            console.error('AssessmentQuiz: No surveyId provided');
             setError('Không có ID bài khảo sát');
             setLoading(false);
         }
@@ -44,52 +39,34 @@ export default function AssessmentQuiz({ surveyId, onComplete, onBack }: Assessm
 
     const fetchSurveyData = async () => {
         try {
-            console.log('AssessmentQuiz: Fetching survey data for surveyId:', surveyId);
             setLoading(true);
             setError(null);
-
-            // Fetch survey details with questions and answers
             const surveyResponse = await SurveyService.getSurveyById(surveyId);
-            console.log('AssessmentQuiz: Full survey response:', surveyResponse);
-            console.log('AssessmentQuiz: Response data:', surveyResponse.data);
-
             let surveyData: SurveyResponse | null = null;
 
             // Handle different possible response structures
             if (surveyResponse.data?.data) {
-                // Standard ResponseSuccess structure: response.data.data
                 surveyData = surveyResponse.data.data;
-                console.log('AssessmentQuiz: Using response.data.data structure');
-            } else if (surveyResponse.data && 'name' in surveyResponse.data) {
-                // Direct data structure: response.data (when it's not wrapped in ResponseSuccess)
+            } else if (surveyResponse.data) {
                 surveyData = surveyResponse.data as unknown as SurveyResponse;
-                console.log('AssessmentQuiz: Using response.data structure');
             } else {
-                console.error('AssessmentQuiz: No valid survey data found in response');
-                console.log('AssessmentQuiz: Available data:', surveyResponse.data);
                 setError('Không thể tải thông tin bài khảo sát');
                 return;
             }
-
-            console.log('AssessmentQuiz: Extracted survey data:', surveyData);
 
             if (surveyData) {
                 setSurvey(surveyData);
 
                 if (surveyData.questions && surveyData.questions.length > 0) {
-                    console.log('AssessmentQuiz: Questions from survey:', surveyData.questions);
                     const sortedQuestions = surveyData.questions.sort((a, b) => a.positionOrder - b.positionOrder);
                     setQuestions(sortedQuestions);
                 } else {
-                    console.error('AssessmentQuiz: No questions found in survey');
                     setError('Không tìm thấy câu hỏi cho bài khảo sát này');
                 }
             } else {
-                console.error('AssessmentQuiz: No survey data extracted');
                 setError('Không thể tải thông tin bài khảo sát');
             }
         } catch (error) {
-            console.error('AssessmentQuiz: Error fetching survey data:', error);
             setError('Không thể tải dữ liệu bài khảo sát. Vui lòng thử lại.');
         } finally {
             setLoading(false);
@@ -126,8 +103,6 @@ export default function AssessmentQuiz({ surveyId, onComplete, onBack }: Assessm
                 return;
             }
 
-            console.log('AssessmentQuiz: Submitting survey with user ID:', userInfo.id);
-            console.log('AssessmentQuiz: Survey answers:', answers);
 
             const submitData: SubmitSurveyRequest = {
                 userId: userInfo.id,
@@ -138,11 +113,8 @@ export default function AssessmentQuiz({ surveyId, onComplete, onBack }: Assessm
                 }))
             };
 
-            console.log('AssessmentQuiz: Submit data:', submitData);
-
             // Try sending data directly without model wrapper
             const response = await SurveyService.submitSurvey(submitData);
-            console.log('AssessmentQuiz: Submit response:', response);
 
             if (response.data?.data && onComplete) {
                 onComplete(response.data.data);
@@ -151,12 +123,9 @@ export default function AssessmentQuiz({ surveyId, onComplete, onBack }: Assessm
                 onComplete(response.data);
             }
         } catch (error: any) {
-            console.error('AssessmentQuiz: Error submitting survey:', error);
-
             // Handle specific API errors
             if (error.response?.status === 400) {
                 const errorData = error.response.data;
-                console.error('AssessmentQuiz: API validation errors:', errorData);
 
                 if (errorData.errors) {
                     const errorMessages = Object.values(errorData.errors).flat();
@@ -172,9 +141,16 @@ export default function AssessmentQuiz({ surveyId, onComplete, onBack }: Assessm
         }
     };
 
+    // Lấy câu hỏi hiện tại dựa trên chỉ số câu hỏi hiện tại
     const currentQuestion = questions[currentQuestionIndex];
+
+    // Tính toán phần trăm tiến độ hoàn thành bài khảo sát
     const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+
+    // Kiểm tra xem có phải câu hỏi cuối cùng không
     const isLastQuestion = currentQuestionIndex === questions.length - 1;
+
+    // Kiểm tra xem người dùng có thể tiếp tục không (đã trả lời câu hỏi hiện tại)
     const canProceed = currentQuestion && answers[currentQuestion.id];
 
     if (loading) {
@@ -238,7 +214,7 @@ export default function AssessmentQuiz({ surveyId, onComplete, onBack }: Assessm
                     {/* Progress Bar */}
                     <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
                         <div
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 h-3 rounded-full transition-all duration-300"
+                            className="bg-primary h-3 rounded-full transition-all duration-300"
                             style={{ width: `${progress}%` }}
                         />
                     </div>
@@ -301,7 +277,7 @@ export default function AssessmentQuiz({ surveyId, onComplete, onBack }: Assessm
                             disabled={!canProceed || submitting}
                             className={`flex items-center px-8 py-3 rounded-lg font-medium transition-all duration-200 ${!canProceed || submitting
                                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700'
+                                : 'bg-primary text-white hover:bg-primary-dark'
                                 }`}
                         >
                             {submitting ? (
@@ -322,7 +298,7 @@ export default function AssessmentQuiz({ surveyId, onComplete, onBack }: Assessm
                             disabled={!canProceed}
                             className={`flex items-center px-6 py-3 rounded-lg font-medium transition-all duration-200 ${!canProceed
                                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700'
+                                : 'bg-primary text-white hover:bg-primary-dark'
                                 }`}
                         >
                             Câu tiếp

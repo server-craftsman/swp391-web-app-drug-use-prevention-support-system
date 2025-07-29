@@ -1,25 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
+import { Modal, message } from "antd";
 import {
     CheckCircleOutlined,
+    LoadingOutlined,
+    ArrowRightOutlined,
     ExclamationCircleOutlined,
     InfoCircleOutlined,
     BookOutlined,
     TeamOutlined,
-    ArrowRightOutlined,
-    LoadingOutlined,
-    ClockCircleOutlined,
+    PlayCircleOutlined,
     LockOutlined,
-    PlayCircleOutlined
-} from '@ant-design/icons';
-import { CourseService } from '../../../services/course/course.service';
-import { ProgramService } from '../../../services/program/program.service';
-import { useAuth } from '../../../contexts/Auth.context';
-import { useNavigate } from 'react-router-dom';
-import { Modal, message } from 'antd';
-import type { Course } from '../../../types/course/Course.res.type';
-import type { Program } from '../../../types/program/Program.type';
-import { RiskLevel } from '../../../app/enums/riskLevel.enum';
-import { ROUTER_URL } from '../../../consts/router.path.const';
+    ClockCircleOutlined
+} from "@ant-design/icons";
+import { ProgramService } from "../../../services/program/program.service";
+import { CourseService } from "../../../services/course/course.service";
+import type { Program } from "../../../types/program/Program.type";
+import type { Course } from "../../../types/course/Course.res.type";
+import { RiskLevel } from "../../../app/enums/riskLevel.enum";
+import { ROUTER_URL } from "../../../consts/router.path.const";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/Auth.context";
 
 interface AssessmentResultProps {
     surveyResult: any;
@@ -60,7 +60,6 @@ export default function AssessmentResult({
     const calculateRiskLevel = (result: any): RiskLevel => {
         // If API provides riskLevel, use it directly
         if (result.riskLevel) {
-            console.log('AssessmentResult: Using riskLevel from API:', result.riskLevel);
             switch (result.riskLevel.toLowerCase()) {
                 case 'none':
                     return RiskLevel.NONE;
@@ -79,7 +78,6 @@ export default function AssessmentResult({
         }
 
         // Fallback to calculation if no riskLevel provided
-        console.log('AssessmentResult: Calculating risk level from totalScore:', result.totalScore);
         const totalScore = result.totalScore || result.answers?.reduce((sum: number, answer: any) => {
             return sum + (answer.score || 0);
         }, 0) || 0;
@@ -144,11 +142,13 @@ export default function AssessmentResult({
 
         try {
             const res = await ProgramService.programEnrollments();
+
             if (res?.data) {
                 const enrolledMap = new Map<string, any>();
                 res.data.data.forEach((program: any) => {
                     const key = program.programId || program.id;
-                    if (key && program.joinDate) {
+
+                    if (key) {
                         enrolledMap.set(key, program);
                     }
                 });
@@ -171,7 +171,6 @@ export default function AssessmentResult({
 
             const riskLevel = calculateRiskLevel(surveyResult);
 
-            // Fetch courses and programs that match the risk level
             const [coursesResponse, programsResponse] = await Promise.all([
                 CourseService.getAllCourses({ pageNumber: 1, pageSize: 10 }),
                 ProgramService.getAllPrograms({ pageNumber: 1, pageSize: 10 })
@@ -204,7 +203,7 @@ export default function AssessmentResult({
             // Combine and sort by relevance
             const allRecommendations = [...courses, ...programs]
                 .filter(item => item.riskLevel === riskLevel)
-                .slice(0, 6); // Limit to 6 recommendations
+                .slice(0, 20); // Limit to 6 recommendations
 
             setRecommendations(allRecommendations);
         } catch (error) {
@@ -270,7 +269,7 @@ export default function AssessmentResult({
         }
 
         const enrollmentData = enrolledPrograms.get(program.id);
-        if (!enrollmentData?.joinDate) {
+        if (!enrollmentData) {
             Modal.confirm({
                 title: 'Tham gia chương trình',
                 content: `Bạn cần tham gia chương trình "${program.name}" để xem chi tiết.`,
@@ -286,7 +285,9 @@ export default function AssessmentResult({
 
     const isEnrolled = (programId: string) => {
         const enrollmentData = enrolledPrograms.get(programId);
-        return !!enrollmentData?.joinDate;
+        // Consider enrolled if program exists in enrollment list
+        // joinDate might not be set immediately after enrollment
+        return !!enrollmentData;
     };
 
     const getEnrollmentData = (programId: string) => {
@@ -297,7 +298,7 @@ export default function AssessmentResult({
     const riskInfo = getRiskLevelInfo(riskLevel);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="min-h-screen to-purple-50">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header */}
                 <div className="text-center mb-12">
@@ -375,7 +376,7 @@ export default function AssessmentResult({
                             </p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
                             {recommendations.map((item) => {
                                 const isUserEnrolled = item.type === 'program' ? isEnrolled(item.id) : false;
                                 const enrollmentData = item.type === 'program' ? getEnrollmentData(item.id) : null;
@@ -383,11 +384,11 @@ export default function AssessmentResult({
                                 return (
                                     <div
                                         key={`${item.type}-${item.id}`}
-                                        className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-pointer"
+                                        className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col h-full"
                                         onClick={() => item.type === 'course' ? handleCourseClick(item) : handleProgramClick(item)}
                                     >
-                                        {/* Image */}
-                                        <div className="relative h-48 bg-gray-200 overflow-hidden">
+                                        {/* Image - Fixed height */}
+                                        <div className="relative h-48 bg-gray-200 overflow-hidden flex-shrink-0">
                                             {item.imageUrl ? (
                                                 <img
                                                     src={item.imageUrl}
@@ -425,8 +426,8 @@ export default function AssessmentResult({
                                             )}
                                         </div>
 
-                                        {/* Content */}
-                                        <div className="p-6">
+                                        {/* Content - Flex grow to fill remaining space */}
+                                        <div className="p-6 flex flex-col flex-grow">
                                             <div className="flex items-center mb-3">
                                                 {item.type === 'course' ? (
                                                     <BookOutlined className="h-5 w-5 text-blue-600 mr-2" />
@@ -441,75 +442,78 @@ export default function AssessmentResult({
                                                 </span>
                                             </div>
 
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3rem] leading-tight">
                                                 {item.name}
                                             </h3>
-                                            <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                                                {item.description}
-                                            </p>
+                                            <p
+                                                className="text-sm text-gray-600 mb-4 line-clamp-3 flex-grow leading-relaxed"
+                                                dangerouslySetInnerHTML={{ __html: item.description }}
+                                            />
 
-                                            {/* Details */}
-                                            <div className="space-y-2 mb-4">
+                                            {/* Details - Fixed height */}
+                                            <div className="space-y-2 mb-4 min-h-[4rem]">
                                                 {item.duration && (
                                                     <div className="flex items-center text-sm text-gray-500">
-                                                        <ClockCircleOutlined className="h-4 w-4 mr-2" />
-                                                        {item.duration}
+                                                        <ClockCircleOutlined className="h-4 w-4 mr-2 flex-shrink-0" />
+                                                        <span className="truncate overflow-hidden">{item.duration}</span>
                                                     </div>
                                                 )}
                                                 {item.location && (
                                                     <div className="flex items-center text-sm text-gray-500">
-                                                        <InfoCircleOutlined className="h-4 w-4 mr-2" />
-                                                        {item.location}
+                                                        <InfoCircleOutlined className="h-4 w-4 mr-2 flex-shrink-0" />
+                                                        <span className="truncate overflow-hidden">{item.location}</span>
                                                     </div>
                                                 )}
                                                 {item.price !== undefined && (
                                                     <div className="flex items-center text-sm text-gray-500">
-                                                        <span className="font-medium text-green-600">
+                                                        <span className="font-medium text-green-600 truncate">
                                                             {item.price === 0 ? 'Miễn phí' : `${item.price.toLocaleString()} VNĐ`}
                                                         </span>
                                                     </div>
                                                 )}
                                             </div>
 
-                                            {/* Action Button */}
-                                            {item.type === 'program' && isLoggedIn && isUserEnrolled ? (
-                                                <div className="text-center">
-                                                    <div className="text-green-600 text-sm font-medium mb-1">
-                                                        <CheckCircleOutlined className="mr-1" />
-                                                        Đã tham gia
-                                                    </div>
-                                                    {enrollmentData?.joinDate && (
-                                                        <div className="text-xs text-gray-500">
-                                                            {new Date(enrollmentData.joinDate).toLocaleDateString('vi-VN')}
+                                            {/* Action Button - Fixed at bottom */}
+                                            <div className="mt-auto pt-4">
+                                                {item.type === 'program' && isLoggedIn && isUserEnrolled ? (
+                                                    <div className="text-center">
+                                                        <div className="text-green-600 text-sm font-medium mb-1">
+                                                            <CheckCircleOutlined className="mr-1" />
+                                                            Đã tham gia
                                                         </div>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        if (item.type === 'program') {
-                                                            handleEnrollProgram(item.id);
-                                                        } else {
-                                                            handleCourseClick(item);
-                                                        }
-                                                    }}
-                                                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium flex items-center justify-center group"
-                                                    disabled={enrolling === item.id}
-                                                >
-                                                    {enrolling === item.id ? (
-                                                        <>
-                                                            <LoadingOutlined className="mr-2" />
-                                                            Đang xử lý...
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            {item.type === 'course' ? 'Xem chi tiết' : 'Tham gia chương trình'}
-                                                            <ArrowRightOutlined className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
-                                                        </>
-                                                    )}
-                                                </button>
-                                            )}
+                                                        {enrollmentData?.joinDate && (
+                                                            <div className="text-xs text-gray-500">
+                                                                {new Date(enrollmentData.joinDate).toLocaleDateString('vi-VN')}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (item.type === 'program') {
+                                                                handleEnrollProgram(item.id);
+                                                            } else {
+                                                                handleCourseClick(item);
+                                                            }
+                                                        }}
+                                                        className="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-primary-dark transition-all duration-200 text-sm font-medium flex items-center justify-center group disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        disabled={enrolling === item.id}
+                                                    >
+                                                        {enrolling === item.id ? (
+                                                            <>
+                                                                <LoadingOutlined className="mr-2" />
+                                                                Đang xử lý...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                {item.type === 'course' ? 'Xem chi tiết' : 'Tham gia chương trình'}
+                                                                <ArrowRightOutlined className="ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 );

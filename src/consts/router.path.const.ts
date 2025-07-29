@@ -109,7 +109,7 @@ export const ROUTER_URL = {
     PROGRAM: "/chuong-trinh-cong-dong",
     PROGRAM_DETAIL: "/chuong-trinh-cong-dong/:programId", // detail page
     SURVEY_DETAIL: "/khau-sat/:surveyId", // client survey detail
-    SURVEY_ATTEMPT: "/khau-sat/:surveyId/thu-thu", // attempt quiz page
+    SURVEY_ATTEMPT: "/khau-sat/:surveyId/try", // attempt quiz page
     SURVEY: "/khau-sat", // client survey list
     ASSESSMENT: "/danh-gia-rui-ro",
     ASSESSMENT_RESULT: "/danh-gia-rui-ro/:assessmentId/ket-qua",

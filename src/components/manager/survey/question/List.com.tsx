@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Button, Space, Tag } from "antd";
-import { EditOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
+import { Table, Input, Button, Space, Tag, Card, Statistic, Row, Col, Tooltip, Badge } from "antd";
+import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, FilterOutlined, QuestionCircleOutlined, BarChartOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { QuestionResponse } from "../../../../types/question/Question.res.type";
 import { QuestionService } from "../../../../services/question/question.service";
@@ -142,79 +142,100 @@ const QuestionList: React.FC<Props> = ({ surveys, onLoadedQuestions, onSelectQue
         }
     };
 
+    const getQuestionTypeIcon = (type: QuestionType) => {
+        switch (type) {
+            case QuestionType.MULTIPLE_CHOICE:
+                return "📝";
+            default:
+                return "❓";
+        }
+    };
+
     const getSurveyName = (surveyId: string) => {
         const survey = surveys.find(s => s.id === surveyId);
         const name = survey?.name || surveyId;
-        return name.length > 20 ? name.substring(0, 20) + '...' : name;
+        return name.length > 40 ? name.substring(0, 40) + '...' : name;
     };
 
     const columns: ColumnsType<QuestionResponse> = [
         {
-            title: "Khảo sát",
-            dataIndex: "surveyId",
-            key: "surveyId",
-            width: 200,
-            render: (surveyId: string) => {
-                const survey = surveys.find(s => s.id === surveyId);
-                const fullName = survey?.name || surveyId;
-                const displayName = getSurveyName(surveyId);
-                return (
-                    <Tag color="blue" title={fullName}>{displayName}</Tag>
-                );
-            }
-        },
-        {
-            title: "Câu hỏi",
+            title: <span className="font-semibold text-gray-700">Câu hỏi</span>,
             dataIndex: "questionContent",
             key: "questionContent",
-            ellipsis: true,
-            render: (text: string) => (
-                <div className="max-w-md truncate" title={text} dangerouslySetInnerHTML={{ __html: text }} />
-            )
+            render: (text: string, record: QuestionResponse) => (
+                <div className="flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-800 mb-1">
+                            <span className="text-blue-500 mr-2">#{record.positionOrder}</span>
+                            <span className="truncate" dangerouslySetInnerHTML={{ __html: text }} />
+                        </div>
+                        <div className="text-sm text-gray-500 flex items-center gap-1">
+                            <Tag color="green" className="mr-1">
+                                <BarChartOutlined className="mr-1" />
+                                Khảo sát: {getSurveyName(record.surveyId || '')}
+                            </Tag>
+                        </div>
+                    </div>
+                </div>
+            ),
         },
         {
-            title: "Loại",
+            title: <span className="font-semibold text-gray-700">Loại</span>,
             dataIndex: "questionType",
             key: "questionType",
             width: 120,
-            render: (type: QuestionType) => getQuestionTypeDisplay(type)
+            render: (type: QuestionType) => (
+                <Tag
+                    color="blue"
+                    className="px-3 py-1 rounded-full font-medium border-0"
+                    style={{ margin: 0 }}
+                >
+                    {getQuestionTypeIcon(type)} {getQuestionTypeDisplay(type)}
+                </Tag>
+            )
         },
         {
-            title: "Thứ tự",
+            title: <span className="font-semibold text-gray-700">Thứ tự</span>,
             dataIndex: "positionOrder",
             key: "positionOrder",
             width: 80,
             align: "center",
-            render: (text: string) => (
-                <span className="text-blue-500 font-bold">#{text}</span>
+            render: (text: number) => (
+                <Badge count={text} showZero/>
             )
         },
         {
-            title: "Hành động",
+            title: <span className="font-semibold text-gray-700">Hành động</span>,
             key: "action",
-            width: 120,
+            width: 150,
             render: (_, record) => (
                 <Space size="small">
-                    <Button
-                        size="small"
-                        type="text"
-                        icon={<EyeOutlined />}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            openDetail(record);
-                        }}
-                        title="Xem chi tiết"
-                    />
-                    <Button
-                        size="small"
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            openEdit(record);
-                        }}
-                        title="Chỉnh sửa"
-                    />
+                    <Tooltip title="Xem chi tiết">
+                        <Button
+                            type="text"
+                            shape="circle"
+                            icon={<EyeOutlined />}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                openDetail(record);
+                            }}
+                            className="hover:bg-blue-50 hover:text-blue-600 border-0 shadow-sm transition-all duration-200"
+                            size="large"
+                        />
+                    </Tooltip>
+                    <Tooltip title="Chỉnh sửa">
+                        <Button
+                            type="text"
+                            shape="circle"
+                            icon={<EditOutlined />}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                openEdit(record);
+                            }}
+                            className="hover:bg-green-50 hover:text-green-600 border-0 shadow-sm transition-all duration-200"
+                            size="large"
+                        />
+                    </Tooltip>
                     <QuestionDeleteButton
                         question={record}
                         onSuccess={handleDeleteSuccess}
@@ -225,50 +246,101 @@ const QuestionList: React.FC<Props> = ({ surveys, onLoadedQuestions, onSelectQue
     ];
 
     return (
-        <>
-            <div className="flex gap-4 mb-4 items-center flex-wrap">
-                <Input
-                    placeholder="Tìm kiếm câu hỏi..."
-                    style={{ width: 300 }}
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                />
-                <Button className="bg-primary" type="primary" onClick={handleSearchClick}>
-                    Lọc
-                </Button>
-                <Button
-                    className="bg-primary"
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={openCreate}
-                >
-                    Tạo câu hỏi
-                </Button>
+        <div className="space-y-6">
+            {/* Header Section */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+                            <QuestionCircleOutlined className="text-white text-xl" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-800 mb-1">Quản lý Câu hỏi</h2>
+                            <p className="text-gray-600">Tạo và quản lý các câu hỏi trong khảo sát</p>
+                        </div>
+                    </div>
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={openCreate}
+                        size="large"
+                        className="bg-primary hover:bg-primary/90 border-0 shadow-lg hover:shadow-xl transition-all duration-200 h-12 px-6 rounded-xl"
+                    >
+                        Tạo câu hỏi mới
+                    </Button>
+                </div>
             </div>
 
-            <Table
-                columns={columns}
-                dataSource={data}
-                rowKey="id"
-                loading={loading}
-                onRow={(record) => ({
-                    onClick: () => onSelectQuestion?.(record),
-                    style: { cursor: 'pointer' }
-                })}
-                pagination={{
-                    current: pageNumber,
-                    pageSize,
-                    total,
-                    showSizeChanger: true,
-                    showQuickJumper: true,
-                    showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} câu hỏi`,
-                    onChange: (p, s) => {
-                        setPageNumber(p);
-                        setPageSize(s || pageSizeDefault);
-                    },
-                }}
-                size="small"
-            />
+            {/* Statistics Cards */}
+            <Row gutter={16}>
+                <Col span={8}>
+                    <Card className="text-center border-0 shadow-sm hover:shadow-md transition-all duration-200">
+                        <Statistic
+                            title="Tổng câu hỏi"
+                            value={total}
+                            valueStyle={{ color: '#3f87f5' }}
+                            prefix={<QuestionCircleOutlined />}
+                        />
+
+                    </Card>    
+                </Col>
+            </Row>
+            {/* Search and Filter Section */}
+            <Card className="border-0 shadow-sm">
+                <div className="flex gap-4 items-center flex-wrap">
+                    <div className="flex-1 max-w-md">
+                        <Input
+                            placeholder="Tìm kiếm câu hỏi..."
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                            prefix={<SearchOutlined className="text-gray-400" />}
+                            className="h-12 rounded-xl border-gray-200 hover:border-blue-300 focus:border-blue-500 transition-all duration-200"
+                            size="large"
+                        />
+                    </div>
+                    <Button
+                        type="primary"
+                        icon={<FilterOutlined />}
+                        onClick={handleSearchClick}
+                        size="large"
+                        className="bg-primary hover:bg-primary/90 border-0 shadow-sm hover:shadow-md transition-all duration-200 h-12 px-6 rounded-xl"
+                    >
+                        Lọc
+                    </Button>
+                </div>
+            </Card>
+
+            {/* Table Section */}
+            <Card className="border-0 shadow-sm">
+                <Table
+                    columns={columns}
+                    dataSource={data}
+                    rowKey="id"
+                    loading={loading}
+                    onRow={(record) => ({
+                        onClick: () => onSelectQuestion?.(record),
+                        className: "hover:bg-blue-50 transition-all duration-200 cursor-pointer"
+                    })}
+                    pagination={{
+                        current: pageNumber,
+                        pageSize,
+                        total,
+                        showSizeChanger: true,
+                        showQuickJumper: true,
+                        showTotal: (total, range) => (
+                            <span className="text-sm text-gray-600">
+                                Hiển thị <span className="font-semibold">{range[0]}-{range[1]}</span> trong tổng số <span className="font-semibold">{total}</span> câu hỏi
+                            </span>
+                        ),
+                        onChange: (p, s) => {
+                            setPageNumber(p);
+                            setPageSize(s || pageSizeDefault);
+                        },
+                        className: "mt-6",
+                    }}
+                    className="custom-table"
+                />
+            </Card>
 
             {/* Modals */}
             <QuestionCreateModal
@@ -303,7 +375,7 @@ const QuestionList: React.FC<Props> = ({ surveys, onLoadedQuestions, onSelectQue
                     openEdit(question);
                 }}
             />
-        </>
+        </div>
     );
 };
 

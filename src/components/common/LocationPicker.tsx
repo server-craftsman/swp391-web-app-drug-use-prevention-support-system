@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Input, Button, Modal, Space, Tabs, message, Spin } from 'antd';
-import { EnvironmentOutlined, SearchOutlined, GlobalOutlined, UnorderedListOutlined, LoadingOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, SearchOutlined, GlobalOutlined, LoadingOutlined, AimOutlined } from '@ant-design/icons';
 
 interface LocationPickerProps {
     value?: string;
@@ -19,14 +19,76 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     const [activeTab, setActiveTab] = useState<string>('map');
     const [clickedCoords, setClickedCoords] = useState<{ lat: number, lng: number } | null>(null);
     const [isGeocodingLoading, setIsGeocodingLoading] = useState(false);
+    const [isGPSLoading, setIsGPSLoading] = useState(false);
+    const [currentGPSLocation, setCurrentGPSLocation] = useState<{ lat: number, lng: number } | null>(null);
     const mapContainerRef = useRef<HTMLDivElement>(null);
 
-    // Common Vietnam locations for quick selection
-    const commonLocations = [
-        'TP. Hồ Chí Minh', 'Hà Nội', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
-        'Quận 1, TP. Hồ Chí Minh', 'Quận 3, TP. Hồ Chí Minh', 'Quận 7, TP. Hồ Chí Minh',
-        'Quận Hoàn Kiếm, Hà Nội', 'Quận Ba Đình, Hà Nội', 'Quận Cầu Giấy, Hà Nội'
-    ];
+    // Check if GPS is available
+    const isGPSAvailable = () => {
+        return navigator.geolocation && navigator.geolocation.getCurrentPosition;
+    };
+
+    // Get current GPS location
+    const getCurrentLocation = (): Promise<{ lat: number, lng: number }> => {
+        return new Promise((resolve, reject) => {
+            if (!isGPSAvailable()) {
+                reject(new Error('Trình duyệt không hỗ trợ GPS'));
+                return;
+            }
+
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    resolve({ lat: latitude, lng: longitude });
+                },
+                (error) => {
+                    let errorMessage = 'Không thể lấy vị trí hiện tại';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Bạn cần cấp quyền truy cập vị trí để sử dụng tính năng này. Vui lòng kiểm tra cài đặt trình duyệt.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Thông tin vị trí không khả dụng. Vui lòng thử lại sau.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Hết thời gian lấy vị trí. Vui lòng thử lại.';
+                            break;
+                    }
+                    reject(new Error(errorMessage));
+                },
+                options
+            );
+        });
+    };
+
+    // Handle getting current location
+    const handleGetCurrentLocation = async () => {
+        setIsGPSLoading(true);
+        try {
+            const coords = await getCurrentLocation();
+            setCurrentGPSLocation(coords);
+
+            // Get address from coordinates
+            const address = await reverseGeocode(coords.lat, coords.lng);
+            setSelectedLocation(address);
+            setMapLocation(address);
+
+            // Switch to map tab to show the location
+            setActiveTab('map');
+
+            message.success('Đã lấy vị trí hiện tại thành công!');
+        } catch (error: any) {
+            message.error(error.message || 'Không thể lấy vị trí hiện tại');
+        } finally {
+            setIsGPSLoading(false);
+        }
+    };
 
     // Reverse geocoding function to get address from coordinates
     const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
@@ -125,11 +187,6 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         setIsModalOpen(true);
     };
 
-    const handleLocationSelect = (location: string) => {
-        setSelectedLocation(location);
-        setMapLocation(location);
-    };
-
     const handleMapLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const location = e.target.value;
         setMapLocation(location);
@@ -207,6 +264,18 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         }
     }, [isModalOpen, activeTab, mapLocation]);
 
+    // Auto get current location when modal opens
+    useEffect(() => {
+        if (isModalOpen && !value) {
+            // Auto get current location after a short delay
+            const timer = setTimeout(() => {
+                handleGetCurrentLocation();
+            }, 1000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [isModalOpen]);
+
     const tabItems = [
         {
             key: 'map',
@@ -231,12 +300,67 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                             <Button
                                 type="primary"
                                 onClick={() => searchLocation(mapLocation)}
-                                style={{ backgroundColor: '#20558A' }}
+                                // style={{ backgroundColor: '#20558A' }}
+                                className='bg-primary p-5'
                             >
                                 Tìm
                             </Button>
+                            <Button
+                                type="default"
+                                icon={<AimOutlined />}
+                                onClick={handleGetCurrentLocation}
+                                loading={isGPSLoading}
+                                title="Lấy vị trí hiện tại"
+                                size="large"
+                                disabled={!isGPSAvailable()}
+                            >
+                                Vị trí hiện tại
+                            </Button>
                         </Space.Compact>
                     </div>
+
+                    {/* GPS Location Info */}
+                    {currentGPSLocation && (
+                        <div style={{
+                            marginBottom: 16,
+                            padding: 12,
+                            backgroundColor: '#e6f7ff',
+                            border: '1px solid #91d5ff',
+                            borderRadius: 6,
+                            fontSize: 12
+                        }}>
+                            <Space>
+                                <AimOutlined style={{ color: '#1890ff' }} />
+                                <div>
+                                    <strong style={{ color: '#1890ff' }}>Vị trí GPS hiện tại:</strong>
+                                    <div style={{ color: '#52c41a', fontFamily: 'monospace' }}>
+                                        {currentGPSLocation.lat.toFixed(6)}, {currentGPSLocation.lng.toFixed(6)}
+                                    </div>
+                                </div>
+                            </Space>
+                        </div>
+                    )}
+
+                    {/* GPS Not Available Warning */}
+                    {!isGPSAvailable() && (
+                        <div style={{
+                            marginBottom: 16,
+                            padding: 12,
+                            backgroundColor: '#fef2f2',
+                            border: '1px solid #fecaca',
+                            borderRadius: 6,
+                            fontSize: 12,
+                            color: '#dc2626'
+                        }}>
+                            <Space>
+                                <AimOutlined style={{ color: '#dc2626' }} />
+                                <div>
+                                    <strong>⚠️ GPS không khả dụng:</strong>
+                                    <div>Trình duyệt của bạn không hỗ trợ GPS hoặc không có quyền truy cập vị trí.</div>
+                                </div>
+                            </Space>
+                        </div>
+                    )}
 
                     <div
                         ref={mapContainerRef}
@@ -342,58 +466,22 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                     }}>
                         <strong>🎯 Hướng dẫn lấy địa chỉ chi tiết:</strong>
                         <ol style={{ margin: '8px 0 0 16px', lineHeight: '1.6' }}>
-                            <li>Nhập tên địa điểm và nhấn "Tìm" để hiển thị khu vực</li>
-                            <li><strong>Click trực tiếp lên bản đồ</strong> tại vị trí bạn muốn chọn</li>
+                            <li><strong>GPS:</strong> Nhấn "Vị trí hiện tại" để tự động lấy địa chỉ từ GPS và hiển thị trên bản đồ</li>
+                            <li><strong>Tìm kiếm:</strong> Nhập tên địa điểm và nhấn "Tìm" để hiển thị khu vực</li>
+                            <li><strong>Click trên bản đồ:</strong> Click trực tiếp lên bản đồ tại vị trí bạn muốn chọn</li>
                             <li>Hệ thống sẽ tự động <strong>tìm địa chỉ chi tiết</strong> của vị trí đó</li>
                             <li>Địa chỉ đầy đủ (số nhà, đường, quận, thành phố) sẽ được hiển thị</li>
                             <li>Nhấn "Xác nhận" để lưu địa chỉ chi tiết đã chọn</li>
                         </ol>
                         <div style={{ marginTop: 8, padding: 6, backgroundColor: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4, fontSize: 11 }}>
-                            <strong>💡 Lưu ý:</strong> Địa chỉ sẽ được hiển thị theo định dạng Việt Nam (số nhà, tên đường, quận/huyện, thành phố)
+                            <strong>💡 Lưu ý:</strong>
+                            <ul style={{ margin: '4px 0 0 16px', lineHeight: '1.4' }}>
+                                <li>Địa chỉ sẽ được hiển thị theo định dạng Việt Nam (số nhà, tên đường, quận/huyện, thành phố)</li>
+                                <li>GPS sẽ tự động lấy vị trí hiện tại khi mở modal lần đầu</li>
+                                <li>Cần cấp quyền truy cập vị trí cho trình duyệt để sử dụng GPS</li>
+                                <li>Khi bấm "Vị trí hiện tại", bản đồ sẽ tự động hiển thị vị trí GPS</li>
+                            </ul>
                         </div>
-                    </div>
-                </>
-            )
-        },
-        {
-            key: 'list',
-            label: (
-                <span>
-                    <UnorderedListOutlined />
-                    <span className='ml-1'>Địa điểm phổ biến</span>
-                </span>
-            ),
-            children: (
-                <>
-                    <div style={{ marginBottom: 16 }}>
-                        <h4 style={{ marginBottom: 12, color: '#20558A' }}>Chọn nhanh địa điểm:</h4>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 8 }}>
-                            {commonLocations.map((location) => (
-                                <Button
-                                    key={location}
-                                    size="small"
-                                    onClick={() => handleLocationSelect(location)}
-                                    style={{
-                                        borderColor: selectedLocation === location ? '#20558A' : '#d9d9d9',
-                                        color: selectedLocation === location ? '#20558A' : '#666',
-                                        backgroundColor: selectedLocation === location ? '#f0f7ff' : 'white',
-                                        textAlign: 'left'
-                                    }}
-                                >
-                                    <EnvironmentOutlined style={{ marginRight: 4 }} />
-                                    {location}
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div style={{ marginTop: 16 }}>
-                        <Input
-                            placeholder="Hoặc nhập địa điểm tùy chỉnh..."
-                            value={selectedLocation}
-                            onChange={(e) => setSelectedLocation(e.target.value)}
-                            prefix={<EnvironmentOutlined />}
-                        />
                     </div>
                 </>
             )
@@ -418,7 +506,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
             />
 
             <Modal
-                title="Chọn địa điểm"
+                title="Chọn địa điểm trên bản đồ"
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
@@ -443,9 +531,19 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                     }}>
                         <Space>
                             <EnvironmentOutlined style={{ color: '#52c41a' }} />
-                            <div>
+                            <div style={{ flex: 1 }}>
                                 <strong style={{ color: '#389e0d' }}>Địa chỉ đã chọn:</strong>
                                 <div style={{ color: '#52c41a', wordBreak: 'break-all', lineHeight: '1.4' }}>{selectedLocation}</div>
+                                {currentGPSLocation && (
+                                    <div style={{
+                                        marginTop: 4,
+                                        fontSize: 11,
+                                        color: '#1890ff',
+                                        fontFamily: 'monospace'
+                                    }}>
+                                        📍 GPS: {currentGPSLocation.lat.toFixed(6)}, {currentGPSLocation.lng.toFixed(6)}
+                                    </div>
+                                )}
                             </div>
                         </Space>
                     </div>

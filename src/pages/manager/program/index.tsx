@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, message } from "antd";
+import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import ProgramDisplay from "../../../components/manager/program/Display.com";
 import CreateProgramModal from "../../../components/manager/program/Create.com";
 import UpdateProgramModal from "../../../components/manager/program/Update.com";
 import ProgramDetailDrawer from "../../../components/manager/program/Detail.com";
+import DeleteProgramButton from "../../../components/manager/program/Delete.com";
 import { ProgramService } from "../../../services/program/program.service";
 import type { Program } from "../../../types/program/Program.type";
 import { helpers } from "../../../utils";
@@ -20,8 +21,10 @@ const ProgramManagementPage: React.FC = () => {
     const [createVisible, setCreateVisible] = useState(false);
     const [detailVisible, setDetailVisible] = useState(false);
     const [updateVisible, setUpdateVisible] = useState(false);
+    const [deleteVisible, setDeleteVisible] = useState(false);
     const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
     const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
+    const [programToDelete, setProgramToDelete] = useState<Program | null>(null);
 
     const fetchPrograms = async () => {
         setLoading(true);
@@ -36,10 +39,10 @@ const ProgramManagementPage: React.FC = () => {
                 setPrograms(list);
                 setTotal(totalCount ?? list.length);
             } else {
-                message.error("Failed to fetch programs");
+                helpers.notificationMessage("Failed to fetch programs", "error");
             }
         } catch {
-            message.error("Failed to fetch programs");
+            helpers.notificationMessage("Failed to fetch programs", "error");
         } finally {
             setLoading(false);
         }
@@ -97,14 +100,8 @@ const ProgramManagementPage: React.FC = () => {
                     setUpdateVisible(true);
                 }}
                 onDelete={(p) => {
-                    if (window.confirm("Bạn có chắc chắn muốn xóa chương trình này?")) {
-                        ProgramService.deleteProgram(String(p.id))
-                            .then(() => {
-                                helpers.notificationMessage("Chương trình đã được xóa thành công", 'success')
-                                handleRefresh();
-                            })
-                            .catch(() => helpers.notificationMessage("Xóa chương trình thất bại", 'error'))
-                    }
+                    setProgramToDelete(p);
+                    setDeleteVisible(true);
                 }}
                 onSearch={handleSearch}
             />
@@ -143,6 +140,23 @@ const ProgramManagementPage: React.FC = () => {
                 }}
                 program={selectedProgram}
             />
+
+            {/* Delete Modal */}
+            {programToDelete && (
+                <DeleteProgramButton
+                    programId={programToDelete.id ?? 0}
+                    visible={deleteVisible}
+                    onCancel={() => {
+                        setDeleteVisible(false);
+                        setProgramToDelete(null);
+                    }}
+                    onSuccess={() => {
+                        setDeleteVisible(false);
+                        setProgramToDelete(null);
+                        handleRefresh();
+                    }}
+                />
+            )}
         </div>
     );
 };
