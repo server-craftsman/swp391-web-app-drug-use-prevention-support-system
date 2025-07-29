@@ -66,3 +66,8 @@ export interface CreateUserRequest {
   profilePicUrl: string;
   role: UserRole;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}

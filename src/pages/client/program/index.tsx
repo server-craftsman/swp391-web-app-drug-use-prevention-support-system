@@ -221,17 +221,17 @@ const ClientProgramPage: React.FC = () => {
       {/* Hero Section */}
       <div className="relative bg-primary overflow-hidden">
         <div className="absolute inset-0 bg-black opacity-20"></div>
-        
+
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-32 -translate-y-32 blur-3xl"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full translate-x-48 translate-y-48 blur-3xl"></div>
-        
+
         <div className="relative px-6 py-16 max-w-screen-xl mx-auto text-center">
           <Title level={1} className="!text-white !mb-4 !text-4xl !font-bold">
             🌟 Khám Phá Chương Trình Nổi Bật
           </Title>
           <Paragraph className="!text-white/90 !text-lg !mb-8 max-w-2xl mx-auto">
-            Tham gia hành trình phát triển bản thân với các chương trình chất lượng cao, 
+            Tham gia hành trình phát triển bản thân với các chương trình chất lượng cao,
             được thiết kế đặc biệt để giúp bạn đạt được mục tiêu của mình.
           </Paragraph>
         </div>
@@ -317,24 +317,24 @@ const ClientProgramPage: React.FC = () => {
                             filter: !isLoggedIn || !isUserEnrolled ? 'brightness(0.8)' : 'none'
                           }}
                         />
-                        
+
                         {/* Overlay gradient */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        
+
                         {/* Video icon */}
                         {p.programVidUrl && isLoggedIn && isUserEnrolled && (
                           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <PlayCircleOutlined className="text-white text-5xl drop-shadow-lg animate-pulse" />
                           </div>
                         )}
-                        
+
                         {/* Lock icon */}
                         {(!isLoggedIn || !isUserEnrolled) && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                             <LockOutlined className="text-white text-4xl drop-shadow-lg" />
                           </div>
                         )}
-                        
+
                         {/* Enrollment badge */}
                         {isLoggedIn && isUserEnrolled && (
                           <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
@@ -376,7 +376,7 @@ const ClientProgramPage: React.FC = () => {
                               className="text-gray-600 text-sm line-clamp-2 leading-relaxed"
                               dangerouslySetInnerHTML={{ __html: p.description ?? "" }}
                             />
-                            
+
                             {/* Enrollment info */}
                             {isLoggedIn && isUserEnrolled && enrollmentData?.joinDate && (
                               <div className="flex items-center text-green-600 text-xs bg-green-50 px-3 py-2 rounded-lg">
@@ -387,12 +387,12 @@ const ClientProgramPage: React.FC = () => {
                           </div>
                         }
                       />
-                      
+
                       {/* Action Button */}
                       <div className="mt-4 pt-4 border-t border-gray-100">
                         {isLoggedIn && isUserEnrolled ? (
-                          <Button 
-                            type="primary" 
+                          <Button
+                            type="primary"
                             size="large"
                             className="w-full bg-green-500 hover:bg-green-600 border-0 h-12 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                             onClick={(e) => e.stopPropagation()}
@@ -434,7 +434,7 @@ const ClientProgramPage: React.FC = () => {
                 total={total}
                 showSizeChanger
                 showQuickJumper
-                showTotal={(total, range) => 
+                showTotal={(total, range) =>
                   `Hiển thị ${range[0]}-${range[1]} trong tổng số ${total} chương trình`
                 }
                 pageSizeOptions={["8", "16", "24", "32"]}
@@ -458,8 +458,8 @@ const ClientProgramPage: React.FC = () => {
             <Paragraph className="!text-gray-400 !mb-6">
               Hãy thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm
             </Paragraph>
-            <Button 
-              type="primary" 
+            <Button
+              type="primary"
               size="large"
               onClick={() => {
                 setSearchName("");
@@ -507,7 +507,7 @@ const ClientProgramPage: React.FC = () => {
           display: flex;
           flex-direction: column;
           height: 100%;
-          min-height: 300px;
+          min-height: 150px;
         }
         
         .program-card .ant-card-body {
