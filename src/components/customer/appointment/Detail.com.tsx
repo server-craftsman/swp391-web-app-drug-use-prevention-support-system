@@ -47,7 +47,7 @@ const AppointmentDetail: React.FC = () => {
     const [submitting, setSubmitting] = useState(false);
     const [editing, setEditing] = useState(false);
     const { userInfo, role } = useAuth();
-    const [user, setUser] = useState<UserResponse | null>(null);
+    // const [user, setUser] = useState<UserResponse | null>(null);
     const [reviewerUser, setReviewerUser] = useState<UserResponse | null>(null);
 
     // Check if user can review/edit reviews based on role
@@ -59,9 +59,6 @@ const AppointmentDetail: React.FC = () => {
     const canCreateReview = isCustomer;
     const canEditOwnReview = isCustomer && review && review.userId === userInfo?.id;
     const canDeleteOwnReview = isCustomer && review && review.userId === userInfo?.id;
-
-    // All roles can view reviews, but with different UI
-    const canViewReviews = true;
 
     // Reset editing mode when review changes
     useEffect(() => {
@@ -132,14 +129,6 @@ const AppointmentDetail: React.FC = () => {
                 .then(res => {
                     if (res?.data?.success && res.data.data) {
                         setConsultant(res.data.data);
-                    }
-                });
-        }
-        if (userInfo?.id) {
-            UserService.getUserById({ userId: userInfo.id })
-                .then(res => {
-                    if (res?.data?.success && res.data.data) {
-                        setUser(res.data.data);
                     }
                 });
         }
