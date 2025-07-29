@@ -3,8 +3,7 @@ import { BlogService } from "../../../services/blog/blog.service";
 import type { Blog } from "../../../types/blog/Blog.res.type";
 import type { BlogRequest } from "../../../types/blog/Blog.req.type";
 import CustomPagination from "../../common/Pagiation.com";
-import BlogCard from "./BlogCard.com"; // Thêm dòng này
-
+import BlogCard from "./BlogCard.com";
 const BlogList = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(false);
@@ -38,25 +37,43 @@ const BlogList = () => {
   };
 
   return (
-    <div>
-      <div className="flex flex-col items-center">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
         {loading ? (
-          <div className="text-center py-8 text-lg">Đang tải...</div>
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="text-lg text-gray-600 mt-4">Đang tải...</p>
+          </div>
         ) : blogs.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            Không có blog nào.
+          <div className="text-center py-16">
+            <div className="text-6xl text-gray-300 mb-4">📝</div>
+            <p className="text-xl text-gray-500">Không có blog nào.</p>
           </div>
         ) : (
-          blogs.map((blog) => <BlogCard key={blog.id} blog={blog} />)
+          <>
+            {/* Grid Layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+              {blogs.map((blog) => (
+                <div
+                  key={blog.id}
+                  className="transform hover:scale-105 transition-transform duration-300"
+                >
+                  <BlogCard blog={blog} />
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="flex justify-center mt-12">
+              <CustomPagination
+                current={current}
+                pageSize={pageSize}
+                total={total}
+                onChange={handlePageChange}
+              />
+            </div>
+          </>
         )}
-      </div>
-      <div className="flex justify-center mt-6">
-        <CustomPagination
-          current={current}
-          pageSize={pageSize}
-          total={total}
-          onChange={handlePageChange}
-        />
       </div>
     </div>
   );

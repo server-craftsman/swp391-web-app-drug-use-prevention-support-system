@@ -13,7 +13,6 @@ import CourseContent from "./detail/CourseContent.com.tsx";
 import CourseDescription from "./detail/CourseDescription.com.tsx";
 import CourseInstructor from "./detail/CourseInstructor.com.tsx";
 import CoursePurchaseCard from "./detail/CoursePurchaseCard.com.tsx";
-import MoreCourses from "./detail/MoreCourses.com.tsx";
 import CourseReviews from "./detail/CourseReviews.com.tsx";
 import MyCourseDetail from "../../customer/my-course/MyCourseDetail.com.tsx";
 
@@ -193,8 +192,6 @@ const CourseDetail: React.FC = () => {
         })) || [],
     })) || [];
 
-  const instructorName = course.name || "Giảng viên";
-
   return (
     <div className="min-h-screen ">
       {/* Hero Section */}
@@ -228,7 +225,6 @@ const CourseDetail: React.FC = () => {
               />
 
               {/* More Courses Section */}
-              <MoreCourses instructorName={instructorName} />
             </div>
           </Col>
 
