@@ -3,7 +3,8 @@ import { Card, Form, Input, Button, Divider } from 'antd';
 import { helpers } from '../../../utils';
 import { LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { motion } from 'framer-motion';
-import { API_PATH } from '../../../consts/api.path.const';
+import { AuthService } from '../../../services/auth/auth.service';
+import { useAuth } from '../../../contexts/Auth.context';
 
 interface PasswordTabProps {
     loading: boolean;
@@ -18,26 +19,23 @@ interface ChangePasswordRequest {
 
 const PasswordTab: React.FC<PasswordTabProps> = ({ loading, setLoading }) => {
     const [passwordForm] = Form.useForm();
+    const { logout } = useAuth();
 
     // Handle password change
     const handlePasswordChange = async (values: ChangePasswordRequest) => {
         setLoading(true);
         try {
-            const response = await fetch(API_PATH.USER.CHANGE_PASSWORD, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-                body: JSON.stringify({
-                    currentPassword: values.currentPassword,
-                    newPassword: values.newPassword,
-                }),
+            const response = await AuthService.changePassword({
+                currentPassword: values.currentPassword,
+                newPassword: values.newPassword,
             });
 
-            if (response.ok) {
-                helpers.notificationMessage('Đổi mật khẩu thành công!', 'success');
+            if (response?.data?.success) {
+                helpers.notificationMessage('Đổi mật khẩu thành công! Vui lòng đăng nhập lại.', 'success');
                 passwordForm.resetFields();
+                setTimeout(() => {
+                    logout();
+                }, 1500);
             } else {
                 helpers.notificationMessage('Đổi mật khẩu thất bại!', 'error');
             }
@@ -47,6 +45,8 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ loading, setLoading }) => {
             setLoading(false);
         }
     };
+
+    
 
     return (
         <motion.div

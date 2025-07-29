@@ -20,6 +20,22 @@ import { ROUTER_URL } from "../../consts/router.path.const";
 
 const { Sider } = Layout;
 
+// Hàm dùng chung cho focus effects
+const createFocusHandlers = (itemName: string) => ({
+    onFocus: (e: any) => {
+        e.target.style.transform = 'scale(1.01)';
+        e.target.style.transition = 'all 0.15s ease';
+        e.target.style.backgroundColor = 'rgba(24, 144, 255, 0.1)';
+        e.target.style.borderRadius = '6px';
+        console.log(`${itemName} item focused`);
+    },
+    onBlur: (e: any) => {
+        e.target.style.transform = 'scale(1)';
+        e.target.style.backgroundColor = 'transparent';
+        console.log(`${itemName} item blurred`);
+    }
+});
+
 const SidebarLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -63,47 +79,56 @@ const SidebarLayout: React.FC = () => {
             key: ROUTER_URL.CONSULTANT.BASE,
             icon: <DashboardOutlined />,
             label: <Link to={ROUTER_URL.CONSULTANT.BASE}>Tổng quan</Link>,
+            ...createFocusHandlers('Dashboard')
         },
-        // {
-        //     key: ROUTER_URL.CONSULTANT.APPOINTMENTS,
-        //     icon: <CalendarOutlined />,
-        //     label: <Link to={ROUTER_URL.CONSULTANT.APPOINTMENTS}>Lịch hẹn tư vấn</Link>,
-        // },
         {
             key: ROUTER_URL.CONSULTANT.CLIENTS,
             icon: <TeamOutlined />,
             label: <Link to={ROUTER_URL.CONSULTANT.CLIENTS}>Khách hàng</Link>,
+            ...createFocusHandlers('Clients')
         },
         {
             key: ROUTER_URL.CONSULTANT.APPOINTMENTS,
             icon: <MessageOutlined />,
             label: <Link to={ROUTER_URL.CONSULTANT.APPOINTMENTS}>Phiên tư vấn</Link>,
+            ...createFocusHandlers('Appointments')
         },
         {
             key: ROUTER_URL.CONSULTANT.ASSESSMENTS,
             icon: <FileTextOutlined />,
             label: <Link to={ROUTER_URL.CONSULTANT.ASSESSMENTS}>Đánh giá nguy cơ</Link>,
+            ...createFocusHandlers('Assessments')
         },
         {
             key: ROUTER_URL.CONSULTANT.RESOURCES,
             icon: <BookOutlined />,
             label: <Link to={ROUTER_URL.CONSULTANT.RESOURCES}>Tài nguyên hỗ trợ</Link>,
+            ...createFocusHandlers('Resources')
         },
         {
             key: ROUTER_URL.CONSULTANT.REPORTS,
             icon: <BarChartOutlined />,
             label: <Link to={ROUTER_URL.CONSULTANT.REPORTS}>Báo cáo</Link>,
+            ...createFocusHandlers('Reports')
         },
         {
             key: ROUTER_URL.CONSULTANT.SETTINGS,
             icon: <SettingOutlined />,
             label: <Link to={ROUTER_URL.CONSULTANT.SETTINGS}>Cài đặt</Link>,
+            ...createFocusHandlers('Settings')
         },
     ];
 
     const getSelectedKey = () => {
         const path = location.pathname;
-        return menuItems.find(item => path.startsWith(item.key))?.key || ROUTER_URL.CONSULTANT.BASE;
+        // Cải thiện logic selection để tránh bug
+        const exactMatch = menuItems.find(item => path === item.key);
+        if (exactMatch) return exactMatch.key;
+
+        const startsWithMatch = menuItems.find(item => path.startsWith(item.key));
+        if (startsWithMatch) return startsWithMatch.key;
+
+        return ROUTER_URL.CONSULTANT.BASE;
     };
 
     return (

@@ -12,10 +12,10 @@ export const API_PATH = {
     GET_USERS: "/user",
     GET_USER_PROFILE: "/user/profile",
     UPDATE_USER_PROFILE: "/user/profile",
-    CHANGE_PASSWORD: "/user/password/change",
     GET_USER_BY_ID: (id: string) => `/user/${id}`,
     DELETE_USER: (id: string) => `/user/${id}`,
     CREATE_USER: "/user/create",
+    CHANGE_PASSWORD: "/user/changePassword",
   },
   PRODUCT: {
     GET_ALL_PRODUCTS: "/products",
