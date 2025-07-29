@@ -30,7 +30,7 @@ const PasswordTab: React.FC<PasswordTabProps> = ({ loading, setLoading }) => {
                 newPassword: values.newPassword,
             });
 
-            if (response?.data?.success) {
+            if (response?.data) {
                 helpers.notificationMessage('Đổi mật khẩu thành công! Vui lòng đăng nhập lại.', 'success');
                 passwordForm.resetFields();
                 setTimeout(() => {
