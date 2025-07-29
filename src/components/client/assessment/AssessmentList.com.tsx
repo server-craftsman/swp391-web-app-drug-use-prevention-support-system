@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   FileTextOutlined,
   TeamOutlined,
@@ -14,6 +15,8 @@ import type { SearchSurveyRequest } from '../../../types/survey/Survey.req.type'
 import { SurveyType } from '../../../app/enums/surveyType.enum';
 import AssessmentCard from './AssessmentCard.com';
 import CustomSearch from '../../common/CustomSearch.com';
+import { ROUTER_URL } from '../../../consts/router.path.const';
+import { helpers } from '../../../utils';
 
 interface AssessmentListProps {
   onStartAssessment?: (surveyId: string) => void;
@@ -32,8 +35,15 @@ export default function AssessmentList({ onStartAssessment, onViewResult }: Asse
   const [totalCount, setTotalCount] = useState(0);
   const [lastKeyword, setLastKeyword] = useState(''); // track last search keyword
 
+  const token = localStorage.getItem("token");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo") || "null");
+  const isLoggedIn = token && userInfo;
+
+  const navigate = useNavigate();
+
   const fetchSurveys = async (page: number = 1, search: string = '') => {
     try {
+
       setLoading(true);
       const params: SearchSurveyRequest = {
         pageNumber: page,
@@ -102,6 +112,11 @@ export default function AssessmentList({ onStartAssessment, onViewResult }: Asse
   }, []);
 
   const handleStartAssessment = (surveyId: string) => {
+    if (!isLoggedIn) {
+      helpers.notificationMessage("Bạn cần đăng nhập để truy cập trang này", "warning");
+      navigate?.(ROUTER_URL.AUTH.LOGIN);
+      return;
+    }
     if (onStartAssessment) {
       onStartAssessment(surveyId);
     } else {
