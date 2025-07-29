@@ -36,7 +36,7 @@ export const AuthService = {
     });
   },
   changePassword(params: ChangePasswordRequest) {
-    return BaseService.put<ResponseSuccess<UserResponse>>({
+    return BaseService.put<any>({
       url: API_PATH.USER.CHANGE_PASSWORD,
       payload: params,
     });
