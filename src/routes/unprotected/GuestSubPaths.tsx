@@ -111,6 +111,10 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
           path: ROUTER_URL.CUSTOMER.LESSON_DETAIL,
           element: <LessonDetailPage />,
         },
+        {
+          element: <UnauthorizedPage />,
+          path: ROUTER_URL.AUTH.UNAUTHOZIZED,
+        },
       ],
     },
   ],
@@ -150,12 +154,6 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
     {
       element: <ConfirmEmailPage />,
       path: ROUTER_URL.AUTH.CONFIRM_EMAIL,
-    },
-  ],
-  [ROUTER_URL.AUTH.UNAUTHOZIZED]: [
-    {
-      element: <UnauthorizedPage />,
-      path: ROUTER_URL.AUTH.UNAUTHOZIZED,
     },
   ],
   [ROUTER_URL.AUTH.NOT_FOUND]: [
