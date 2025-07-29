@@ -1,8 +1,8 @@
 import React from 'react';
 import { Tabs } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import ProfileTab from './ProfileTab';
-import PasswordTab from './PasswordTab';
+import ProfileTab from './ProfileTab.com';
+import PasswordTab from './PasswordTab.com';
 
 interface SettingsTabsProps {
     loading: boolean;

@@ -24,6 +24,22 @@ import { ROUTER_URL } from "../../consts/router.path.const";
 
 const { Sider } = Layout;
 
+// Hàm dùng chung cho focus effects
+const createFocusHandlers = (itemName: string) => ({
+    onFocus: (e: any) => {
+        e.target.style.transform = 'scale(1.01)';
+        e.target.style.transition = 'all 0.15s ease';
+        e.target.style.backgroundColor = 'rgba(24, 144, 255, 0.1)';
+        e.target.style.borderRadius = '6px';
+        console.log(`${itemName} item focused`);
+    },
+    onBlur: (e: any) => {
+        e.target.style.transform = 'scale(1)';
+        e.target.style.backgroundColor = 'transparent';
+        console.log(`${itemName} item blurred`);
+    }
+});
+
 const SidebarLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -67,72 +83,86 @@ const SidebarLayout: React.FC = () => {
             key: ROUTER_URL.MANAGER.BASE,
             icon: <DashboardOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.BASE}>Tổng quan</Link>,
+            ...createFocusHandlers('Manager Dashboard')
         },
         {
             key: ROUTER_URL.MANAGER.ANALYTICS,
             icon: <LineChartOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.ANALYTICS}>Phân tích dữ liệu</Link>,
+            ...createFocusHandlers('Manager Analytics')
         },
         {
             key: ROUTER_URL.MANAGER.USERS,
             icon: <TeamOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.USERS}>Quản lý nhân sự</Link>,
+            ...createFocusHandlers('Manager Users')
         },
-        // {
-        //     key: ROUTER_URL.MANAGER.CONSULTANTS,
-        //     icon: <UserOutlined />,
-        //     label: <Link to={ROUTER_URL.MANAGER.CONSULTANTS}>Quản lý tư vấn viên</Link>,
-        // },
         {
             key: ROUTER_URL.MANAGER.PROGRAMS,
             icon: <AppstoreOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.PROGRAMS}>Chương trình</Link>,
+            ...createFocusHandlers('Manager Programs')
         },
         {
             key: ROUTER_URL.MANAGER.SURVEYS,
             icon: <BookOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.SURVEYS}>Khảo sát</Link>,
+            ...createFocusHandlers('Manager Surveys')
         },
         {
             key: ROUTER_URL.MANAGER.COURSES,
             icon: <BookOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.COURSES}>Khóa học</Link>,
+            ...createFocusHandlers('Manager Courses')
         },
         {
             key: ROUTER_URL.MANAGER.REPORTS,
             icon: <BarChartOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.REPORTS}>Báo cáo</Link>,
+            ...createFocusHandlers('Manager Reports')
         },
         {
             key: ROUTER_URL.MANAGER.COMPLIANCE,
             icon: <SafetyOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.COMPLIANCE}>Tuân thủ</Link>,
+            ...createFocusHandlers('Manager Compliance')
         },
         {
             key: ROUTER_URL.MANAGER.OPERATIONS,
             icon: <BankOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.OPERATIONS}>Vận hành</Link>,
+            ...createFocusHandlers('Manager Operations')
         },
         {
             key: ROUTER_URL.MANAGER.SCHEDULE,
             icon: <CalendarOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.SCHEDULE}>Lịch hẹn tư vấn</Link>,
+            ...createFocusHandlers('Manager Schedule')
         },
         {
             key: ROUTER_URL.MANAGER.REVIEWS,
             icon: <FileTextOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.REVIEWS}>Đánh giá</Link>,
+            ...createFocusHandlers('Manager Reviews')
         },
         {
             key: ROUTER_URL.MANAGER.SETTINGS,
             icon: <SettingOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.SETTINGS}>Cài đặt</Link>,
+            ...createFocusHandlers('Manager Settings')
         },
     ];
 
     const getSelectedKey = () => {
         const path = location.pathname;
-        return menuItems.find(item => path.startsWith(item.key))?.key || ROUTER_URL.MANAGER.BASE;
+        // Cải thiện logic selection để tránh bug
+        const exactMatch = menuItems.find(item => path === item.key);
+        if (exactMatch) return exactMatch.key;
+
+        const startsWithMatch = menuItems.find(item => path.startsWith(item.key));
+        if (startsWithMatch) return startsWithMatch.key;
+
+        return ROUTER_URL.MANAGER.BASE;
     };
 
     return (
