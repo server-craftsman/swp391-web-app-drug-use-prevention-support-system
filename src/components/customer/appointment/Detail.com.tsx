@@ -10,11 +10,12 @@ import { ROUTER_URL } from '../../../consts/router.path.const';
 import { ReviewService } from '../../../services/review/review.service';
 import type { Review } from '../../../types/review/Review.res.type';
 import { ConsultantService } from '../../../services/consultant/consultant.service';
+import { UserService } from '../../../services/user/user.service';
 import type { Consultant } from '../../../types/consultant/consultant.res.type';
 import { useAuth } from '../../../contexts/Auth.context';
 import type { UpdateReviewRequest } from '../../../types/review/Review.req.type';
 import { UserRole } from '../../../app/enums/userRole.enum';
-
+import type { UserResponse } from '../../../types/user/User.res.type';
 const statusColorMap: Record<string, string> = {
     [AppointmentStatus.PENDING]: 'orange',
     [AppointmentStatus.CONFIRMED]: 'blue',
@@ -46,9 +47,21 @@ const AppointmentDetail: React.FC = () => {
     const [submitting, setSubmitting] = useState(false);
     const [editing, setEditing] = useState(false);
     const { userInfo, role } = useAuth();
+    const [user, setUser] = useState<UserResponse | null>(null);
+    const [reviewerUser, setReviewerUser] = useState<UserResponse | null>(null);
 
-    // Check if user can review/edit reviews
-    const canReview = role !== UserRole.MANAGER && role !== UserRole.CONSULTANT;
+    // Check if user can review/edit reviews based on role
+    const isCustomer = role === UserRole.CUSTOMER;
+    const isManager = role === UserRole.MANAGER;
+    const isConsultant = role === UserRole.CONSULTANT;
+
+    // Only customers can create/edit/delete their own reviews
+    const canCreateReview = isCustomer;
+    const canEditOwnReview = isCustomer && review && review.userId === userInfo?.id;
+    const canDeleteOwnReview = isCustomer && review && review.userId === userInfo?.id;
+
+    // All roles can view reviews, but with different UI
+    const canViewReviews = true;
 
     // Reset editing mode when review changes
     useEffect(() => {
@@ -122,10 +135,36 @@ const AppointmentDetail: React.FC = () => {
                     }
                 });
         }
-    }, [appointment]);
+        if (userInfo?.id) {
+            UserService.getUserById({ userId: userInfo.id })
+                .then(res => {
+                    if (res?.data?.success && res.data.data) {
+                        setUser(res.data.data);
+                    }
+                });
+        }
+    }, [appointment, userInfo?.id]);
+
+    // Fetch reviewer user info when review changes
+    useEffect(() => {
+        if (review?.userId) {
+            UserService.getUserById({ userId: review.userId })
+                .then(res => {
+                    if (res?.data?.success && res.data.data) {
+                        setReviewerUser(res.data.data);
+                    }
+                })
+                .catch(error => {
+                    console.log('Error fetching reviewer user:', error);
+                    setReviewerUser(null);
+                });
+        } else {
+            setReviewerUser(null);
+        }
+    }, [review?.userId]);
 
     const handleReviewSubmit = async (values: any) => {
-        if (!appointmentId || !userInfo?.id || !canReview) return;
+        if (!appointmentId || !userInfo?.id || !canCreateReview) return;
         setSubmitting(true);
         try {
             const res = await ReviewService.reviewAppointment({
@@ -150,15 +189,15 @@ const AppointmentDetail: React.FC = () => {
     };
 
     const handleEdit = () => {
-        if (review && canReview) {
+        if (review && canEditOwnReview) {
             reviewForm.setFieldsValue({ rating: review.rating, comment: review.comment });
             setEditing(true);
         }
     };
 
     const handleDelete = async () => {
-        if (!review || !review.id || !canReview) {
-            helpers.notificationMessage('Không tìm thấy ID đánh giá!', 'error');
+        if (!review || !review.id || !canDeleteOwnReview) {
+            helpers.notificationMessage('Bạn không có quyền xóa đánh giá này!', 'error');
             return;
         }
         setSubmitting(true);
@@ -181,8 +220,8 @@ const AppointmentDetail: React.FC = () => {
     };
 
     const handleEditSubmit = async (values: any) => {
-        if (!review || !review.id || !canReview) {
-            helpers.notificationMessage('Không tìm thấy ID đánh giá!', 'error');
+        if (!review || !review.id || !canEditOwnReview) {
+            helpers.notificationMessage('Bạn không có quyền chỉnh sửa đánh giá này!', 'error');
             return;
         }
         setSubmitting(true);
@@ -369,7 +408,11 @@ const AppointmentDetail: React.FC = () => {
                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                             </svg>
                                         </div>
-                                        <h3 className="text-2xl font-bold text-gray-800">Đánh giá cuộc hẹn</h3>
+                                        <h3 className="text-2xl font-bold text-gray-800">
+                                            {isCustomer ? 'Đánh giá cuộc hẹn' :
+                                                isManager ? 'Đánh giá từ khách hàng' :
+                                                    'Phản hồi từ khách hàng'}
+                                        </h3>
                                     </div>
 
                                     {reviewLoading ? (
@@ -380,7 +423,7 @@ const AppointmentDetail: React.FC = () => {
                                             </div>
                                         </div>
                                     ) : review ? (
-                                        editing && canReview ? (
+                                        editing && canEditOwnReview ? (
                                             <div className="max-w-2xl">
                                                 <Form
                                                     form={reviewForm}
@@ -442,11 +485,18 @@ const AppointmentDetail: React.FC = () => {
                                             </div>
                                         ) : (
                                             <div className="max-w-2xl">
-                                                <Card className="border-0 shadow-xl rounded-2xl overflow-hidden bg-gradient-to-br from-white to-gray-50">
+                                                <Card className={`border-0 shadow-xl rounded-2xl overflow-hidden ${isManager ? 'bg-gradient-to-br from-blue-50 to-indigo-50' :
+                                                    isConsultant ? 'bg-gradient-to-br from-green-50 to-emerald-50' :
+                                                        'bg-gradient-to-br from-white to-gray-50'
+                                                    }`}>
                                                     <div className="flex items-start gap-4 mb-6">
-                                                        <Avatar src={userInfo?.profilePicUrl} size={56} className="border-4 border-white shadow-lg" />
+                                                        <Avatar src={reviewerUser?.profilePicUrl} size={56} className="border-4 border-white shadow-lg" />
                                                         <div className="flex-1">
-                                                            <h4 className="font-semibold text-gray-800 text-lg mb-2">{userInfo?.fullName || 'Bạn'}</h4>
+                                                            <h4 className="font-semibold text-gray-800 text-lg mb-2">
+                                                                {isCustomer ? ('Bạn') :
+                                                                    reviewerUser ? (reviewerUser.fullName) :
+                                                                        'Khách hàng'}
+                                                            </h4>
                                                             <div className="flex items-center gap-3 mb-3">
                                                                 <Rate
                                                                     disabled
@@ -461,7 +511,7 @@ const AppointmentDetail: React.FC = () => {
                                                                 {dayjs(review.createdAt).format('DD/MM/YYYY HH:mm')}
                                                             </p>
                                                         </div>
-                                                        {canReview && (
+                                                        {canEditOwnReview && (
                                                             <div className="flex gap-2">
                                                                 <Button
                                                                     type="text"
@@ -489,7 +539,10 @@ const AppointmentDetail: React.FC = () => {
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-blue-500">
+                                                    <div className={`p-6 rounded-xl border-l-4 ${isManager ? 'bg-blue-50 border-blue-500' :
+                                                        isConsultant ? 'bg-green-50 border-green-500' :
+                                                            'bg-gray-50 border-blue-500'
+                                                        }`}>
                                                         <p className="text-gray-800 text-lg leading-relaxed italic">
                                                             "{review.comment || 'Chưa có nhận xét'}"
                                                         </p>
@@ -498,7 +551,7 @@ const AppointmentDetail: React.FC = () => {
                                             </div>
                                         )
                                     ) : (
-                                        canReview && (
+                                        canCreateReview ? (
                                             <div className="max-w-2xl">
                                                 <Form
                                                     form={reviewForm}
@@ -509,7 +562,7 @@ const AppointmentDetail: React.FC = () => {
                                                     <div className="flex items-center gap-4 mb-6 pb-6 border-b border-yellow-200">
                                                         <Avatar src={userInfo?.profilePicUrl} size={56} className="border-4 border-white shadow-lg" />
                                                         <div className="flex-1">
-                                                            <h4 className="font-semibold text-gray-800 text-lg">{userInfo?.fullName || 'Bạn'}</h4>
+                                                            <h4 className="font-semibold text-gray-800 text-lg">{userInfo?.firstName + ' ' + userInfo?.lastName || 'Bạn'}</h4>
                                                             <p className="text-gray-600">Chia sẻ trải nghiệm của bạn</p>
                                                         </div>
                                                     </div>
@@ -548,19 +601,28 @@ const AppointmentDetail: React.FC = () => {
                                                     </Button>
                                                 </Form>
                                             </div>
-                                        )
-                                    )}
-
-                                    {!canReview && !review && (
-                                        <div className="max-w-2xl">
-                                            <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-xl">
-                                                <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                                <h4 className="text-lg font-medium text-gray-700 mb-2">Chưa có đánh giá</h4>
-                                                <p className="text-gray-500">Cuộc hẹn này chưa được đánh giá</p>
+                                        ) : (
+                                            <div className="max-w-2xl">
+                                                <div className={`text-center py-12 rounded-xl ${isManager ? 'bg-blue-50 text-blue-600' :
+                                                    isConsultant ? 'bg-green-50 text-green-600' :
+                                                        'bg-gray-50 text-gray-500'
+                                                    }`}>
+                                                    <svg className="w-16 h-16 mx-auto mb-4 text-current opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                    <h4 className="text-lg font-medium mb-2">
+                                                        {isManager ? 'Chưa có đánh giá từ khách hàng' :
+                                                            isConsultant ? 'Chưa có phản hồi từ khách hàng' :
+                                                                'Chưa có đánh giá'}
+                                                    </h4>
+                                                    <p className="text-current opacity-75">
+                                                        {isManager ? 'Khách hàng chưa đánh giá cuộc hẹn này' :
+                                                            isConsultant ? 'Khách hàng chưa để lại phản hồi về dịch vụ tư vấn' :
+                                                                'Cuộc hẹn này chưa được đánh giá'}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )
                                     )}
                                 </div>
                             </div>
