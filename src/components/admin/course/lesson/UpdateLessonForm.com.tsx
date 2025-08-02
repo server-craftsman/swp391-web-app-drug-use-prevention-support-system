@@ -6,6 +6,7 @@ import type { Lesson } from "../../../../types/lesson/Lesson.res.type";
 import { useUpdateLesson } from "../../../../hooks/useLesson";
 import { BaseService } from "../../../../app/api/base.service";
 import { SessionService } from "../../../../services/session/session.service";
+import Editor from "../../../common/Editor.com";
 
 const { Option } = Select;
 
@@ -38,6 +39,16 @@ const UpdateLessonForm = ({
 
   const [fileVideo, setFileVideo] = useState<File | null>(null);
   const [previewVideoUrl, setPreviewVideoUrl] = useState("");
+
+  // Reset form fields when lesson type changes
+  const handleLessonTypeChange = (type: "text" | "image" | "video") => {
+    setLessonType(type);
+    setFileImage(null);
+    setFileVideo(null);
+    setPreviewImageUrl("");
+    setPreviewVideoUrl("");
+    form.setFieldValue('content', ''); // Reset content field
+  };
 
   useEffect(() => {
     if (!lesson) return;
@@ -104,6 +115,21 @@ const UpdateLessonForm = ({
       return;
     }
 
+    // Validation theo lesson type
+    if (lessonType === "text") {
+      if (!values.content?.trim()) {
+        return message.error("Vui lòng nhập nội dung mô tả.");
+      }
+    } else if (lessonType === "image") {
+      if (!fileImage && !previewImageUrl) {
+        return message.error("Vui lòng upload ảnh.");
+      }
+    } else if (lessonType === "video") {
+      if (!fileVideo && !previewVideoUrl) {
+        return message.error("Vui lòng upload video.");
+      }
+    }
+
     // Xử lý file upload tương ứng với lessonType
     let uploadedImageUrl = previewImageUrl;
     let uploadedVideoUrl = previewVideoUrl;
@@ -130,24 +156,11 @@ const UpdateLessonForm = ({
       }
     }
 
-    // Kiểm tra required đúng theo type
-    if (lessonType === "image" && !uploadedImageUrl) {
-      return message.error("Vui lòng upload ảnh.");
-    }
-
-    if (lessonType === "video" && !uploadedVideoUrl) {
-      return message.error("Vui lòng upload video.");
-    }
-
-    if (lessonType === "text" && !values.content?.trim()) {
-      return message.error("Vui lòng nhập nội dung mô tả.");
-    }
-
     updateLesson(
       {
         id: lesson.id,
         name: values.name,
-        content: values.content,
+        content: lessonType === "text" ? (values.content || "") : "",
         positionOrder: values.positionOrder,
         fullTime: 0,
         courseId: selectedCourseId,
@@ -201,7 +214,7 @@ const UpdateLessonForm = ({
       </Form.Item>
 
       <Form.Item label="Loại bài học" required>
-        <Select value={lessonType} onChange={setLessonType}>
+        <Select value={lessonType} onChange={handleLessonTypeChange}>
           <Option value="text">Text</Option>
           <Option value="image">Image</Option>
           <Option value="video">Video</Option>
@@ -216,47 +229,54 @@ const UpdateLessonForm = ({
         <Input />
       </Form.Item>
 
-      <Form.Item
-        name="content"
-        label="Mô tả"
-        rules={[{ required: false }]} // required thủ công theo type
-      >
-        <Input.TextArea rows={4} />
-      </Form.Item>
+      {/* Chỉ hiển thị description cho text type */}
+      {lessonType === "text" && (
+        <Form.Item
+          name="content"
+          label="Mô tả"
+          rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+        >
+          <Editor />
+        </Form.Item>
+      )}
 
-      {/* Upload ảnh luôn hiển thị */}
-      <Form.Item label="Upload ảnh">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-        />
-        {previewImageUrl && (
-          <img
-            src={previewImageUrl}
-            alt="preview"
-            className="mt-2 w-32 h-20 object-cover rounded border"
+      {/* Chỉ hiển thị image upload cho image type */}
+      {lessonType === "image" && (
+        <Form.Item label="Upload ảnh" required>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
-        )}
-      </Form.Item>
+          {previewImageUrl && (
+            <img
+              src={previewImageUrl}
+              alt="preview"
+              className="mt-2 w-32 h-20 object-cover rounded border"
+            />
+          )}
+        </Form.Item>
+      )}
 
-      {/* Upload video luôn hiển thị */}
-      <Form.Item label="Upload video">
-        <input
-          type="file"
-          accept="video/*"
-          onChange={handleVideoChange}
-          className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-        />
-        {previewVideoUrl && (
-          <video
-            controls
-            src={previewVideoUrl}
-            className="mt-2 w-64 h-36 rounded border"
+      {/* Chỉ hiển thị video upload cho video type */}
+      {lessonType === "video" && (
+        <Form.Item label="Upload video" required>
+          <input
+            type="file"
+            accept="video/*"
+            onChange={handleVideoChange}
+            className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
-        )}
-      </Form.Item>
+          {previewVideoUrl && (
+            <video
+              controls
+              src={previewVideoUrl}
+              className="mt-2 w-64 h-36 rounded border"
+            />
+          )}
+        </Form.Item>
+      )}
 
       <Form.Item
         name="positionOrder"
@@ -280,7 +300,7 @@ const UpdateLessonForm = ({
           htmlType="submit"
           loading={isPending}
           block
-          className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
+          className="w-full bg-primary text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
         >
           Cập nhật bài học
         </Button>

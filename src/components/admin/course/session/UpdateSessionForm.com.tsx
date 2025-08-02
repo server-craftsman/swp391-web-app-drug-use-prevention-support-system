@@ -5,6 +5,7 @@ import type { Session } from "../../../../types/session/Session.res.type";
 import { useUpdateSession } from "../../../../hooks/useSession";
 import type { UpdateSessionRequest } from "../../../../types/session/Session.req.type";
 import type { Course } from "../../../../types/course/Course.res.type"; // THÊM MỚI
+import Editor from "../../../common/Editor.com";
 
 // CẬP NHẬT: Thêm `courses` vào props
 interface UpdateSessionFormProps {
@@ -56,7 +57,7 @@ const UpdateSessionForm = ({
   return (
     <Form layout="vertical" form={form} onFinish={handleSubmit}>
       <h2 className="text-2xl font-bold text-[#20558A] mb-2 text-center">
-        Cập Nhập Buổi Học
+        Cập Nhập Phiên Học
       </h2>
       <Form.Item
         name="courseId"
@@ -85,7 +86,7 @@ const UpdateSessionForm = ({
       </Form.Item>
 
       <Form.Item name="content" label="Nội dung">
-        <Input.TextArea rows={4} />
+        <Editor />
       </Form.Item>
 
       <Form.Item
@@ -101,7 +102,7 @@ const UpdateSessionForm = ({
           type="primary"
           htmlType="submit"
           loading={updateSessionMutation.isPending}
-          className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
+          className="w-full bg-primary text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
         >
           Cập nhật
         </Button>

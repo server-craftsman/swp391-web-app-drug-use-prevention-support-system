@@ -88,7 +88,7 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
                         </Button>
                       )}
                       {/* Hiển thị ảnh nếu có */}
-                      {lecture.imageUrl && lecture.imageUrl !== "" && (
+                      {/* {lecture.imageUrl && lecture.imageUrl !== "" && (
                         <img
                           src={lecture.imageUrl}
                           alt={lecture.title}
@@ -101,7 +101,7 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
                             objectFit: "cover",
                           }}
                         />
-                      )}
+                      )} */}
                     </div>
                     <Text className="text-gray-600 text-sm">
                       {lecture.duration}

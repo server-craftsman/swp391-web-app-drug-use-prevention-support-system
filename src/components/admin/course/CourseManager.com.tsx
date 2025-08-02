@@ -132,8 +132,8 @@ const AdminCourseManager = () => {
             status === "published"
               ? "green"
               : status === "archived"
-              ? "orange"
-              : "default"
+                ? "orange"
+                : "default"
           }
         >
           {status?.toUpperCase()}
@@ -153,15 +153,6 @@ const AdminCourseManager = () => {
       key: "action",
       render: (_: any, record: Course) => (
         <div className="flex gap-2">
-          <Tooltip title="Cập nhật">
-            <Button
-              icon={<EditOutlined />}
-              shape="circle"
-              type="default"
-              size="small"
-              onClick={() => openUpdateModal(record)}
-            />
-          </Tooltip>
           <Tooltip title="Xem chi tiết">
             <Button
               icon={<EyeOutlined />}
@@ -172,6 +163,15 @@ const AdminCourseManager = () => {
                 setViewingCourseId(record.id);
                 setViewModalOpen(true);
               }}
+            />
+          </Tooltip>
+          <Tooltip title="Cập nhật">
+            <Button
+              icon={<EditOutlined />}
+              shape="circle"
+              type="default"
+              size="small"
+              onClick={() => openUpdateModal(record)}
             />
           </Tooltip>
           <Tooltip title="Xóa">
@@ -222,7 +222,7 @@ const AdminCourseManager = () => {
         {/* Bên phải: Nút tạo mới */}
         <Button
           type="primary"
-          className="bg-[#20558A]"
+          className="bg-primary"
           onClick={() => setShowCreateModal(true)}
         >
           Tạo khóa học mới
