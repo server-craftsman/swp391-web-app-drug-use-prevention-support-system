@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Button, Space, Tag, Card, Statistic, Row, Col, Tooltip, Badge } from "antd";
+import { Table, Input, Button, Space, Tag, Card, Statistic, Row, Col, Tooltip, Badge, Pagination } from "antd";
 import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, FilterOutlined, QuestionCircleOutlined, BarChartOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { QuestionResponse } from "../../../../types/question/Question.res.type";
 import { QuestionService } from "../../../../services/question/question.service";
 import type { SurveyResponse } from "../../../../types/survey/Survey.res.type";
+import type { SearchQuestionRequest } from "../../../../types/question/Question.req.type";
 import { QuestionType } from "../../../../app/enums/questionType.enum";
 import { helpers } from "../../../../utils";
 
@@ -39,66 +40,50 @@ const QuestionList: React.FC<Props> = ({ surveys, onLoadedQuestions, onSelectQue
     const fetchData = async () => {
         try {
             setLoading(true);
-            // Fetch questions for all surveys
-            const allQuestions: QuestionResponse[] = [];
 
-            for (const survey of surveys) {
-                try {
-                    const res = await QuestionService.getQuestionBySurveyId(survey.id);
-                    const questions = (res as any)?.data || [];
-                    allQuestions.push(...questions);
-                } catch (error) {
-                    console.error(`Error fetching questions for survey ${survey.id}:`, error);
-                }
+            // Use getAllQuestions without surveyId filter
+            const searchParams: SearchQuestionRequest = {
+                surveyId: "", // Empty string to get all questions
+                pageNumber: pageNumber,
+                pageSize: pageSize,
+                filter: filter,
+            };
+
+            const res = await QuestionService.getAllQuestions(searchParams);
+            const responseData = res?.data;
+
+            if (responseData && Array.isArray(responseData.data)) {
+                setData(responseData.data);
+                setTotal(responseData.totalCount || 0);
+                onLoadedQuestions?.(responseData.data);
+            } else {
+                console.warn("Unexpected response format:", responseData);
+                setData([]);
+                setTotal(0);
             }
-
-            // Apply filter if needed
-            const filteredQuestions = filter
-                ? allQuestions.filter(q =>
-                    q.questionContent.toLowerCase().includes(filter.toLowerCase()) ||
-                    q.questionType.toLowerCase().includes(filter.toLowerCase())
-                )
-                : allQuestions;
-
-            // Sort by survey name and position order
-            filteredQuestions.sort((a, b) => {
-                const surveyA = surveys.find(s => s.id === a.surveyId)?.name || '';
-                const surveyB = surveys.find(s => s.id === b.surveyId)?.name || '';
-
-                if (surveyA !== surveyB) {
-                    return surveyA.localeCompare(surveyB);
-                }
-                return a.positionOrder - b.positionOrder;
-            });
-
-            // Apply pagination
-            const startIndex = (pageNumber - 1) * pageSize;
-            const endIndex = startIndex + pageSize;
-            const paginatedData = filteredQuestions.slice(startIndex, endIndex);
-
-            setData(paginatedData);
-            setTotal(filteredQuestions.length);
-            onLoadedQuestions?.(paginatedData);
-        } catch {
+        } catch (error) {
+            console.error("Error fetching questions:", error);
             helpers.notificationMessage("Không thể tải câu hỏi", "error");
+            setData([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (surveys.length > 0) {
-            fetchData();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageNumber, pageSize, surveys]);
+        fetchData();
+    }, [pageNumber, pageSize, filter]);
 
-    /* Handle manual search click */
-    const handleSearchClick = () => {
-        if (pageNumber !== 1) {
-            setPageNumber(1); // useEffect will fetch
-        } else {
-            fetchData();
+    // Reset to first page when filter changes
+    useEffect(() => {
+        setPageNumber(1);
+    }, [filter]);
+
+    const handlePageChange = (page: number, size?: number) => {
+        setPageNumber(page);
+        if (size && size !== pageSize) {
+            setPageSize(size);
         }
     };
 
@@ -201,7 +186,7 @@ const QuestionList: React.FC<Props> = ({ surveys, onLoadedQuestions, onSelectQue
             width: 80,
             align: "center",
             render: (text: number) => (
-                <Badge count={text} showZero/>
+                <Badge count={text} showZero />
             )
         },
         {
@@ -281,10 +266,20 @@ const QuestionList: React.FC<Props> = ({ surveys, onLoadedQuestions, onSelectQue
                             valueStyle={{ color: '#3f87f5' }}
                             prefix={<QuestionCircleOutlined />}
                         />
-
-                    </Card>    
+                    </Card>
+                </Col>
+                <Col span={8}>
+                    <Card className="text-center border-0 shadow-sm hover:shadow-md transition-all duration-200">
+                        <Statistic
+                            title="Đang hiển thị"
+                            value={`${data.length}/${total}`}
+                            valueStyle={{ color: '#f59e0b' }}
+                            prefix={<QuestionCircleOutlined />}
+                        />
+                    </Card>
                 </Col>
             </Row>
+
             {/* Search and Filter Section */}
             <Card className="border-0 shadow-sm">
                 <div className="flex gap-4 items-center flex-wrap">
@@ -301,11 +296,11 @@ const QuestionList: React.FC<Props> = ({ surveys, onLoadedQuestions, onSelectQue
                     <Button
                         type="primary"
                         icon={<FilterOutlined />}
-                        onClick={handleSearchClick}
+                        onClick={() => setFilter("")}
                         size="large"
                         className="bg-primary hover:bg-primary/90 border-0 shadow-sm hover:shadow-md transition-all duration-200 h-12 px-6 rounded-xl"
                     >
-                        Lọc
+                        Xóa bộ lọc
                     </Button>
                 </div>
             </Card>
@@ -321,25 +316,28 @@ const QuestionList: React.FC<Props> = ({ surveys, onLoadedQuestions, onSelectQue
                         onClick: () => onSelectQuestion?.(record),
                         className: "hover:bg-blue-50 transition-all duration-200 cursor-pointer"
                     })}
-                    pagination={{
-                        current: pageNumber,
-                        pageSize,
-                        total,
-                        showSizeChanger: true,
-                        showQuickJumper: true,
-                        showTotal: (total, range) => (
-                            <span className="text-sm text-gray-600">
-                                Hiển thị <span className="font-semibold">{range[0]}-{range[1]}</span> trong tổng số <span className="font-semibold">{total}</span> câu hỏi
-                            </span>
-                        ),
-                        onChange: (p, s) => {
-                            setPageNumber(p);
-                            setPageSize(s || pageSizeDefault);
-                        },
-                        className: "mt-6",
-                    }}
+                    pagination={false}
                     className="custom-table"
                 />
+
+                {/* Pagination */}
+                {total > pageSize && (
+                    <div className="flex justify-center mt-6">
+                        <Pagination
+                            current={pageNumber}
+                            total={total}
+                            pageSize={pageSize}
+                            onChange={handlePageChange}
+                            showSizeChanger
+                            showQuickJumper
+                            showTotal={(total, range) =>
+                                `${range[0]}-${range[1]} của ${total} câu hỏi`
+                            }
+                            pageSizeOptions={['5', '10', '20', '50']}
+                            className="custom-pagination"
+                        />
+                    </div>
+                )}
             </Card>
 
             {/* Modals */}

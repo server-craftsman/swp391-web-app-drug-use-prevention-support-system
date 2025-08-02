@@ -6,7 +6,7 @@ import { SessionService } from "../../../../services/session/session.service";
 import type { CreateLessonRequest } from "../../../../types/lesson/Lesson.req.type";
 import type { Course } from "../../../../types/course/Course.res.type";
 import type { Session } from "../../../../types/session/Session.res.type";
-
+import Editor from "../../../common/Editor.com";
 const { Option } = Select;
 
 interface CreateLessonFormProps {
@@ -33,6 +33,14 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const createLesson = useCreateLesson();
+
+  // Reset form fields when lesson type changes
+  const handleLessonTypeChange = (type: "text" | "image" | "video") => {
+    setLessonType(type);
+    setFile(null);
+    setPreviewFileUrl("");
+    form.setFieldValue('content', ''); // Reset content field
+  };
 
   useEffect(() => {
     if (selectedCourseId) {
@@ -76,13 +84,18 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
       message.error("Vui lòng chọn phiên học");
       return;
     }
-    if (!values.content || values.content.trim() === "") {
-      message.error("Vui lòng nhập mô tả bài học");
-      return;
-    }
-    if ((lessonType === "image" || lessonType === "video") && !file) {
-      message.error(`Vui lòng upload file ${lessonType}`);
-      return;
+
+    // Validation theo lesson type
+    if (lessonType === "text") {
+      if (!values.content || values.content.trim() === "") {
+        message.error("Vui lòng nhập mô tả bài học");
+        return;
+      }
+    } else if (lessonType === "image" || lessonType === "video") {
+      if (!file) {
+        message.error(`Vui lòng upload file ${lessonType === "image" ? "ảnh" : "video"}`);
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -103,7 +116,7 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
 
     const payload: CreateLessonRequest = {
       name: values.name,
-      content: values.content || "",
+      content: lessonType === "text" ? (values.content || "") : "",
       positionOrder: values.positionOrder || 0,
       fullTime: 0,
       courseId: selectedCourseId,
@@ -169,7 +182,7 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
       </Form.Item>
 
       <Form.Item label="Loại bài học" required>
-        <Select value={lessonType} onChange={setLessonType}>
+        <Select value={lessonType} onChange={handleLessonTypeChange}>
           <Option value="text">Text</Option>
           <Option value="image">Image</Option>
           <Option value="video">Video</Option>
@@ -184,14 +197,18 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
         <Input />
       </Form.Item>
 
-      <Form.Item
-        label="Mô tả"
-        name="content"
-        rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
-      >
-        <Input.TextArea rows={4} />
-      </Form.Item>
+      {/* Chỉ hiển thị description cho text type */}
+      {lessonType === "text" && (
+        <Form.Item
+          label="Mô tả"
+          name="content"
+          rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+        >
+          <Editor />
+        </Form.Item>
+      )}
 
+      {/* Chỉ hiển thị image upload cho image type */}
       {lessonType === "image" && (
         <Form.Item label="Upload ảnh" required>
           <input
@@ -210,6 +227,7 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
         </Form.Item>
       )}
 
+      {/* Chỉ hiển thị video upload cho video type */}
       {lessonType === "video" && (
         <Form.Item label="Upload video" required>
           <input
@@ -250,7 +268,7 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
           htmlType="submit"
           loading={isSubmitting}
           block
-          className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
+          className="w-full bg-primary text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
         >
           Tạo bài học
         </Button>

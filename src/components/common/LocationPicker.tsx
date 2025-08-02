@@ -2,10 +2,25 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Input, Button, Modal, Space, Tabs, message, Spin } from 'antd';
 import { EnvironmentOutlined, SearchOutlined, GlobalOutlined, LoadingOutlined, AimOutlined } from '@ant-design/icons';
 
+/**
+ * LOCATION PICKER COMPONENT - CHỌN ĐỊA ĐIỂM
+ * 
+ * Component này cho phép người dùng chọn địa điểm theo nhiều cách:
+ * 1. Tự động lấy vị trí GPS hiện tại
+ * 2. Tìm kiếm địa điểm trên bản đồ
+ * 3. Click trực tiếp trên bản đồ để chọn vị trí chính xác
+ * 
+ * Đặc điểm chính:
+ * - Tích hợp Google Maps để hiển thị bản đồ
+ * - Reverse geocoding để chuyển tọa độ thành địa chỉ tiếng Việt
+ * - Hỗ trợ GPS để lấy vị trí hiện tại
+ * - Giao diện thân thiện với tabs để chuyển đổi giữa các chế độ
+ */
+
 interface LocationPickerProps {
-    value?: string;
-    onChange?: (value: string) => void;
-    placeholder?: string;
+    value?: string;              // Giá trị địa chỉ hiện tại
+    onChange?: (value: string) => void;  // Callback khi thay đổi địa chỉ
+    placeholder?: string;        // Text hiển thị khi chưa có giá trị
 }
 
 const LocationPicker: React.FC<LocationPickerProps> = ({
@@ -13,33 +28,49 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     onChange,
     placeholder = "Chọn địa điểm..."
 }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState<string>(value || '');
-    const [mapLocation, setMapLocation] = useState<string>('');
-    const [activeTab, setActiveTab] = useState<string>('map');
-    const [clickedCoords, setClickedCoords] = useState<{ lat: number, lng: number } | null>(null);
-    const [isGeocodingLoading, setIsGeocodingLoading] = useState(false);
-    const [isGPSLoading, setIsGPSLoading] = useState(false);
-    const [currentGPSLocation, setCurrentGPSLocation] = useState<{ lat: number, lng: number } | null>(null);
+    // ========== STATES QUẢN LÝ MODAL VÀ GIAO DIỆN ==========
+    const [isModalOpen, setIsModalOpen] = useState(false);               // Modal mở/đóng
+    const [selectedLocation, setSelectedLocation] = useState<string>(value || '');  // Địa chỉ đã chọn
+    const [mapLocation, setMapLocation] = useState<string>('');          // Địa điểm tìm kiếm trên bản đồ
+    const [activeTab, setActiveTab] = useState<string>('map');           // Tab hiện tại (chỉ có bản đồ)
+    
+    // ========== STATES QUẢN LÝ TỌA ĐỘ VÀ GPS ==========
+    const [clickedCoords, setClickedCoords] = useState<{ lat: number, lng: number } | null>(null);  // Tọa độ được click
+    const [currentGPSLocation, setCurrentGPSLocation] = useState<{ lat: number, lng: number } | null>(null);  // Vị trí GPS hiện tại
+    
+    // ========== STATES QUẢN LÝ LOADING ==========
+    const [isGeocodingLoading, setIsGeocodingLoading] = useState(false); // Loading khi chuyển tọa độ thành địa chỉ
+    const [isGPSLoading, setIsGPSLoading] = useState(false);             // Loading khi lấy GPS
+    
+    // ========== REF CHO MAP CONTAINER ==========
     const mapContainerRef = useRef<HTMLDivElement>(null);
 
-    // Check if GPS is available
+    /**
+     * KIỂM TRA GPS CÓ KHẢ DỤNG KHÔNG
+     * Kiểm tra xem trình duyệt có hỗ trợ geolocation API hay không
+     */
     const isGPSAvailable = () => {
         return navigator.geolocation && navigator.geolocation.getCurrentPosition;
     };
 
-    // Get current GPS location
+    /**
+     * LẤY VỊ TRÍ GPS HIỆN TẠI
+     * Sử dụng Geolocation API để lấy tọa độ GPS của thiết bị
+     * Trả về Promise với {lat, lng} hoặc throw error nếu thất bại
+     */
     const getCurrentLocation = (): Promise<{ lat: number, lng: number }> => {
         return new Promise((resolve, reject) => {
+            // Kiểm tra GPS có khả dụng không
             if (!isGPSAvailable()) {
                 reject(new Error('Trình duyệt không hỗ trợ GPS'));
                 return;
             }
 
+            // Cấu hình GPS với độ chính xác cao
             const options = {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 60000
+                enableHighAccuracy: true,    // Yêu cầu độ chính xác cao (GPS thay vì WiFi/Cell)
+                timeout: 10000,              // Timeout 10 giây
+                maximumAge: 60000            // Cache vị trí trong 1 phút
             };
 
             navigator.geolocation.getCurrentPosition(
@@ -48,6 +79,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                     resolve({ lat: latitude, lng: longitude });
                 },
                 (error) => {
+                    // Xử lý các loại lỗi GPS khác nhau
                     let errorMessage = 'Không thể lấy vị trí hiện tại';
                     switch (error.code) {
                         case error.PERMISSION_DENIED:
@@ -67,19 +99,26 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         });
     };
 
-    // Handle getting current location
+    /**
+     * XỬ LÝ NÚT "VỊ TRÍ HIỆN TẠI"
+     * 1. Lấy tọa độ GPS
+     * 2. Chuyển tọa độ thành địa chỉ chi tiết
+     * 3. Hiển thị trên bản đồ
+     * 4. Tự động chuyển sang tab bản đồ
+     */
     const handleGetCurrentLocation = async () => {
         setIsGPSLoading(true);
         try {
+            // Lấy tọa độ GPS
             const coords = await getCurrentLocation();
             setCurrentGPSLocation(coords);
 
-            // Get address from coordinates
+            // Chuyển tọa độ thành địa chỉ
             const address = await reverseGeocode(coords.lat, coords.lng);
             setSelectedLocation(address);
             setMapLocation(address);
 
-            // Switch to map tab to show the location
+            // Chuyển sang tab bản đồ để hiển thị
             setActiveTab('map');
 
             message.success('Đã lấy vị trí hiện tại thành công!');
@@ -90,11 +129,23 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         }
     };
 
-    // Reverse geocoding function to get address from coordinates
+    /**
+     * REVERSE GEOCODING - CHUYỂN TỌA ĐỘ THÀNH ĐỊA CHỈ
+     * Sử dụng OpenStreetMap Nominatim API (miễn phí) để:
+     * 1. Gửi request với tọa độ lat, lng
+     * 2. Nhận về thông tin địa chỉ chi tiết
+     * 3. Format theo chuẩn địa chỉ Việt Nam
+     * 
+     * Format địa chỉ: Số nhà + Đường, Phường/Xã, Quận/Huyện, Thành phố, Quốc gia
+     */
     const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
         setIsGeocodingLoading(true);
         try {
-            // Using free Nominatim service for reverse geocoding
+            // Gọi API Nominatim với các tham số:
+            // - format=json: trả về JSON
+            // - zoom=18: độ chi tiết cao nhất
+            // - addressdetails=1: bao gồm chi tiết địa chỉ
+            // - accept-language=vi: ưu tiên tiếng Việt
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=vi`
             );
@@ -102,22 +153,22 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
             if (response.ok) {
                 const data = await response.json();
                 if (data && data.display_name) {
-                    // Try to get a more formatted address
+                    // Lấy object address chứa các thành phần địa chỉ
                     const address = data.address;
                     let formattedAddress = '';
 
                     if (address) {
-                        // Build Vietnamese style address
+                        // Xây dựng địa chỉ theo chuẩn Việt Nam
                         const parts = [];
 
-                        // House number and road
+                        // Số nhà và tên đường
                         if (address.house_number && address.road) {
                             parts.push(`${address.house_number} ${address.road}`);
                         } else if (address.road) {
                             parts.push(address.road);
                         }
 
-                        // Suburb, quarter, or neighbourhood
+                        // Phường/Xã (suburb, quarter, neighbourhood)
                         if (address.suburb) {
                             parts.push(address.suburb);
                         } else if (address.quarter) {
@@ -126,36 +177,37 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                             parts.push(address.neighbourhood);
                         }
 
-                        // District/City district
+                        // Quận/Huyện
                         if (address.city_district) {
                             parts.push(address.city_district);
                         } else if (address.county) {
                             parts.push(address.county);
                         }
 
-                        // City/State
+                        // Thành phố/Tỉnh
                         if (address.city) {
                             parts.push(address.city);
                         } else if (address.state) {
                             parts.push(address.state);
                         }
 
-                        // Country
+                        // Quốc gia (chỉ hiển thị nếu là Việt Nam)
                         if (address.country && address.country === 'Việt Nam') {
                             parts.push('Việt Nam');
                         }
 
+                        // Nối các phần bằng dấu phẩy
                         formattedAddress = parts.join(', ');
                     }
 
-                    // Fallback to display_name if formatted address is empty
+                    // Fallback về display_name nếu không format được
                     const finalAddress = formattedAddress || data.display_name;
                     setIsGeocodingLoading(false);
                     return finalAddress;
                 }
             }
 
-            // Fallback if geocoding fails
+            // Fallback nếu API thất bại - hiển thị tọa độ
             setIsGeocodingLoading(false);
             return `Vị trí: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
@@ -166,6 +218,10 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         }
     };
 
+    /**
+     * XỬ LÝ NÚT "XÁC NHẬN" TRONG MODAL
+     * Gọi onChange callback với địa chỉ đã chọn và đóng modal
+     */
     const handleOk = () => {
         if (onChange && selectedLocation) {
             onChange(selectedLocation);
@@ -173,6 +229,10 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         setIsModalOpen(false);
     };
 
+    /**
+     * XỬ LÝ NÚT "HỦY" TRONG MODAL
+     * Reset về trạng thái ban đầu và đóng modal
+     */
     const handleCancel = () => {
         setSelectedLocation(value || '');
         setMapLocation('');
@@ -180,6 +240,10 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         setIsModalOpen(false);
     };
 
+    /**
+     * XỬ LÝ MỞ MODAL
+     * Khởi tạo các giá trị từ props và mở modal
+     */
     const handleModalOpen = () => {
         setSelectedLocation(value || '');
         setMapLocation(value || '');
@@ -187,26 +251,43 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         setIsModalOpen(true);
     };
 
+    /**
+     * XỬ LÝ THAY ĐỔI INPUT TÌM KIẾM
+     * Cập nhật state khi người dùng nhập địa điểm để tìm kiếm
+     */
     const handleMapLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const location = e.target.value;
         setMapLocation(location);
     };
 
-    // Search location and update map
+    /**
+     * TÌM KIẾM ĐỊA ĐIỂM
+     * Cập nhật bản đồ với địa điểm mới được tìm kiếm
+     */
     const searchLocation = (query: string) => {
         if (!query.trim()) return;
         setMapLocation(query);
     };
 
-    // Handle map iframe load and setup click detection
+    /**
+     * THIẾT LẬP PHÁT HIỆN CLICK TRÊN BẢN ĐỒ
+     * 
+     * Cách hoạt động:
+     * 1. Tạo một div overlay trong suốt phủ lên bản đồ
+     * 2. Bắt sự kiện click trên overlay
+     * 3. Tính toán tọa độ dựa trên vị trí click
+     * 4. Gọi reverse geocoding để lấy địa chỉ
+     * 
+     * Lưu ý: Đây là cách tiếp cận đơn giản vì không thể tương tác trực tiếp
+     * với Google Maps iframe từ domain khác (CORS policy)
+     */
     useEffect(() => {
         if (isModalOpen && activeTab === 'map') {
-            // Setup map click detection using a simple overlay approach
             const setupMapClickDetection = () => {
                 const mapContainer = mapContainerRef.current;
                 if (!mapContainer) return;
 
-                // Create an invisible overlay for click detection
+                // Tạo overlay trong suốt để bắt click
                 const overlay = document.createElement('div');
                 overlay.style.position = 'absolute';
                 overlay.style.top = '0';
@@ -218,30 +299,31 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                 overlay.style.backgroundColor = 'transparent';
 
                 overlay.addEventListener('click', async (e) => {
+                    // Tính toán vị trí click tương đối
                     const rect = overlay.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
 
-                    // Calculate approximate coordinates based on click position
-                    // This is a simple approximation for the visible map area
+                    // Kích thước overlay
                     const mapWidth = rect.width;
                     const mapHeight = rect.height;
 
-                    // Base coordinates for the current map center (default Ho Chi Minh City)
+                    // Tọa độ trung tâm mặc định (TP.HCM)
                     const baseLat = 10.8231;
                     const baseLng = 106.6297;
 
-                    // Calculate approximate lat/lng based on click position
-                    // Adjust range based on zoom level (zoom 15 shows roughly 0.02 degrees)
-                    const latRange = 0.02; // Approximate range visible on map at zoom 15
+                    // Tính toán tọa độ gần đúng dựa trên vị trí click
+                    // Giả định map hiển thị khoảng 0.02 độ ở zoom level 15
+                    const latRange = 0.02;
                     const lngRange = 0.02;
 
+                    // Chuyển đổi vị trí pixel thành tọa độ
                     const clickLat = baseLat + ((mapHeight / 2 - y) / mapHeight) * latRange;
                     const clickLng = baseLng + ((x - mapWidth / 2) / mapWidth) * lngRange;
 
                     setClickedCoords({ lat: clickLat, lng: clickLng });
 
-                    // Get detailed address from coordinates
+                    // Lấy địa chỉ chi tiết từ tọa độ
                     message.loading('Đang tìm địa chỉ...', 0.5);
                     const detailedAddress = await reverseGeocode(clickLat, clickLng);
                     setSelectedLocation(detailedAddress);
@@ -249,9 +331,11 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                     message.success('Đã chọn địa điểm và lấy địa chỉ chi tiết!');
                 });
 
+                // Thêm overlay vào container
                 mapContainer.style.position = 'relative';
                 mapContainer.appendChild(overlay);
 
+                // Cleanup function
                 return () => {
                     if (mapContainer.contains(overlay)) {
                         mapContainer.removeChild(overlay);
@@ -259,15 +343,18 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                 };
             };
 
+            // Delay để đảm bảo iframe đã load
             const timer = setTimeout(setupMapClickDetection, 1000);
             return () => clearTimeout(timer);
         }
     }, [isModalOpen, activeTab, mapLocation]);
 
-    // Auto get current location when modal opens
+    /**
+     * TỰ ĐỘNG LẤY VỊ TRÍ GPS KHI MỞ MODAL
+     * Nếu chưa có giá trị và modal được mở, tự động lấy GPS sau 1 giây
+     */
     useEffect(() => {
         if (isModalOpen && !value) {
-            // Auto get current location after a short delay
             const timer = setTimeout(() => {
                 handleGetCurrentLocation();
             }, 1000);
@@ -276,6 +363,10 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         }
     }, [isModalOpen]);
 
+    /**
+     * CẤU HÌNH TABS CHO MODAL
+     * Hiện tại chỉ có 1 tab "Bản đồ" nhưng có thể mở rộng thêm các tab khác
+     */
     const tabItems = [
         {
             key: 'map',
@@ -287,6 +378,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
             ),
             children: (
                 <>
+                    {/* THANH TÌM KIẾM VÀ BUTTONS */}
                     <div style={{ marginBottom: 16 }}>
                         <Space.Compact style={{ width: '100%' }}>
                             <Input
@@ -300,7 +392,6 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                             <Button
                                 type="primary"
                                 onClick={() => searchLocation(mapLocation)}
-                                // style={{ backgroundColor: '#20558A' }}
                                 className='bg-primary p-5'
                             >
                                 Tìm
@@ -319,7 +410,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                         </Space.Compact>
                     </div>
 
-                    {/* GPS Location Info */}
+                    {/* HIỂN THỊ THÔNG TIN GPS HIỆN TẠI */}
                     {currentGPSLocation && (
                         <div style={{
                             marginBottom: 16,
@@ -341,7 +432,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                         </div>
                     )}
 
-                    {/* GPS Not Available Warning */}
+                    {/* CẢNH BÁO GPS KHÔNG KHẢ DỤNG */}
                     {!isGPSAvailable() && (
                         <div style={{
                             marginBottom: 16,
@@ -362,6 +453,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                         </div>
                     )}
 
+                    {/* CONTAINER BẢN ĐỒ VỚI OVERLAY */}
                     <div
                         ref={mapContainerRef}
                         style={{
@@ -374,6 +466,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                     >
                         {mapLocation ? (
                             <>
+                                {/* GOOGLE MAPS IFRAME */}
                                 <iframe
                                     src={`https://maps.google.com/maps?q=${encodeURIComponent(mapLocation)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                                     width="100%"
@@ -383,6 +476,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                                     loading="lazy"
                                     referrerPolicy="no-referrer-when-downgrade"
                                 />
+                                
+                                {/* HƯỚNG DẪN CLICK */}
                                 <div
                                     style={{
                                         position: 'absolute',
@@ -399,6 +494,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                                 >
                                     🎯 Click trên bản đồ để chọn địa chỉ
                                 </div>
+                                
+                                {/* LOADING INDICATOR KHI ĐANG LẤY ĐỊA CHỈ */}
                                 {isGeocodingLoading && (
                                     <div
                                         style={{
@@ -418,6 +515,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                                         <span style={{ marginLeft: 8 }}>Đang lấy địa chỉ...</span>
                                     </div>
                                 )}
+                                
+                                {/* THÔNG BÁO THÀNH CÔNG */}
                                 {clickedCoords && !isGeocodingLoading && (
                                     <div
                                         style={{
@@ -439,6 +538,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                                 )}
                             </>
                         ) : (
+                            // PLACEHOLDER KHI CHƯA CÓ ĐỊA ĐIỂM
                             <div style={{
                                 height: '400px',
                                 display: 'flex',
@@ -456,6 +556,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                         )}
                     </div>
 
+                    {/* HƯỚNG DẪN CHI TIẾT */}
                     <div style={{
                         padding: 12,
                         backgroundColor: '#fff7e6',
@@ -490,6 +591,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
 
     return (
         <>
+            {/* INPUT CHÍNH - HIỂN THỊ ĐỊA CHỈ ĐÃ CHỌN */}
             <Input
                 value={value}
                 placeholder={placeholder}
@@ -505,6 +607,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                 style={{ cursor: 'pointer' }}
             />
 
+            {/* MODAL CHỌN ĐỊA ĐIỂM */}
             <Modal
                 title="Chọn địa điểm trên bản đồ"
                 open={isModalOpen}
@@ -521,6 +624,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                     items={tabItems}
                 />
 
+                {/* HIỂN THỊ ĐỊA CHỈ ĐÃ CHỌN */}
                 {selectedLocation && (
                     <div style={{
                         marginTop: 16,
@@ -553,4 +657,4 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     );
 };
 
-export default LocationPicker; 
+export default LocationPicker;

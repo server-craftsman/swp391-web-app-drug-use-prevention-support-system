@@ -70,6 +70,7 @@ export const ROUTER_URL = {
     PROGRAMS: "/manager/chuong-trinh",
     SURVEYS: "/manager/khao-sat",
     COURSES: "/manager/khoa-hoc",
+    CATEGORIES: "/manager/danh-muc",
     REPORTS: "/manager/bao-cao",
     COMPLIANCE: "/manager/phap-luat",
     OPERATIONS: "/manager/hoat-dong",

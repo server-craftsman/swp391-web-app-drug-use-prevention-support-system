@@ -2,6 +2,7 @@ import { Form, Input, Button, message, Select } from "antd";
 import { useCreateSession } from "../../../../hooks/useSession";
 import type { CreateSessionRequest } from "../../../../types/session/Session.req.type";
 import type { Course } from "../../../../types/course/Course.res.type";
+import Editor from "../../../common/Editor.com";
 
 interface CreateSessionFormProps {
   courses: Course[];
@@ -49,7 +50,7 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
   return (
     <Form form={form} layout="vertical" onFinish={onFinish}>
       <h2 className="text-2xl font-bold text-[#20558A] mb-2 text-center">
-        Tạo Buổi Học Mới
+        Tạo Phiên Học Mới
       </h2>
       <Form.Item
         label="Khóa học"
@@ -66,7 +67,7 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
       </Form.Item>
 
       <Form.Item
-        label="Tên Buổi Học"
+        label="Tên Phiên Học"
         name="name"
         rules={[{ required: true, message: "Vui lòng nhập tên phiên học" }]}
       >
@@ -78,7 +79,7 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
         name="content"
         rules={[{ required: true, message: "Vui lòng nhập nội dung" }]}
       >
-        <Input.TextArea rows={4} placeholder="Nhập nội dung phiên học" />
+        <Editor />
       </Form.Item>
 
       <Form.Item
@@ -95,7 +96,7 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
           htmlType="submit"
           loading={createSessionMutation.isPending}
           block
-          className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
+          className="w-full bg-primary text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
         >
           Tạo phiên học
         </Button>

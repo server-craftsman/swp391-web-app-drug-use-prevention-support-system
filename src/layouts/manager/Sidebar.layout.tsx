@@ -110,6 +110,12 @@ const SidebarLayout: React.FC = () => {
             ...createFocusHandlers('Manager Surveys')
         },
         {
+            key: ROUTER_URL.MANAGER.CATEGORIES,
+            icon: <AppstoreOutlined />,
+            label: <Link to={ROUTER_URL.MANAGER.CATEGORIES}>Danh mục</Link>,
+            ...createFocusHandlers('Manager Categories')
+        },
+        {
             key: ROUTER_URL.MANAGER.COURSES,
             icon: <BookOutlined />,
             label: <Link to={ROUTER_URL.MANAGER.COURSES}>Khóa học</Link>,
