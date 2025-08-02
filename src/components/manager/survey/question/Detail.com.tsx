@@ -1,9 +1,13 @@
-import React from "react";
-import { Drawer, Descriptions, Tag, Button, Card, Statistic, Row, Col, Badge } from "antd";
-import { EditOutlined, QuestionCircleOutlined, FileTextOutlined, BarChartOutlined, NumberOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { Drawer, Descriptions, Tag, Button, Card, Statistic, Row, Col, Badge, Table, Avatar, Empty } from "antd";
+import { EditOutlined, QuestionCircleOutlined, FileTextOutlined, BarChartOutlined, NumberOutlined, CheckCircleOutlined, StarOutlined } from "@ant-design/icons";
 import { QuestionType } from "../../../../app/enums/questionType.enum";
 import type { QuestionResponse } from "../../../../types/question/Question.res.type";
 import type { SurveyResponse } from "../../../../types/survey/Survey.res.type";
+import type { AnswerResponse } from "../../../../types/answer/Answer.res.type";
+import { AnswerService } from "../../../../services/answer/answer.service";
+import type { SearchAnswerRequest } from "../../../../types/answer/Answer.req.type";
+import { helpers } from "../../../../utils";
 
 interface Props {
     open: boolean;
@@ -14,6 +18,45 @@ interface Props {
 }
 
 const QuestionDetailDrawer: React.FC<Props> = ({ open, questionData, surveys, onClose, onEdit }) => {
+    const [answers, setAnswers] = useState<AnswerResponse[]>([]);
+    const [loadingAnswers, setLoadingAnswers] = useState(false);
+
+    // Fetch answers when question data changes
+    useEffect(() => {
+        if (open && questionData) {
+            fetchAnswers();
+        }
+    }, [open, questionData]);
+
+    const fetchAnswers = async () => {
+        if (!questionData) return;
+
+        try {
+            setLoadingAnswers(true);
+            const searchParams: SearchAnswerRequest = {
+                questionId: questionData.id,
+                pageNumber: 1,
+                pageSize: 1000, // Get all answers for this question
+                filter: "",
+                filterByScore: 0
+            };
+
+            const res = await AnswerService.getAllAnswers(searchParams);
+            const responseData = res?.data;
+
+            if (responseData && Array.isArray(responseData.data)) {
+                setAnswers(responseData.data);
+            } else {
+                setAnswers([]);
+            }
+        } catch (error) {
+            console.error("Error fetching answers:", error);
+            helpers.notificationMessage("Không thể tải danh sách đáp án", "error");
+            setAnswers([]);
+        } finally {
+            setLoadingAnswers(false);
+        }
+    };
 
     const getQuestionTypeDisplay = (type: QuestionType) => {
         switch (type) {
@@ -54,6 +97,64 @@ const QuestionDetailDrawer: React.FC<Props> = ({ open, questionData, surveys, on
         }
     };
 
+    // Table columns for answers
+    const answerColumns = [
+        {
+            title: <span className="font-semibold text-gray-700">Phương án</span>,
+            dataIndex: "optionContent",
+            key: "optionContent",
+            render: (html: string, record: AnswerResponse) => (
+                <div className="flex items-center gap-3">
+                    <Avatar
+                        size={40}
+                        style={{
+                            backgroundColor: '#10b981',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '16px'
+                        }}
+                    >
+                        <CheckCircleOutlined />
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-800 mb-1">
+                            <span className="text-green-500 mr-2">#{record.positionOrder}</span>
+                            <span className="truncate" dangerouslySetInnerHTML={{ __html: html }} />
+                        </div>
+                        <div className="text-sm text-gray-500 flex items-center gap-2">
+                            <Tag color="green" className="text-xs">
+                                <StarOutlined className="mr-1" />
+                                {record.score} điểm
+                            </Tag>
+                        </div>
+                    </div>
+                </div>
+            ),
+        },
+        {
+            title: <span className="font-semibold text-gray-700">Điểm</span>,
+            dataIndex: "score",
+            key: "score",
+            width: 100,
+            render: (score: number) => (
+                <Tag color="green" className="px-3 py-1 rounded-full font-medium">
+                    <StarOutlined className="mr-1" />
+                    {score}
+                </Tag>
+            ),
+        },
+        {
+            title: <span className="font-semibold text-gray-700">Thứ tự</span>,
+            dataIndex: "positionOrder",
+            key: "positionOrder",
+            width: 100,
+            render: (order: number) => (
+                <Badge count={order} showZero />
+            ),
+        },
+    ];
+
     return (
         <Drawer
             title={
@@ -83,36 +184,36 @@ const QuestionDetailDrawer: React.FC<Props> = ({ open, questionData, surveys, on
                     padding: '24px 32px 0'
                 }
             }}
-            // extra={
-            //     <div className="flex gap-2">
-            //         {questionData && onEdit && (
-            //             <Button
-            //                 type="primary"
-            //                 icon={<EditOutlined />}
-            //                 onClick={handleEdit}
-            //                 size="large"
-            //                 className="bg-blue-500 hover:bg-blue-600 border-0 shadow-sm hover:shadow-md transition-all duration-200"
-            //             >
-            //                 Chỉnh sửa
-            //             </Button>
-            //         )}
-            //         <Button
-            //             icon={<CloseOutlined />}
-            //             onClick={onClose}
-            //             size="large"
-            //             className="border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-all duration-200"
-            //         >
-            //             Đóng
-            //         </Button>
-            //     </div>
-            // }
+        // extra={
+        //     <div className="flex gap-2">
+        //         {questionData && onEdit && (
+        //             <Button
+        //                 type="primary"
+        //                 icon={<EditOutlined />}
+        //                 onClick={handleEdit}
+        //                 size="large"
+        //                 className="bg-blue-500 hover:bg-blue-600 border-0 shadow-sm hover:shadow-md transition-all duration-200"
+        //             >
+        //                 Chỉnh sửa
+        //             </Button>
+        //         )}
+        //         <Button
+        //             icon={<CloseOutlined />}
+        //             onClick={onClose}
+        //             size="large"
+        //             className="border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-all duration-200"
+        //         >
+        //             Đóng
+        //         </Button>
+        //     </div>
+        // }
         >
             {questionData ? (
                 <div className="space-y-8">
 
                     {/* Statistics Row */}
                     <Row gutter={16}>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Card className="text-center border-0 shadow-sm hover:shadow-md transition-all duration-200" style={{ minHeight: '120px' }}>
                                 <Statistic
                                     title="Loại câu hỏi"
@@ -122,7 +223,7 @@ const QuestionDetailDrawer: React.FC<Props> = ({ open, questionData, surveys, on
                                 />
                             </Card>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Card className="text-center border-0 shadow-sm hover:shadow-md transition-all duration-200" style={{ minHeight: '120px' }}>
                                 <Statistic
                                     title="Khảo sát"
@@ -132,13 +233,23 @@ const QuestionDetailDrawer: React.FC<Props> = ({ open, questionData, surveys, on
                                 />
                             </Card>
                         </Col>
-                        <Col span={8}>
+                        <Col span={6}>
                             <Card className="text-center border-0 shadow-sm hover:shadow-md transition-all duration-200" style={{ minHeight: '120px' }}>
                                 <Statistic
                                     title="Thứ tự"
                                     value={questionData.positionOrder}
                                     valueStyle={{ color: '#f59e0b', fontSize: '16px' }}
                                     prefix={<NumberOutlined />}
+                                />
+                            </Card>
+                        </Col>
+                        <Col span={6}>
+                            <Card className="text-center border-0 shadow-sm hover:shadow-md transition-all duration-200" style={{ minHeight: '120px' }}>
+                                <Statistic
+                                    title="Số đáp án"
+                                    value={answers.length}
+                                    valueStyle={{ color: '#10b981', fontSize: '16px' }}
+                                    prefix={<CheckCircleOutlined />}
                                 />
                             </Card>
                         </Col>
@@ -209,6 +320,42 @@ const QuestionDetailDrawer: React.FC<Props> = ({ open, questionData, surveys, on
                                 />
                             </Descriptions.Item>
                         </Descriptions>
+                    </Card>
+
+                    {/* Answers Section */}
+                    <Card
+                        title={
+                            <span className="font-semibold text-gray-700">
+                                <CheckCircleOutlined className="mr-2" />
+                                Danh sách đáp án ({answers.length})
+                            </span>
+                        }
+                        className="border-0 shadow-sm"
+                    >
+                        {loadingAnswers ? (
+                            <div className="flex items-center justify-center py-8">
+                                <div className="text-center">
+                                    <div className="text-gray-400 text-2xl mb-2">⏳</div>
+                                    <p className="text-gray-500">Đang tải đáp án...</p>
+                                </div>
+                            </div>
+                        ) : answers.length > 0 ? (
+                            <Table
+                                columns={answerColumns}
+                                dataSource={answers}
+                                rowKey="id"
+                                pagination={false}
+                                className="custom-table"
+                                onRow={() => ({
+                                    className: "hover:bg-green-50 transition-all duration-200 cursor-pointer"
+                                })}
+                            />
+                        ) : (
+                            <Empty
+                                description="Chưa có đáp án nào cho câu hỏi này"
+                                className="py-12"
+                            />
+                        )}
                     </Card>
 
                     {/* Action Buttons */}

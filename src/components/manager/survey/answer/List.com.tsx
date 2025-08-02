@@ -1,33 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Space, Input, Tag, Collapse, Empty, Card, Avatar, Statistic, Row, Col, Tooltip, Badge } from "antd";
-import { PlusOutlined, EditOutlined, EyeOutlined, CheckCircleOutlined, QuestionCircleOutlined, StarOutlined, SearchOutlined, FilterOutlined } from "@ant-design/icons";
+import { Table, Button, Space, Input, Tag, Empty, Card, Avatar, Statistic, Row, Col, Tooltip, Badge, Pagination } from "antd";
+import { PlusOutlined, EditOutlined, EyeOutlined, CheckCircleOutlined, StarOutlined, SearchOutlined, FilterOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import type { AnswerResponse } from "../../../../types/answer/Answer.res.type";
 import { AnswerService } from "../../../../services/answer/answer.service";
 import type { QuestionResponse } from "../../../../types/question/Question.res.type";
+import type { SearchAnswerRequest } from "../../../../types/answer/Answer.req.type";
 import { helpers } from "../../../../utils";
 import AnswerCreateModal from "./Create.com";
 import AnswerUpdateModal from "./Update.com";
 import AnswerDeleteButton from "./Delete.com";
 import AnswerDetailDrawer from "./Detail.com";
 import { QuestionType } from "../../../../app/enums/questionType.enum";
+import { QuestionService } from "../../../../services/question/question.service";
 
-const { Panel } = Collapse;
 
 interface Props {
     questions: QuestionResponse[];
     pageSizeDefault?: number;
 }
 
-interface QuestionWithAnswers {
-    question: QuestionResponse;
-    answers: AnswerResponse[];
-    loading: boolean;
-}
+const AnswerList: React.FC<Props> = ({ questions, pageSizeDefault = 10 }) => {
+    console.log("AnswerList rendered with questions:", questions); // Debug log
+    console.log("Questions length:", questions?.length); // Debug log
 
-const AnswerList: React.FC<Props> = ({ questions }) => {
-    const [questionsWithAnswers, setQuestionsWithAnswers] = useState<QuestionWithAnswers[]>([]);
     const [filter, setFilter] = useState("");
+    const [pageNumber, setPageNumber] = useState(1);
+    const [pageSize, setPageSize] = useState(pageSizeDefault);
+    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState<AnswerResponse[]>([]);
+    const [localQuestions, setLocalQuestions] = useState<QuestionResponse[]>([]);
+
+    // Modal states
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
     const [detailDrawerVisible, setDetailDrawerVisible] = useState(false);
@@ -35,64 +40,86 @@ const AnswerList: React.FC<Props> = ({ questions }) => {
     const [selectedAnswers, setSelectedAnswers] = useState<AnswerResponse[]>([]);
     const [viewingAnswer, setViewingAnswer] = useState<AnswerResponse | null>(null);
 
-    const fetchAnswersForQuestion = async (question: QuestionResponse) => {
+    // Monitor questions prop changes
+    useEffect(() => {
+        console.log("Questions prop changed:", questions);
+        console.log("Questions length:", questions?.length);
+
+        // If questions are empty, try to load them
+        if (!questions || questions.length === 0) {
+            console.log("Questions array is empty, will load questions directly");
+            loadQuestions();
+        }
+    }, [questions]);
+
+    const loadQuestions = async () => {
         try {
-            const res = await AnswerService.getAnswerByQuestionId(question.id);
-            // ResponseSuccess<AnswerResponse[]> structure: { success: boolean, data: AnswerResponse[] }
-            const answers = res?.data || [];
-            // Sort answers by positionOrder
-            const sortedAnswers = Array.isArray(answers)
-                ? answers.sort((a, b) => a.positionOrder - b.positionOrder)
-                : [];
-            return sortedAnswers;
+            console.log("Loading questions directly in AnswerList");
+            const res = await QuestionService.getAllQuestions({
+                surveyId: "",
+                pageNumber: 1,
+                pageSize: 1000,
+                filter: "",
+            });
+
+            const responseData = res?.data;
+            if (responseData && Array.isArray(responseData.data)) {
+                console.log("Loaded questions in AnswerList:", responseData.data);
+                setLocalQuestions(responseData.data);
+            }
         } catch (error) {
-            console.error(`Error fetching answers for question ${question.id}:`, error);
-            helpers.notificationMessage(`Không thể tải đáp án cho câu hỏi: ${question.questionContent}`, "error");
-            return [];
+            console.error("Error loading questions in AnswerList:", error);
         }
     };
 
-    const loadAllAnswers = async () => {
-        console.log("Loading answers for questions:", questions.length);
-        const questionAnswerPromises = questions.map(async (question) => {
-            console.log(`Fetching answers for question: ${question.questionContent} (${question.id})`);
-            const answers = await fetchAnswersForQuestion(question);
-            console.log(`Found ${answers.length} answers for question: ${question.questionContent}`);
-            return {
-                question,
-                answers,
-                loading: false,
-            };
-        });
+    const fetchData = async () => {
+        try {
+            setLoading(true);
 
-        const results = await Promise.all(questionAnswerPromises);
-        console.log("All answers loaded:", results);
-        setQuestionsWithAnswers(results);
+            // Use getAllAnswers without questionId filter
+            const searchParams: SearchAnswerRequest = {
+                questionId: "", // Empty string to get all answers
+                pageNumber: pageNumber,
+                pageSize: pageSize,
+                filter: filter,
+                filterByScore: 0 // 0 means no filter by score
+            };
+
+            const res = await AnswerService.getAllAnswers(searchParams);
+            const responseData = res?.data;
+
+            if (responseData && Array.isArray(responseData.data)) {
+                setData(responseData.data);
+                setTotal(responseData.totalCount || 0);
+            } else {
+                console.warn("Unexpected response format:", responseData);
+                setData([]);
+                setTotal(0);
+            }
+        } catch (error) {
+            console.error("Error fetching answers:", error);
+            helpers.notificationMessage("Không thể tải đáp án", "error");
+            setData([]);
+            setTotal(0);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
-        if (questions.length > 0) {
-            loadAllAnswers();
+        fetchData();
+    }, [pageNumber, pageSize, filter]);
+
+    // Reset to first page when filter changes
+    useEffect(() => {
+        setPageNumber(1);
+    }, [filter]);
+
+    const handlePageChange = (page: number, size?: number) => {
+        setPageNumber(page);
+        if (size && size !== pageSize) {
+            setPageSize(size);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [questions]);
-
-    const filteredQuestionsWithAnswers = questionsWithAnswers.filter(
-        ({ question, answers }) =>
-            filter === "" ||
-            question.questionContent.toLowerCase().includes(filter.toLowerCase()) ||
-            answers.some(answer => answer.optionContent.toLowerCase().includes(filter.toLowerCase()))
-    );
-
-    const openCreate = (question: QuestionResponse) => {
-        setSelectedQuestion(question);
-        setCreateModalVisible(true);
-    };
-
-    const openUpdate = (question: QuestionResponse, answers: AnswerResponse[]) => {
-        setSelectedQuestion(question);
-        setSelectedAnswers(answers);
-        setUpdateModalVisible(true);
     };
 
     const openDetail = (answer: AnswerResponse) => {
@@ -101,24 +128,60 @@ const AnswerList: React.FC<Props> = ({ questions }) => {
     };
 
     const handleDeleteSuccess = () => {
-        loadAllAnswers();
+        fetchData();
     };
 
     const handleCreateSuccess = () => {
         setCreateModalVisible(false);
         setSelectedQuestion(null);
-        loadAllAnswers();
+        fetchData();
     };
 
     const handleUpdateSuccess = () => {
         setUpdateModalVisible(false);
         setSelectedQuestion(null);
         setSelectedAnswers([]);
-        loadAllAnswers();
+        fetchData();
     };
 
-    const getTotalAnswers = () => {
-        return questionsWithAnswers.reduce((total, q) => total + q.answers.length, 0);
+    const getQuestionName = (questionId: string) => {
+        console.log("getQuestionName called with questionId:", questionId); // Debug log
+        console.log("Available questions (prop):", questions); // Debug log
+        console.log("Available questions (local):", localQuestions); // Debug log
+
+        // Use prop questions first, fallback to local questions
+        const availableQuestions = questions && questions.length > 0 ? questions : localQuestions;
+
+        if (!availableQuestions || availableQuestions.length === 0) {
+            console.warn("No questions available"); // Debug log
+            return `Question ID: ${questionId}`;
+        }
+
+        const question = availableQuestions.find(q => q.id === questionId);
+        console.log("Found question:", question); // Debug log
+
+        if (question) {
+            return question.questionContent;
+        } else {
+            console.warn(`Question not found for ID: ${questionId}`); // Debug log
+            return `Question ID: ${questionId}`;
+        }
+    };
+
+    const getQuestionType = (questionId: string) => {
+        // Use prop questions first, fallback to local questions    
+        const availableQuestions = questions && questions.length > 0 ? questions : localQuestions;
+        const question = availableQuestions.find(q => q.id === questionId);
+        return question?.questionType || QuestionType.MULTIPLE_CHOICE;
+    };  
+
+    const getDisplayQuestionType = (questionType: QuestionType) => {
+        switch (questionType) {
+            case QuestionType.MULTIPLE_CHOICE:
+                return "Trắc nghiệm";
+            default:
+                return "Câu hỏi khác";
+        }
     };
 
     const answerColumns: ColumnsType<AnswerResponse> = [
@@ -150,8 +213,21 @@ const AnswerList: React.FC<Props> = ({ questions }) => {
                                 <StarOutlined className="mr-1" />
                                 {record.score} điểm
                             </Tag>
+                            <Tag color="blue" className="text-xs">
+                                {getDisplayQuestionType(getQuestionType(record.questionId))}
+                            </Tag>
                         </div>
                     </div>
+                </div>
+            ),
+        },
+        {
+            title: <span className="font-semibold text-gray-700">Câu hỏi</span>,
+            dataIndex: "questionId",
+            key: "questionId",
+            render: (questionId: string) => (
+                <div className="max-w-xs">
+                    <div className="font-medium text-gray-800 truncate" dangerouslySetInnerHTML={{ __html: getQuestionName(questionId) }} />
                 </div>
             ),
         },
@@ -172,26 +248,14 @@ const AnswerList: React.FC<Props> = ({ questions }) => {
             dataIndex: "positionOrder",
             key: "positionOrder",
             width: 100,
-            render: (order, record: AnswerResponse) => {
-                // Check if there are duplicates in position order
-                const currentQuestion = questionsWithAnswers.find(q => q.question.id === record.questionId);
-                const answers = currentQuestion?.answers || [];
-                const duplicateCount = answers.filter(a => a.positionOrder === order).length;
-                const isDuplicate = duplicateCount > 1;
-
-                return (
-                    <Badge
-                        count={order}
-                        showZero
-                        title={isDuplicate ? "Thứ tự trùng lặp" : ""}
-                    />
-                );
-            },
+            render: (order) => (
+                <Badge count={order} showZero />
+            ),
         },
         {
             title: <span className="font-semibold text-gray-700">Hành động</span>,
             key: "action",
-            width: 120,
+            width: 150,
             render: (_, record) => (
                 <Space>
                     <Tooltip title="Xem chi tiết">
@@ -204,20 +268,29 @@ const AnswerList: React.FC<Props> = ({ questions }) => {
                             size="large"
                         />
                     </Tooltip>
+                    <Tooltip title="Chỉnh sửa">
+                        <Button
+                            type="text"
+                            shape="circle"
+                            icon={<EditOutlined />}
+                            onClick={() => {
+                                const question = questions.find(q => q.id === record.questionId);
+                                if (question) {
+                                    setSelectedQuestion(question);
+                                    setSelectedAnswers([record]);
+                                    setUpdateModalVisible(true);
+                                }
+                            }}
+                            className="hover:bg-green-50 hover:text-green-600 border-0 shadow-sm transition-all duration-200"
+                            size="large"
+                        />
+                    </Tooltip>
                     <AnswerDeleteButton answer={record} onSuccess={handleDeleteSuccess} />
                 </Space>
             ),
         },
     ];
 
-    const getDisplayQuestionType = (questionType: QuestionType) => {
-        switch (questionType) {
-            case QuestionType.MULTIPLE_CHOICE:
-                return "Trắc nghiệm";
-            default:
-                return "Câu hỏi khác";
-        }
-    };
     return (
         <div className="space-y-6">
             {/* Header Section */}
@@ -232,16 +305,6 @@ const AnswerList: React.FC<Props> = ({ questions }) => {
                             <p className="text-gray-600">Tạo và quản lý các phương án trả lời</p>
                         </div>
                     </div>
-                    {/* <div className="flex items-center gap-4">
-                        <Button
-                            icon={<ReloadOutlined />}
-                            onClick={loadAllAnswers}
-                            size="large"
-                            className="border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-all duration-200"
-                        >
-                            Tải lại
-                        </Button>
-                    </div> */}
                 </div>
             </div>
 
@@ -250,19 +313,19 @@ const AnswerList: React.FC<Props> = ({ questions }) => {
                 <Col span={8}>
                     <Card className="text-center border-0 shadow-sm hover:shadow-md transition-all duration-200">
                         <Statistic
-                            title="Tổng câu hỏi"
-                            value={questions.length}
-                            valueStyle={{ color: '#3f87f5' }}
-                            prefix={<QuestionCircleOutlined />}
+                            title="Tổng đáp án"
+                            value={total}
+                            valueStyle={{ color: '#10b981' }}
+                            prefix={<CheckCircleOutlined />}
                         />
                     </Card>
                 </Col>
                 <Col span={8}>
                     <Card className="text-center border-0 shadow-sm hover:shadow-md transition-all duration-200">
                         <Statistic
-                            title="Tổng đáp án"
-                            value={getTotalAnswers()}
-                            valueStyle={{ color: '#10b981' }}
+                            title="Đang hiển thị"
+                            value={`${data.length}/${total}`}
+                            valueStyle={{ color: '#f59e0b' }}
                             prefix={<CheckCircleOutlined />}
                         />
                     </Card>
@@ -274,7 +337,7 @@ const AnswerList: React.FC<Props> = ({ questions }) => {
                 <div className="flex gap-4 items-center flex-wrap">
                     <div className="flex-1 max-w-md">
                         <Input
-                            placeholder="Tìm kiếm câu hỏi hoặc đáp án..."
+                            placeholder="Tìm kiếm đáp án..."
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
                             prefix={<SearchOutlined className="text-gray-400" />}
@@ -294,96 +357,61 @@ const AnswerList: React.FC<Props> = ({ questions }) => {
                 </div>
             </Card>
 
-            {/* Questions and Answers Section */}
+            {/* Table Section */}
             <Card className="border-0 shadow-sm">
-                {filteredQuestionsWithAnswers.length === 0 ? (
+                {data.length === 0 ? (
                     <Empty
-                        description="Không có câu hỏi nào"
+                        description="Không có đáp án nào"
                         className="py-12"
                     />
                 ) : (
-                    <Collapse size="large" className="border-0">
-                        {filteredQuestionsWithAnswers.map(({ question, answers, loading }) => (
-                            <Panel
-                                key={question.id || `question-${Math.random()}`}
-                                header={
-                                    <div className="flex justify-between items-center w-full mr-4">
-                                        <div className="flex items-center gap-3">
-                                            <Avatar
-                                                size={32}
-                                                style={{
-                                                    backgroundColor: '#3f87f5',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontSize: '14px'
-                                                }}
-                                            >
-                                                <QuestionCircleOutlined />
-                                            </Avatar>
-                                            <div>
-                                                <div className="font-semibold text-gray-800" dangerouslySetInnerHTML={{ __html: question.questionContent }}></div>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <Tag color="blue" className="text-xs">
-                                                        {getDisplayQuestionType(question.questionType)}
-                                                    </Tag>
-                                                    <Tag color="orange" className="text-xs">
-                                                        {answers.length} đáp án
-                                                    </Tag>
-                                                    <Tag color="purple" className="text-xs">
-                                                        #{question.positionOrder}
-                                                    </Tag>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                                extra={
-                                    <Space onClick={(e) => e.stopPropagation()}>
-                                        <Button
-                                            type="primary"
-                                            size="large"
-                                            className="bg-green-500 hover:bg-green-600 border-0 shadow-sm hover:shadow-md transition-all duration-200"
-                                            icon={<PlusOutlined />}
-                                            onClick={() => openCreate(question)}
-                                        >
-                                            Tạo đáp án
-                                        </Button>
-                                        {answers.length > 0 && (
-                                            <Button
-                                                size="large"
-                                                icon={<EditOutlined />}
-                                                onClick={() => openUpdate(question, answers)}
-                                                className="border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-all duration-200"
-                                            >
-                                                Sửa tất cả
-                                            </Button>
-                                        )}
-                                    </Space>
-                                }
-                            >
-                                {answers.length === 0 ? (
-                                    <Empty
-                                        description="Chưa có đáp án nào"
-                                        image={Empty.PRESENTED_IMAGE_SIMPLE}
-                                        className="py-8"
-                                    />
-                                ) : (
-                                    <Table
-                                        columns={answerColumns}
-                                        dataSource={answers}
-                                        rowKey="id"
-                                        loading={loading}
-                                        pagination={false}
-                                        className="custom-table"
-                                        onRow={() => ({
-                                            className: "hover:bg-green-50 transition-all duration-200 cursor-pointer"
-                                        })}
-                                    />
-                                )}
-                            </Panel>
-                        ))}
-                    </Collapse>
+                    <>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-semibold text-gray-800">Danh sách đáp án</h3>
+                            <div className="flex gap-2">
+                                <Button
+                                    type="primary"
+                                    icon={<PlusOutlined />}
+                                    onClick={() => setCreateModalVisible(true)}
+                                    className="bg-green-500 hover:bg-green-600 border-0 shadow-sm hover:shadow-md transition-all duration-200"
+                                    size="large"
+                                >
+                                    Tạo đáp án mới
+                                </Button>
+                            </div>
+                        </div>
+
+                        <Table
+                            columns={answerColumns}
+                            dataSource={data}
+                            rowKey="id"
+                            loading={loading}
+                            pagination={false}
+                            className="custom-table"
+                            onRow={() => ({
+                                className: "hover:bg-green-50 transition-all duration-200 cursor-pointer"
+                            })}
+                        />
+
+                        {/* Pagination */}
+                        {total > pageSize && (
+                            <div className="flex justify-center mt-6">
+                                <Pagination
+                                    current={pageNumber}
+                                    total={total}
+                                    pageSize={pageSize}
+                                    onChange={handlePageChange}
+                                    showSizeChanger
+                                    showQuickJumper
+                                    showTotal={(total, range) =>
+                                        `${range[0]}-${range[1]} của ${total} đáp án`
+                                    }
+                                    pageSizeOptions={['5', '10', '20', '50']}
+                                    className="custom-pagination"
+                                />
+                            </div>
+                        )}
+                    </>
                 )}
             </Card>
 
