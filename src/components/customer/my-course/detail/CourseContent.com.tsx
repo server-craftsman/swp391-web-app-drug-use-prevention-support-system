@@ -1,6 +1,11 @@
 import React from "react";
 import { Typography, Card, Button, Collapse } from "antd";
-import { DownOutlined, PlayCircleOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  PlayCircleOutlined,
+  FileTextOutlined,
+  PictureOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { ROUTER_URL } from "../../../../consts/router.path.const";
 
@@ -14,6 +19,7 @@ interface Lecture {
   preview?: boolean;
   completed?: boolean;
   imageUrl?: string;
+  lessonType?: string;
 }
 
 interface CourseSection {
@@ -35,6 +41,19 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
     (acc, section) => acc + section.lessons,
     0
   );
+
+  const getLessonIcon = (lessonType?: string) => {
+    switch ((lessonType || "").toLowerCase()) {
+      case "video":
+        return <PlayCircleOutlined className="text-blue-500 text-base" />;
+      case "text":
+        return <FileTextOutlined className="text-green-500 text-base" />;
+      case "image":
+        return <PictureOutlined className="text-orange-500 text-base" />;
+      default:
+        return <FileTextOutlined className="text-gray-400 text-base" />;
+    }
+  };
 
   return (
     <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>
@@ -88,7 +107,7 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
                     }
                   >
                     <div className="flex items-center space-x-3">
-                      <PlayCircleOutlined className="text-gray-500 text-sm" />
+                      {getLessonIcon(lecture.lessonType)}
                       <Text className="text-gray-700 text-sm">
                         {lecture.title}
                       </Text>

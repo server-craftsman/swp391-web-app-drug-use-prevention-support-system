@@ -234,7 +234,6 @@ const AdminBlogManager = () => {
         open={showUpdateModal}
         onCancel={() => setShowUpdateModal(false)}
         footer={null}
-        title="Cập nhật blog"
         width={600}
       >
         {selectedBlog && (

@@ -18,6 +18,7 @@ import DeleteReview from "../../client/review/DeleteReview.com";
 import CustomSearch from "../../common/CustomSearch.com";
 import { formatDate } from "../../../utils/helper";
 import UpdateReview from "../../client/review/UpdateReview.com";
+import type { CourseDetailResponse } from "../../../types/course/Course.res.type";
 
 const PAGE_SIZE = 8;
 
@@ -30,6 +31,7 @@ const ReviewManager: React.FC = () => {
   const [viewModal, setViewModal] = useState(false);
   const [viewLoading, setViewLoading] = useState(false);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<CourseDetailResponse | null>(null);
 
   // State cho update review
   const [updateModal, setUpdateModal] = useState(false);
@@ -108,12 +110,21 @@ const ReviewManager: React.FC = () => {
       const res = await ReviewService.getReviewById({ id: reviewId });
       if (res.data?.success && res.data?.data) {
         setSelectedReview(res.data.data);
+        // Lấy thông tin khóa học chi tiết
+        const courseRes = await CourseService.getCourseById({ id: res.data.data.courseId });
+        if (courseRes.data?.success && courseRes.data?.data) {
+          setSelectedCourse(courseRes.data.data);
+        } else {
+          setSelectedCourse(null);
+        }
       } else {
         setSelectedReview(null);
+        setSelectedCourse(null);
         message.error("Không tìm thấy đánh giá!");
       }
     } catch {
       setSelectedReview(null);
+      setSelectedCourse(null);
       message.error("Không thể tải chi tiết đánh giá!");
     } finally {
       setViewLoading(false);
@@ -293,7 +304,7 @@ const ReviewManager: React.FC = () => {
             Đóng
           </Button>,
         ]}
-        width={400}
+        width={500}
         style={{ top: 40 }}
         bodyStyle={{
           padding: 32,
@@ -315,10 +326,68 @@ const ReviewManager: React.FC = () => {
           </div>
         ) : selectedReview ? (
           <div style={{ fontSize: 16 }}>
-            <div style={{ marginBottom: 10 }}>
-              <b>Khóa học:</b>{" "}
-              {courseMap[selectedReview.courseId] || selectedReview.courseId}
-            </div>
+            {/* Thông tin khóa học */}
+            {selectedCourse && (
+              <div style={{ marginBottom: 18 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                  {selectedCourse.imageUrls && selectedCourse.imageUrls.length > 0 && (
+                    <img
+                      src={selectedCourse.imageUrls[0]}
+                      alt={selectedCourse.name}
+                      style={{
+                        width: 56,
+                        height: 56,
+                        objectFit: "cover",
+                        borderRadius: 8,
+                        border: "1px solid #eee",
+                        background: "#fafafa",
+                      }}
+                    />
+                  )}
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 18, color: "#20558A" }}>
+                      {selectedCourse.name}
+                    </div>
+                    <div style={{ fontSize: 13, color: "#888" }}>
+                      Ngày tạo: {selectedCourse.createdAt ? formatDate(new Date(selectedCourse.createdAt)) : ""}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 14, color: "#555", marginBottom: 4 }}>
+                  <b>Mức độ rủi ro:</b>{" "}
+                  <span style={{
+                    color:
+                      selectedCourse.riskLevel === "High"
+                        ? "#ff4d4f"
+                        : selectedCourse.riskLevel === "Medium"
+                        ? "#faad14"
+                        : "#52c41a",
+                    fontWeight: 600,
+                  }}>
+                    {selectedCourse.riskLevel === "High"
+                      ? "Cao"
+                      : selectedCourse.riskLevel === "Medium"
+                      ? "Trung bình"
+                      : "Thấp"}
+                  </span>
+                </div>
+                <div style={{ fontSize: 14, color: "#555", marginBottom: 4 }}>
+                  <b>Đối tượng:</b> {selectedCourse.targetAudience}
+                </div>
+                <div style={{ fontSize: 14, color: "#555", marginBottom: 4 }}>
+                  <b>Mô tả:</b>{" "}
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        selectedCourse.content?.length > 120
+                          ? selectedCourse.content.slice(0, 120) + "..."
+                          : selectedCourse.content,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+            {/* Thông tin đánh giá */}
             <div style={{ marginBottom: 10 }}>
               <b>Số sao:</b> <Rate disabled value={selectedReview.rating} />
             </div>

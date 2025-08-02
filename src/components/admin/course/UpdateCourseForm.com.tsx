@@ -146,7 +146,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md border space-y-6"
+      className="max-w-xl mx-auto p-6 bg-white rounded-xl   space-y-6"
     >
       <h2 className="text-2xl font-bold text-blue-800 text-center">
         Cập nhật khóa học

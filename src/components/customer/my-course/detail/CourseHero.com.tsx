@@ -100,9 +100,14 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course, averageRating }) => {
                 fontSize: 20,
                 margin: "18px 0 28px 0",
                 fontWeight: 400,
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
-              {course.content}
+              <span dangerouslySetInnerHTML={{ __html: course.content }} />
             </div>
             {/* Stats */}
             <div

@@ -80,7 +80,7 @@ const UpdateBlogForm: React.FC<UpdateBlogFormProps> = ({ blog, onSuccess }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-lg mx-auto p-8 bg-white rounded-xl shadow-lg space-y-6 border border-gray-100"
+      className="max-w-lg mx-auto p-8 bg-white rounded-xl  space-y-6  border-gray-100"
     >
       <h2 className="text-2xl font-bold text-blue-900 mb-2 text-center">
         Cập nhật blog
