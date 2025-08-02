@@ -57,7 +57,7 @@ const CourseCardContent: React.FC<CourseCardContentProps> = ({ course }) => {
         </h3>
 
         <Paragraph className="text-sm text-gray-600 line-clamp-2 mb-4 leading-relaxed">
-          {course.content}
+          <span dangerouslySetInnerHTML={{ __html: course.content }} />
         </Paragraph>
       </div>
 

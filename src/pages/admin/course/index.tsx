@@ -13,7 +13,7 @@ export default function CourseManagement() {
       },
       {
         key: "2",
-        label: "Quản lý buổi học",
+        label: "Quản lý phiên học",
         children: <SessionManager />,
       },
       {

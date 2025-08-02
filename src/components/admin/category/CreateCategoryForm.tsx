@@ -34,7 +34,7 @@ const CreateCategoryForm: React.FC<CreateCategoryFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-lg mx-auto p-8 bg-white rounded-xl shadow-lg space-y-6 border border-gray-100"
+      className="max-w-lg mx-auto p-4 bg-white rounded-xl space-y-6 "
     >
       <h2 className="text-2xl font-bold text-[#20558A] mb-2 text-center">
         Tạo danh mục mới
@@ -55,7 +55,7 @@ const CreateCategoryForm: React.FC<CreateCategoryFormProps> = ({
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
+        className="w-full bg-primary text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
       >
         {isPending ? "Đang tạo..." : "Tạo danh mục"}
       </button>

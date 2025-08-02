@@ -7,17 +7,24 @@ import type {
   CreateLessonRequest,
   UpdateLessonRequest,
 } from "../types/lesson/Lesson.req.type";
-
+import { useAuth } from "../contexts/Auth.context";
+import { UserRole } from "../app/enums";
 /**
  * Hook for createLesson
  */
 export const useCreateLesson = () => {
   const navigate = useNavigate();
+  const { userInfo } = useAuth();
   return useMutation({
     mutationFn: (data: CreateLessonRequest) => LessonService.createLesson(data),
     onSuccess: () => {
       helpers.notificationMessage("Tạo bài học thành công", "success");
-      navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
+      // Check role and navigate to appropriate route
+      if (userInfo?.role === UserRole.ADMIN) {
+        navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
+      } else if (userInfo?.role === UserRole.MANAGER) {
+        navigate(ROUTER_URL.MANAGER.COURSES);
+      }
     },
     onError: (error) => {
       helpers.notificationMessage(error.message, "error");
@@ -30,11 +37,17 @@ export const useCreateLesson = () => {
  */
 export const useUpdateLesson = () => {
   const navigate = useNavigate();
+  const { userInfo } = useAuth();
   return useMutation({
     mutationFn: (data: UpdateLessonRequest) => LessonService.updateLesson(data),
     onSuccess: () => {
       helpers.notificationMessage("Cập nhập bài học thành công", "success");
-      navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
+      // Check role and navigate to appropriate route
+      if (userInfo?.role === UserRole.ADMIN) {
+        navigate(ROUTER_URL.ADMIN.MANAGER_COURSE);
+      } else if (userInfo?.role === UserRole.MANAGER) {
+        navigate(ROUTER_URL.MANAGER.COURSES);
+      }
     },
     onError: (error) => {
       helpers.notificationMessage(error.message, "error");

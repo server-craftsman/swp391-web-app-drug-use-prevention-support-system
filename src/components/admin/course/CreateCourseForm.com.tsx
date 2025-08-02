@@ -8,6 +8,7 @@ import { CategoryService } from "../../../services/category/category.service";
 import { CourseStatus } from "../../../app/enums/courseStatus.enum";
 import { CourseTargetAudience } from "../../../app/enums/courseTargetAudience.enum";
 import { RiskLevel } from "../../../app/enums/riskLevel.enum";
+import Editor from "../../common/Editor.com";
 
 const defaultState: CreateCourseRequest = {
   name: "",
@@ -125,6 +126,7 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
     // Đảm bảo truyền đúng enum lên backend
     const payload: CreateCourseRequest = {
       ...form,
+      content: form.content || "",
       imageUrls: imageUrlsList,
       videoUrls: form.videoUrls || [],
       createdAt: form.createdAt || now,
@@ -152,7 +154,7 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-lg mx-auto p-8 bg-white rounded-xl shadow-lg space-y-6 border border-gray-100"
+      className="max-w-lg mx-auto p-4 bg-white rounded-xl space-y-6"
     >
       <h2 className="text-2xl font-bold text-[#20558A] mb-2 text-center">
         Tạo khóa học mới
@@ -176,15 +178,7 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
         <label className="block mb-2 font-semibold text-gray-700">
           Nội dung khóa học
         </label>
-        <textarea
-          name="content"
-          value={form.content}
-          onChange={handleChange}
-          className="border border-gray-300 px-4 py-3 rounded-lg w-full"
-          rows={5}
-          placeholder="Nhập nội dung khóa học"
-          required
-        />
+        <Editor value={form.content} onChange={(value) => setForm({ ...form, content: value })} />
       </div>
 
       <div>
@@ -223,7 +217,7 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
           {previewImage && (
             <img
               src={previewImage}
-              alt="Preview"
+              alt="Xem trước"
               className="w-32 h-32 object-cover rounded-lg border"
             />
           )}
@@ -322,7 +316,7 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
+        className="w-full bg-primary text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
       >
         {isPending ? (
           <span className="flex items-center justify-center gap-2">

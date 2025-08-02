@@ -132,99 +132,101 @@ const LessonManager = () => {
   const columns: ColumnsType<
     Lesson & { courseName?: string; courseId?: string; sessionName?: string }
   > = [
-    {
-      title: "Tên bài học",
-      dataIndex: "name",
-      key: "name",
-      render: (text) => <strong>{text}</strong>,
-    },
-    {
-      title: "Khóa học",
-      dataIndex: "courseName",
-      key: "courseName",
-      render: (_, record) =>
-        record.courseId ? (
-          <Link
-            to={`/courses/${record.courseId}`}
-            className="text-blue-600 hover:underline"
-          >
-            {record.courseName}
-          </Link>
-        ) : (
-          "-"
-        ),
-    },
-    {
-      title: "Phiên học",
-      dataIndex: "sessionName",
-      key: "sessionName",
-    },
-    {
-      title: "Loại bài học",
-      dataIndex: "lessonType",
-      key: "lessonType",
-      render: (value: string) => formatStatusTag(value),
-    },
-    {
-      title: "Nội dung",
-      dataIndex: "content",
-      key: "content",
-      render: (text) => (
-        <Tooltip title={text}>
-          <span>
-            {text?.length > 50 ? text.slice(0, 50) + "..." : text || "-"}
-          </span>
-        </Tooltip>
-      ),
-    },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => (
-        <Tag color="cyan">{formatDate(new Date(date))}</Tag>
-      ),
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      render: (_, record) => (
-        <div className="flex gap-2">
-          <Tooltip title="Cập nhật">
-            <Button
-              icon={<EditOutlined />}
-              shape="circle"
-              type="default"
-              size="small"
-              onClick={() => openUpdateModal(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Xem chi tiết">
-            <Button
-              icon={<EyeOutlined />}
-              shape="circle"
-              type="default"
-              size="small"
-              onClick={() => openViewModal(record.id)}
-            />
-          </Tooltip>
-          <Tooltip title="Xóa">
-            <DeleteLesson
-              lessonId={record.id}
-              onDeleted={() => fetchLessons()}
-              buttonProps={{
-                icon: <DeleteOutlined />,
-                shape: "circle",
-                danger: true,
-                size: "small",
-                style: { borderColor: "#ff4d4f", color: "#ff4d4f" },
+      {
+        title: "Tên bài học",
+        dataIndex: "name",
+        key: "name",
+        render: (text) => <strong>{text}</strong>,
+      },
+      {
+        title: "Khóa học",
+        dataIndex: "courseName",
+        key: "courseName",
+        render: (_, record) =>
+          record.courseId ? (
+            <Link
+              to={`/courses/${record.courseId}`}
+              className="text-blue-600 hover:underline"
+            >
+              {record.courseName}
+            </Link>
+          ) : (
+            "-"
+          ),
+      },
+      {
+        title: "Phiên học",
+        dataIndex: "sessionName",
+        key: "sessionName",
+      },
+      {
+        title: "Loại bài học",
+        dataIndex: "lessonType",
+        key: "lessonType",
+        render: (value: string) => formatStatusTag(value),
+      },
+      {
+        title: "Nội dung",
+        dataIndex: "content",
+        key: "content",
+        render: (text) => (
+          <Tooltip title={text}>
+            <span
+              dangerouslySetInnerHTML={{
+                __html: text?.length > 50 ? text.slice(0, 50) + "..." : text || "-"
               }}
             />
           </Tooltip>
-        </div>
-      ),
-    },
-  ];
+        ),
+      },
+      {
+        title: "Ngày tạo",
+        dataIndex: "createdAt",
+        key: "createdAt",
+        render: (date: string) => (
+          <Tag color="cyan">{formatDate(new Date(date))}</Tag>
+        ),
+      },
+      {
+        title: "Hành động",
+        key: "action",
+        render: (_, record) => (
+          <div className="flex gap-2">
+            <Tooltip title="Xem chi tiết">
+              <Button
+                icon={<EyeOutlined />}
+                shape="circle"
+                type="default"
+                size="small"
+                onClick={() => openViewModal(record.id)}
+              />
+            </Tooltip>
+            <Tooltip title="Cập nhật">
+              <Button
+                icon={<EditOutlined />}
+                shape="circle"
+                type="default"
+                size="small"
+                onClick={() => openUpdateModal(record)}
+              />
+            </Tooltip>
+            <Tooltip title="Xóa">
+              <DeleteLesson
+                lessonId={record.id}
+                onDeleted={() => fetchLessons()}
+                buttonProps={{
+                  icon: <DeleteOutlined />,
+                  shape: "circle",
+                  danger: true,
+                  size: "small",
+                  style: { borderColor: "#ff4d4f", color: "#ff4d4f" },
+                }}
+              />
+            </Tooltip>
+          </div>
+        ),
+      },
+    ];
 
   return (
     <div className="p-6 bg-white rounded shadow">

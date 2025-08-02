@@ -8,6 +8,7 @@ import { CourseStatus } from "../../../app/enums/courseStatus.enum";
 import { CourseTargetAudience } from "../../../app/enums/courseTargetAudience.enum";
 import { RiskLevel } from "../../../app/enums/riskLevel.enum";
 import { message } from "antd";
+import Editor from "../../common/Editor.com";
 
 interface UpdateCourseFormProps {
   course: Course;
@@ -168,13 +169,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         <label className="block mb-2 font-semibold text-gray-700">
           Nội dung khóa học
         </label>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={5}
-          className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400"
-          required
-        />
+        <Editor value={content} onChange={(value) => setContent(value)} />
       </div>
 
       <div>

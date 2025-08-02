@@ -79,7 +79,7 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
             className="text-gray-600 text-sm mb-4 line-clamp-3"
             ellipsis={{ rows: 3 }}
           >
-            {course.content}
+            <span dangerouslySetInnerHTML={{ __html: course.content }} />
           </Paragraph>
 
           {/* Course Highlights */}

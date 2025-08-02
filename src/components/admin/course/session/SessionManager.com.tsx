@@ -138,9 +138,11 @@ const SessionManager = () => {
       key: "content",
       render: (text) => (
         <Tooltip title={text}>
-          <span>
-            {text?.length > 50 ? text.slice(0, 50) + "..." : text || "-"}
-          </span>
+          <span
+            dangerouslySetInnerHTML={{
+              __html: text?.length > 50 ? text.slice(0, 50) + "..." : text || "-"
+            }}
+          />
         </Tooltip>
       ),
     },
@@ -149,6 +151,14 @@ const SessionManager = () => {
       key: "action",
       render: (_, record) => (
         <div className="flex gap-2">
+          <Tooltip title="Xem chi tiết">
+            <Button
+              icon={<EyeOutlined />}
+              shape="circle"
+              size="small"
+              onClick={() => openViewModal(record.id)}
+            />
+          </Tooltip>
           <Tooltip title="Cập nhật">
             <Button
               icon={<EditOutlined />}
@@ -156,14 +166,6 @@ const SessionManager = () => {
               type="default"
               size="small"
               onClick={() => openUpdateModal(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Xem chi tiết">
-            <Button
-              icon={<EyeOutlined />}
-              shape="circle"
-              size="small"
-              onClick={() => openViewModal(record.id)}
             />
           </Tooltip>
           <Tooltip title="Xóa">
