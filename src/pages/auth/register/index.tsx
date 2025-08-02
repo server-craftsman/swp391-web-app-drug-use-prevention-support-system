@@ -16,7 +16,7 @@ import type { RcFile } from 'antd/es/upload'
 const { Option } = Select
 
 // Validation functions
-const validatePassword = (rule: any, value: string) => {
+const validatePassword = (_: any, value: string) => {
   if (!value) {
     return Promise.resolve()
   }
@@ -37,7 +37,7 @@ const validatePassword = (rule: any, value: string) => {
   return Promise.resolve()
 }
 
-const validateEmail = (rule: any, value: string) => {
+const validateEmail = (_: any, value: string) => {
   if (!value) {
     return Promise.resolve()
   }
@@ -58,7 +58,7 @@ const validateEmail = (rule: any, value: string) => {
   return Promise.resolve()
 }
 
-const validatePhoneNumber = (rule: any, value: string) => {
+const validatePhoneNumber = (_: any, value: string) => {
   if (!value) {
     return Promise.resolve()
   }
@@ -72,7 +72,7 @@ const validatePhoneNumber = (rule: any, value: string) => {
   return Promise.resolve()
 }
 
-const validateName = (rule: any, value: string) => {
+const validateName = (_: any, value: string) => {
   if (!value) {
     return Promise.resolve()
   }
@@ -89,7 +89,7 @@ const validateName = (rule: any, value: string) => {
   return Promise.resolve()
 }
 
-const validateDateOfBirth = (rule: any, value: any) => {
+const validateDateOfBirth = (_: any, value: any) => {
   if (!value) {
     return Promise.resolve()
   }
@@ -122,7 +122,7 @@ const validatePasswordConfirmation = (getFieldValue: any) => ({
   },
 })
 
-const validateAddressDetails = (rule: any, value: string) => {
+const validateAddressDetails = (_: any, value: string) => {
   if (!value) {
     return Promise.resolve()
   }
@@ -221,7 +221,7 @@ const RegisterPage = () => {
     if (fileList.length > 0) {
       // Lấy URL xem trước cho ảnh đã chọn
       const file = fileList[0]
-      
+
       // Nếu có file gốc (file mới được chọn từ máy tính)
       if (file.originFileObj) {
         // Sử dụng FileReader để đọc file và tạo URL xem trước
@@ -232,11 +232,11 @@ const RegisterPage = () => {
         }
         // Đọc file dưới dạng Data URL (base64)
         reader.readAsDataURL(file.originFileObj)
-      } 
+      }
       // Nếu file đã có URL sẵn (file từ server)
       else if (file.url) {
         setPreviewImage(file.url)
-      } 
+      }
       // Nếu có thumbnail URL
       else if (file.thumbUrl) {
         setPreviewImage(file.thumbUrl)
