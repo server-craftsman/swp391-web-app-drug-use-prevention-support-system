@@ -286,10 +286,10 @@ const SurveyList: React.FC<Props> = ({ pageSizeDefault = 10, onSelectSurvey, onL
                     dataSource={data}
                     rowKey="id"
                     loading={loading}
-                    onRow={(record) => ({
-                        onClick: () => onSelectSurvey?.(record),
-                        className: "hover:bg-blue-50 transition-all duration-200 cursor-pointer"
-                    })}
+                    // onRow={(record) => ({
+                    //     onClick: () => onSelectSurvey?.(record),
+                    //     className: "hover:bg-blue-50 transition-all duration-200 cursor-pointer"
+                    // })}
                     pagination={{
                         current: pageNumber,
                         pageSize,

@@ -78,6 +78,7 @@ const SurveyPageManagement: React.FC = () => {
                 <AnswerList
                     key={answerRefreshKey}
                     questions={questions}
+                    pageSizeDefault={10}
                 />
             ) : null,
         },
