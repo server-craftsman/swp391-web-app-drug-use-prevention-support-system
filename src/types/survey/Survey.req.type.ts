@@ -3,6 +3,7 @@ export interface SearchSurveyRequest {
     pageNumber: number;
     pageSize: number;
     filterByName: string;
+    surveyType?: SurveyType;
 }
 
 export interface CreateSurveyRequest {

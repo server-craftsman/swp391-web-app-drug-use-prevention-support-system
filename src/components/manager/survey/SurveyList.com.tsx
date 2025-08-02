@@ -34,12 +34,13 @@ const SurveyList: React.FC<Props> = ({ pageSizeDefault = 10, onSelectSurvey, onL
     const fetchData = async () => {
         try {
             setLoading(true);
-            console.log("Fetching surveys with params:", { pageNumber, pageSize, filterByName });
+            console.log("Fetching surveys with params:", { pageNumber, pageSize, filterByName, surveyTypeFilter });
 
             const res = await SurveyService.getAllSurveys({
                 pageNumber,
                 pageSize,
                 filterByName,
+                surveyType: surveyTypeFilter,
             } as any);
 
             console.log("Survey API response:", res);
@@ -65,7 +66,20 @@ const SurveyList: React.FC<Props> = ({ pageSizeDefault = 10, onSelectSurvey, onL
 
     useEffect(() => {
         fetchData();
-    }, [pageNumber, pageSize]);
+    }, [pageNumber, pageSize, filterByName, surveyTypeFilter]);
+
+    // // Auto search when filters change (with debounce)
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         if (pageNumber !== 1) {
+    //             setPageNumber(1);
+    //         } else {
+    //             fetchData();
+    //         }
+    //     }, 500); // 500ms debounce
+
+    //     return () => clearTimeout(timer);
+    // }, [filterByName, surveyTypeFilter]);
 
     const handleSearchClick = () => {
         if (pageNumber !== 1) {
@@ -73,6 +87,12 @@ const SurveyList: React.FC<Props> = ({ pageSizeDefault = 10, onSelectSurvey, onL
         } else {
             fetchData();
         }
+    };
+
+    const handleClearFilters = () => {
+        setFilterByName("");
+        setSurveyTypeFilter(undefined);
+        setPageNumber(1);
     };
 
     const getSurveyTypeIcon = (type: SurveyType) => {
@@ -246,23 +266,13 @@ const SurveyList: React.FC<Props> = ({ pageSizeDefault = 10, onSelectSurvey, onL
                         value={surveyTypeFilter}
                         className="w-48 h-13 mt-0 rounded-xl"
                         onChange={(val) => setSurveyTypeFilter(val as any)}
-                        optionLabelProp="label"
                         size="large"
                     >
                         {Object.values(SurveyType).map((t) => (
-                            <Select.Option
-                                key={t}
-                                value={t}
-                                label={
-                                    <div className="flex items-center gap-2">
-                                        <span>{getSurveyTypeIcon(t)}</span>
-                                        <span>{t}</span>
-                                    </div>
-                                }
-                            >
+                            <Select.Option key={t} value={t}>
                                 <div className="flex items-center gap-2">
                                     <span>{getSurveyTypeIcon(t)}</span>
-                                    <span>{t}</span>
+                                    <span>{getSurveyTypeDisplayName(t)}</span>
                                 </div>
                             </Select.Option>
                         ))}
@@ -275,6 +285,14 @@ const SurveyList: React.FC<Props> = ({ pageSizeDefault = 10, onSelectSurvey, onL
                         className="bg-primary hover:bg-primary-dark border-0 shadow-sm hover:shadow-md transition-all duration-200 h-12 px-6 rounded-xl"
                     >
                         Lọc
+                    </Button>
+                    <Button
+                        type="default"
+                        onClick={handleClearFilters}
+                        size="large"
+                        className="bg-gray-100 hover:bg-gray-200 border-0 shadow-sm hover:shadow-md transition-all duration-200 h-12 px-6 rounded-xl"
+                    >
+                        Xóa lọc
                     </Button>
                 </div>
             </Card>
