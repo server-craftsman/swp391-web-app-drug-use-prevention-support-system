@@ -189,6 +189,7 @@ const CourseDetail: React.FC = () => {
           completed: false,
           imageUrl: lesson.imageUrl || undefined,
           videoUrl: lesson.videoUrl || undefined,
+          lessonType: lesson.lessonType || "", // THÊM DÒNG NÀY
         })) || [],
     })) || [];
 

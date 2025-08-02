@@ -162,7 +162,6 @@ const AdminManagerCategory = () => {
         open={showUpdateModal}
         onCancel={() => setShowUpdateModal(false)}
         footer={null}
-        title="Cập nhật danh mục"
         width={500}
       >
         {editingCategory && (

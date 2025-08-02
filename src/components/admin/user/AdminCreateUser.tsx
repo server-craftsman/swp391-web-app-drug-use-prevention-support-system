@@ -150,7 +150,7 @@ const AdminCreateUserForm: React.FC<{ onSuccess?: () => void }> = ({
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-lg max-w-2xl mx-auto">
+    <div className="p-6 bg-white rounded-lg  max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold text-blue-900 text-center mb-6">
         Tạo người dùng mới
       </h2>

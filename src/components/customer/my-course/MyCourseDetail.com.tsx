@@ -99,6 +99,7 @@ const MyCourseDetail: React.FC<MyCourseDetailProps> = ({ course }) => {
           completed: false,
           imageUrl: lesson.imageUrl || undefined,
           videoUrl: lesson.videoUrl || undefined,
+          lessonType: lesson.lessonType || "", // THÊM DÒNG NÀY
         })) || [],
     })) || [];
 
