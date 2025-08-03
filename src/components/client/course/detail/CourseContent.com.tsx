@@ -1,6 +1,11 @@
 import React from "react";
 import { Typography, Card, Button, Collapse } from "antd";
-import { DownOutlined, PlayCircleOutlined } from "@ant-design/icons";
+import {
+  DownOutlined,
+  PlayCircleOutlined,
+  FileTextOutlined,
+  PictureOutlined,
+} from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -10,6 +15,7 @@ interface Lecture {
   duration: string;
   preview: boolean;
   completed: boolean;
+  lessonType?: string; // Thêm lessonType
   imageUrl?: string;
 }
 
@@ -30,6 +36,22 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
     (acc, section) => acc + section.lessons,
     0
   );
+
+  // Hàm trả về icon phù hợp với LessonType
+  const getLessonIcon = (lessonType?: string) => {
+    switch ((lessonType || "").toLowerCase()) {
+      case "video":
+        return <PlayCircleOutlined className="text-blue-500 text-base" />;
+      case "text":
+        return <FileTextOutlined className="text-green-500 text-base" />;
+      case "image":
+        return <PictureOutlined className="text-orange-500 text-base" />;
+      default:
+        return <FileTextOutlined className="text-gray-400 text-base" />;
+    }
+  };
+
+  console.log("DEBUG lectures:", content);
 
   return (
     <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>
@@ -74,7 +96,8 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
                     className="flex items-center justify-between py-2 px-4 hover:bg-gray-50 rounded transition-colors"
                   >
                     <div className="flex items-center space-x-3">
-                      <PlayCircleOutlined className="text-gray-500 text-sm" />
+                      {/* Hiển thị icon theo lessonType */}
+                      {getLessonIcon(lecture.lessonType)}
                       <Text className="text-gray-700 text-sm">
                         {lecture.title}
                       </Text>

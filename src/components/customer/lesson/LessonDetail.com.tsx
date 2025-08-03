@@ -8,6 +8,7 @@ import type { Session } from "../../../types/session/Session.res.type";
 import {
   PlayCircleOutlined,
   FileTextOutlined,
+  PictureOutlined,
   CaretRightOutlined,
 } from "@ant-design/icons";
 
@@ -130,6 +131,20 @@ const LessonDetail: React.FC = () => {
     if (lesson?.courseId) fetchCourseAndSessions();
   }, [lesson?.courseId]);
 
+  // Thêm hàm chọn icon theo lessonType
+  const getLessonIcon = (lessonType?: string) => {
+    switch ((lessonType || "").toLowerCase()) {
+      case "video":
+        return <PlayCircleOutlined className="text-blue-500 text-sm" />;
+      case "text":
+        return <FileTextOutlined className="text-green-500 text-sm" />;
+      case "image":
+        return <PictureOutlined className="text-orange-500 text-sm" />;
+      default:
+        return <FileTextOutlined className="text-gray-400 text-sm" />;
+    }
+  };
+
   // Render sidebar - SỬA PHẦN XỬ LÝ LESSONS
   const renderSidebar = () => (
     <div
@@ -224,11 +239,7 @@ const LessonDetail: React.FC = () => {
                       }}
                     >
                       <div className="flex items-center space-x-3">
-                        {lessonItem.videoUrl ? (
-                          <PlayCircleOutlined className="text-gray-500 text-sm" />
-                        ) : (
-                          <FileTextOutlined className="text-gray-500 text-sm" />
-                        )}
+                        {getLessonIcon(lessonItem.lessonType)}
                         <span className="text-gray-700 text-sm">
                           {lessonItem.name}
                         </span>

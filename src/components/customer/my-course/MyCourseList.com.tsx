@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Typography, message, Spin, Empty, Table, Button } from "antd";
+import { Typography, message, Spin, Empty, Table, Button, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { CourseService } from "../../../services/course/course.service";
 import type { Course } from "../../../types/course/Course.res.type";
 import { ROUTER_URL } from "../../../consts/router.path.const";
+import CustomSearch from "../../common/CustomSearch.com";
 
 const { Title } = Typography;
+const { Option } = Select;
 
 const MyCourseList: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState(""); // keyword to filter
+  const [riskFilter, setRiskFilter] = useState<string | undefined>(undefined); // filter risk
   const navigate = useNavigate();
 
   // Lấy userId từ localStorage
@@ -39,6 +43,15 @@ const MyCourseList: React.FC = () => {
     };
     fetchMyCourses();
   }, [userId]);
+
+  // Lọc courses theo search và risk
+  const filteredCourses = courses.filter((course) => {
+    const matchName = course.name?.toLowerCase().includes(search.toLowerCase());
+    const matchRisk =
+      !riskFilter ||
+      course.riskLevel?.toLowerCase() === riskFilter.toLowerCase();
+    return matchName && matchRisk;
+  });
 
   const columns = [
     {
@@ -130,7 +143,6 @@ const MyCourseList: React.FC = () => {
     <div
       style={{
         minHeight: "100vh",
-        background: "#f7fafd",
         padding: "40px 0",
       }}
     >
@@ -138,9 +150,7 @@ const MyCourseList: React.FC = () => {
         style={{
           maxWidth: 1200,
           margin: "0 auto",
-          background: "#fff",
           borderRadius: 20,
-          boxShadow: "0 4px 24px 0 rgba(32,85,138,0.08)",
           padding: "40px 32px",
         }}
       >
@@ -158,6 +168,33 @@ const MyCourseList: React.FC = () => {
           Khóa học của tôi
         </Title>
 
+        {/* Search & Filter */}
+        <div
+          style={{
+            marginBottom: 24,
+            display: "flex",
+            justifyContent: "flex-start",
+            gap: 12,
+          }}
+        >
+          <CustomSearch
+            placeholder="Tìm kiếm theo tên khóa học"
+            onSearch={(keyword: string) => setSearch(keyword)}
+            inputWidth="w-80"
+          />
+          <Select
+            allowClear
+            placeholder="Lọc theo mức độ rủi ro"
+            style={{ width: 180 }}
+            value={riskFilter}
+            onChange={(value) => setRiskFilter(value)}
+          >
+            <Option value="High">Cao</Option>
+            <Option value="Medium">Trung bình</Option>
+            <Option value="Low">Thấp</Option>
+          </Select>
+        </div>
+
         {loading ? (
           <div
             style={{
@@ -168,17 +205,17 @@ const MyCourseList: React.FC = () => {
           >
             <Spin size="large" />
           </div>
-        ) : courses.length === 0 ? (
+        ) : filteredCourses.length === 0 ? (
           <div style={{ padding: "48px 0" }}>
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="Bạn chưa có khóa học nào. Hãy khám phá và bắt đầu học!"
+              description="Không tìm thấy khóa học nào."
             />
           </div>
         ) : (
           <Table
             columns={columns}
-            dataSource={courses}
+            dataSource={filteredCourses}
             rowKey="id"
             pagination={{ pageSize: 8 }}
           />

@@ -142,7 +142,7 @@ const AdminCreateStaffForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       form={form}
       layout="vertical"
       onFinish={handleSubmit}
-      className="bg-white p-6 rounded-xl shadow-md max-w-2xl mx-auto mt-6"
+      className="bg-white p-6 rounded-xl  max-w-2xl mx-auto mt-6"
     >
       <h2 className="text-2xl font-bold mb-6 text-center text-[#20558A]">
         Tạo Nhân Viên Mới
