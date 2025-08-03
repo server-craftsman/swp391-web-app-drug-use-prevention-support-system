@@ -17,6 +17,8 @@ const ProgramManagementPage: React.FC = () => {
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [type, setType] = useState("");
+    const [riskLevel, setRiskLevel] = useState("");
 
     const [createVisible, setCreateVisible] = useState(false);
     const [detailVisible, setDetailVisible] = useState(false);
@@ -33,6 +35,8 @@ const ProgramManagementPage: React.FC = () => {
                 pageNumber,
                 pageSize,
                 filterByName: searchKeyword || undefined,
+                type,
+                riskLevel,
             });
             if (res?.data) {
                 const { data: list, totalCount } = res.data;
@@ -51,7 +55,7 @@ const ProgramManagementPage: React.FC = () => {
     useEffect(() => {
         fetchPrograms();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageNumber, pageSize, searchKeyword]);
+    }, [pageNumber, pageSize, searchKeyword, type, riskLevel]);
 
     const handleRefresh = () => {
         fetchPrograms();
@@ -73,6 +77,16 @@ const ProgramManagementPage: React.FC = () => {
         setTimeout(() => {
             fetchPrograms();
         }, 0);
+    };
+
+    const handleTypeFilter = (type: string) => {
+        setPageNumber(1);
+        setType(type);
+    };
+
+    const handleRiskLevelFilter = (riskLevel: string) => {
+        setPageNumber(1);
+        setRiskLevel(riskLevel);
     };
 
     return (
@@ -104,6 +118,10 @@ const ProgramManagementPage: React.FC = () => {
                     setDeleteVisible(true);
                 }}
                 onSearch={handleSearch}
+                onTypeFilter={handleTypeFilter}
+                onRiskLevelFilter={handleRiskLevelFilter}
+                selectedType={type}
+                selectedRiskLevel={riskLevel}
             />
 
             {/* Create Modal */}

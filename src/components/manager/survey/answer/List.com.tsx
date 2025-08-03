@@ -144,30 +144,6 @@ const AnswerList: React.FC<Props> = ({ questions, pageSizeDefault = 10 }) => {
         fetchData();
     };
 
-    const getQuestionName = (questionId: string) => {
-        console.log("getQuestionName called with questionId:", questionId); // Debug log
-        console.log("Available questions (prop):", questions); // Debug log
-        console.log("Available questions (local):", localQuestions); // Debug log
-
-        // Use prop questions first, fallback to local questions
-        const availableQuestions = questions && questions.length > 0 ? questions : localQuestions;
-
-        if (!availableQuestions || availableQuestions.length === 0) {
-            console.warn("No questions available"); // Debug log
-            return `Question ID: ${questionId}`;
-        }
-
-        const question = availableQuestions.find(q => q.id === questionId);
-        console.log("Found question:", question); // Debug log
-
-        if (question) {
-            return question.questionContent;
-        } else {
-            console.warn(`Question not found for ID: ${questionId}`); // Debug log
-            return `Question ID: ${questionId}`;
-        }
-    };
-
     const getQuestionType = (questionId: string) => {
         // Use prop questions first, fallback to local questions    
         const availableQuestions = questions && questions.length > 0 ? questions : localQuestions;
@@ -223,11 +199,11 @@ const AnswerList: React.FC<Props> = ({ questions, pageSizeDefault = 10 }) => {
         },
         {
             title: <span className="font-semibold text-gray-700">Câu hỏi</span>,
-            dataIndex: "questionId",
-            key: "questionId",
-            render: (questionId: string) => (
+            dataIndex: "questionContent",
+            key: "questionContent",
+            render: (questionContent: string) => (
                 <div className="max-w-xs">
-                    <div className="font-medium text-gray-800 truncate" dangerouslySetInnerHTML={{ __html: getQuestionName(questionId) }} />
+                    <div className="font-medium text-gray-800 truncate" dangerouslySetInnerHTML={{ __html: questionContent }} />
                 </div>
             ),
         },
