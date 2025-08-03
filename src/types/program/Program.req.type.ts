@@ -4,6 +4,8 @@ export interface ProgramRequest {
   pageNumber: number;
   pageSize: number;
   filterByName?: string; // optional
+  type?: string;
+  riskLevel?: string;
 }
 
 export interface CreateProgramRequest {

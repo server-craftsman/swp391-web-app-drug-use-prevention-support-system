@@ -30,7 +30,7 @@ const AdminStaffManager = () => {
     try {
       const res = await UserService.getAllUsers({
         pageNumber: 1,
-        pageSize: 1000,
+        pageSize: 10,
       });
       const data = res.data as any;
 
