@@ -35,6 +35,7 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
     const [loadingDetail, setLoadingDetail] = useState(false);
     const [vidUrl, setVidUrl] = useState<string>("");
     const [uploadingVideo, setUploadingVideo] = useState(false);
+    const [description, setDescription] = useState<string>("");
 
     useEffect(() => {
         if (visible && programId) {
@@ -67,6 +68,7 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
                         form.setFieldsValue(formValues);
                         setImgUrl(program.programImgUrl ?? "");
                         setVidUrl(program.programVidUrl ?? "");
+                        setDescription(program.description ?? "");
                     }
                 } catch (err) {
                     console.error("Fetch detail error", err);
@@ -80,6 +82,7 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
             form.resetFields();
             setImgUrl("");
             setVidUrl("");
+            setDescription("");
         }
     }, [visible, programId, form]);
 
@@ -136,6 +139,7 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
         }
         const payload = {
             ...values,
+            description: description,
             startDate: dayjs(values.startDate).format("YYYY-MM-DD"),
             endDate: dayjs(values.endDate).format("YYYY-MM-DD"),
             programImgUrl: imgUrl,
@@ -242,9 +246,11 @@ const UpdateProgramModal: React.FC<UpdateProps> = ({ visible, onCancel, onSucces
                         >
                             <div className="rounded-xl border-2 border-gray-200 focus-within:border-blue-500 transition-colors duration-200">
                                 <Editor
+                                    value={description}
                                     placeholder="Mô tả chi tiết về chương trình, mục tiêu và nội dung..."
                                     height={180}
                                     onChange={(value) => {
+                                        setDescription(value);
                                         form.setFieldsValue({ description: value });
                                         form.validateFields(['description']);
                                     }}

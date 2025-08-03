@@ -1,11 +1,12 @@
 import React from "react";
-import { Table, Image, Button, Space, Tag } from "antd";
+import { Table, Image, Button, Space, Tag, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { Program } from "../../../types/program/Program.type";
 import { helpers } from "../../../utils";
 import CustomSearch from "../../common/CustomSearch.com";
 import { RiskLevel } from "../../../app/enums/riskLevel.enum";
+import { ProgramType } from "../../../app/enums/programType.enum";
 
 interface DisplayProps {
     programs: Program[];
@@ -18,6 +19,10 @@ interface DisplayProps {
     onEdit: (program: Program) => void;
     onDelete: (program: Program) => void;
     onSearch: (keyword: string) => void;
+    onTypeFilter: (type: string) => void;
+    onRiskLevelFilter: (riskLevel: string) => void;
+    selectedType: string;
+    selectedRiskLevel: string;
 }
 
 const ProgramDisplay: React.FC<DisplayProps> = ({
@@ -31,7 +36,27 @@ const ProgramDisplay: React.FC<DisplayProps> = ({
     onEdit,
     onDelete,
     onSearch,
+    onTypeFilter,
+    onRiskLevelFilter,
+    selectedType,
+    selectedRiskLevel,
 }) => {
+    const typeOptions = [
+        { value: "", label: "Tất cả loại" },
+        { value: ProgramType.COMMUNICATION, label: "Giao tiếp" },
+        { value: ProgramType.TRAINING, label: "Đào tạo" },
+        { value: ProgramType.COUNSELING, label: "Tư vấn" },
+    ];
+
+    const riskLevelOptions = [
+        { value: "", label: "Tất cả mức rủi ro" },
+        { value: RiskLevel.NONE, label: "Không rủi ro" },
+        { value: RiskLevel.LOW, label: "Thấp" },
+        { value: RiskLevel.MEDIUM, label: "Trung bình" },
+        { value: RiskLevel.HIGH, label: "Cao" },
+        { value: RiskLevel.VERY_HIGH, label: "Rất cao" },
+    ];
+
     const columns: ColumnsType<Program> = [
         {
             title: <span className="font-semibold text-gray-700">Ảnh</span>,
@@ -39,10 +64,10 @@ const ProgramDisplay: React.FC<DisplayProps> = ({
             key: "image",
             render: (url: string) => (
                 <div className="flex justify-center">
-                    <Image 
-                        src={url} 
-                        width={80} 
-                        height={50} 
+                    <Image
+                        src={url}
+                        width={80}
+                        height={50}
                         className="rounded-lg object-cover shadow-sm border border-gray-200"
                         placeholder={
                             <div className="w-20 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -91,8 +116,8 @@ const ProgramDisplay: React.FC<DisplayProps> = ({
                 };
                 const config = typeConfig[value as keyof typeof typeConfig] || { color: "purple", icon: "📋", label: value };
                 return (
-                    <Tag 
-                        color={config.color} 
+                    <Tag
+                        color={config.color}
                         className="rounded-full px-3 py-1 font-medium border-0"
                         style={{ margin: 0 }}
                     >
@@ -138,8 +163,8 @@ const ProgramDisplay: React.FC<DisplayProps> = ({
                 };
                 const config = riskConfig[value as RiskLevel] || { color: 'default', icon: '⚪', label: value };
                 return (
-                    <Tag 
-                        color={config.color} 
+                    <Tag
+                        color={config.color}
                         className="rounded-full px-3 py-1 font-medium border-0"
                         style={{ margin: 0 }}
                     >
@@ -192,22 +217,83 @@ const ProgramDisplay: React.FC<DisplayProps> = ({
     return (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="p-6 border-b border-gray-100">
-                <div className="flex justify-between items-center">
-                    <div className="flex-1 max-w-md">
-                        <CustomSearch
-                            placeholder="Tìm kiếm theo tên chương trình..."
-                            onSearch={onSearch}
-                            loading={loading}
-                        />
+                <div className="flex flex-col gap-6">
+                    {/* Header with search and stats */}
+                    <div className="flex justify-between items-center">
+                        <div className="flex-1 max-w-md">
+                            <CustomSearch
+                                placeholder="Tìm kiếm theo tên chương trình..."
+                                onSearch={onSearch}
+                                loading={loading}
+                            />
+                        </div>
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-lg border border-blue-200">
+                            <div className="flex items-center gap-2">
+                                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="text-sm text-gray-600">
+                                    Tổng cộng: <span className="font-bold text-blue-700">{total}</span> chương trình
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 rounded-lg border border-blue-200">
-                        <div className="flex items-center gap-2">
-                            <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+
+                    {/* Filter Section */}
+                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div className="flex items-center gap-1 mb-3">
+                            <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
                             </svg>
-                            <span className="text-sm text-gray-600">
-                                Tổng cộng: <span className="font-bold text-blue-700">{total}</span> chương trình
-                            </span>
+                            <span className="text-sm font-semibold text-gray-700">Bộ lọc</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="space-y-2">
+                                <label className="block text-xs font-medium text-gray-600 uppercase tracking-wide">
+                                    Loại chương trình
+                                </label>
+                                <Select
+                                    value={selectedType}
+                                    onChange={onTypeFilter}
+                                    options={typeOptions}
+                                    className="w-full"
+                                    placeholder="Chọn loại"
+                                    allowClear
+                                    size="middle"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="block text-xs font-medium text-gray-600 uppercase tracking-wide">
+                                    Mức độ rủi ro
+                                </label>
+                                <Select
+                                    value={selectedRiskLevel}
+                                    onChange={onRiskLevelFilter}
+                                    options={riskLevelOptions}
+                                    className="w-full"
+                                    placeholder="Chọn mức rủi ro"
+                                    allowClear
+                                    size="middle"
+                                />
+                            </div>
+                            <div className="md:col-span-2 lg:col-span-2 flex items-end">
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="default"
+                                        size="middle"
+                                        onClick={() => {
+                                            onTypeFilter("");
+                                            onRiskLevelFilter("");
+                                        }}
+                                        className="flex items-center gap-2 hover:bg-gray-100 border-gray-300"
+                                    >
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                                        </svg>
+                                        Đặt lại bộ lọc
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
