@@ -22,7 +22,7 @@ const AdminCreateConsultantForm: React.FC<{ onSuccess?: () => void }> = ({
       try {
         const res = await UserService.getAllUsers({
           pageNumber: 1,
-          pageSize: 1000,
+          pageSize: 50,
         });
 
         const data = res.data as any;

@@ -110,7 +110,7 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
                           Xem trước
                         </Button>
                       )}
-                      {/* Hiển thị ảnh nếu có */}
+                      {/* XÓA hoặc BỎ COMMENT phần ảnh dưới đây */}
                       {/* {lecture.imageUrl && lecture.imageUrl !== "" && (
                         <img
                           src={lecture.imageUrl}

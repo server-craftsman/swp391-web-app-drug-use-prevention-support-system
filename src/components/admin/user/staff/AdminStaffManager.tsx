@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { Table, Image, message, Button, Space, Tag, Modal } from "antd";
+import { Table, Image, message, Button, Space, Tag, Modal, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import { UserService } from "../../../../services/user/user.service";
 import type { UserResponse } from "../../../../types/user/User.res.type";
 import CustomPagination from "../../../common/Pagiation.com";
-import CustomSearch from "../../../common/CustomSearch.com"; // ✅ Thêm dòng này
+import CustomSearch from "../../../common/CustomSearch.com";
 import AdminCreateStaffForm from "./AdminCreateStaff";
 import AdminDeleteStaff from "./AdminDeleteStaff";
 import AdminViewStaff from "./AdminViewStaff";
+import { UserRole } from "../../../../app/enums/userRole.enum"; // Thêm dòng này
+
+const { Option } = Select;
 
 const AdminStaffManager = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -18,7 +21,8 @@ const AdminStaffManager = () => {
   const [total, setTotal] = useState(0);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [viewUserId, setViewUserId] = useState<string | null>(null);
-  const [searchKeyword, setSearchKeyword] = useState(""); // ✅ Thêm state tìm kiếm
+  const [searchKeyword, setSearchKeyword] = useState(""); // ✅ State tìm kiếm
+  const [isVerified, setIsVerified] = useState<boolean | undefined>(undefined);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
@@ -29,8 +33,11 @@ const AdminStaffManager = () => {
     setLoading(true);
     try {
       const res = await UserService.getAllUsers({
-        pageNumber: 1,
-        pageSize: 10,
+        pageNumber: current,
+        pageSize,
+        role: UserRole.STAFF, // Lọc trực tiếp ở backend
+        searchCondition: searchKeyword || undefined,
+        isVerified, // Thêm filter trạng thái xác thực
       });
       const data = res.data as any;
 
@@ -38,23 +45,8 @@ const AdminStaffManager = () => {
         throw new Error("Invalid data format from API");
       }
 
-      let allStaff = data.data.filter(
-        (user: UserResponse) => user.role?.toLowerCase() === "staff"
-      );
-
-      // ✅ Lọc theo từ khóa tìm kiếm
-      if (searchKeyword.trim()) {
-        allStaff = allStaff.filter((user: UserResponse) =>
-          user.fullName?.toLowerCase().includes(searchKeyword.toLowerCase())
-        );
-      }
-
-      const startIdx = (current - 1) * pageSize;
-      const endIdx = current * pageSize;
-      const paginatedStaff = allStaff.slice(startIdx, endIdx);
-
-      setUsers(paginatedStaff);
-      setTotal(allStaff.length);
+      setUsers(data.data);
+      setTotal(data.total || data.data.length);
     } catch (err) {
       message.error("Lỗi khi lấy danh sách nhân viên!");
       setUsers([]);
@@ -65,7 +57,8 @@ const AdminStaffManager = () => {
 
   useEffect(() => {
     fetchStaff();
-  }, [current, pageSize, searchKeyword]); // ✅ thêm searchKeyword
+    // eslint-disable-next-line
+  }, [current, pageSize, searchKeyword, isVerified]);
 
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);
@@ -195,16 +188,31 @@ const AdminStaffManager = () => {
         </Button>
       </div>
 
-      {/* ✅ Thanh tìm kiếm */}
-      <CustomSearch
-        onSearch={(keyword) => {
-          setCurrent(1); // reset về trang đầu
-          setSearchKeyword(keyword);
-        }}
-        className="mb-4"
-        placeholder="Tìm kiếm nhân viên theo tên"
-        inputWidth="w-96"
-      />
+      {/* Thanh tìm kiếm và filter */}
+      <div className="flex flex-wrap gap-3 mb-4 items-center">
+        <CustomSearch
+          onSearch={(keyword) => {
+            setCurrent(1);
+            setSearchKeyword(keyword);
+          }}
+          className="mb-0"
+          placeholder="Tìm kiếm nhân viên theo tên, email, số điện thoại"
+          inputWidth="w-96"
+        />
+        <Select
+          allowClear
+          placeholder="Lọc trạng thái xác thực"
+          style={{ width: 200 }}
+          value={isVerified}
+          onChange={(value) => {
+            setCurrent(1);
+            setIsVerified(value);
+          }}
+        >
+          <Option value={true}>Đã xác thực</Option>
+          <Option value={false}>Chưa xác thực</Option>
+        </Select>
+      </div>
 
       <div className="mb-4">
         <Tag color="green">Tổng cộng: {total} nhân viên</Tag>

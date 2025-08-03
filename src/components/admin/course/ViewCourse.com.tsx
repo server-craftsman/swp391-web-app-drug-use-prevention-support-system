@@ -236,7 +236,7 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
           )}
 
           {/* Session list */}
-          <div className="bg-white p-4 rounded-lg shadow-sm">
+          <div className="bg-white p-4 rounded-lg">
             <Divider
               orientation="left"
               className="!text-gray-700 !font-semibold"
@@ -246,29 +246,51 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
             {data.sessionList?.length ? (
               <List
                 size="small"
-                bordered
-                className="bg-gray-50 rounded-md"
+                // Bỏ thuộc tính bordered để giảm border
+                className="rounded-md"
                 dataSource={data.sessionList}
                 renderItem={(session) => (
-                  <List.Item className="hover:bg-gray-100 transition-colors">
+                  <List.Item
+                    className="hover:bg-gray-50 transition-colors border-0 border-b border-dashed border-gray-200 last:border-b-0"
+                    style={{
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                      background: "none",
+                    }}
+                  >
                     <div className="w-full">
                       <Text strong className="text-gray-800">
                         {session.name}
                       </Text>
-                      : <span className="text-gray-600">{session.content}</span>
+                      :{" "}
+                      {(() => {
+                        const plain = (session.content || "")
+                          .replace(/<[^>]*>/g, "")
+                          .trim();
+                        if (!plain || plain === ".") return null;
+                        return (
+                          <span
+                            className="text-gray-600"
+                            dangerouslySetInnerHTML={{
+                              __html: session.content || "",
+                            }}
+                          />
+                        );
+                      })()}
                       {/* Danh sách Lesson trong mỗi Session */}
                       <Divider
                         orientation="left"
                         className="!text-gray-700 !font-semibold"
+                        style={{ marginTop: 16, marginBottom: 8 }}
                       >
                         Danh sách Lesson
                       </Divider>
                       {session.lessonList && session.lessonList.length > 0 ? (
                         <List
                           size="small"
-                          className="mt-3 ml-4 bg-white rounded-md shadow-inner"
+                          // Bỏ thuộc tính bordered để giảm border
+                          className="mt-3 ml-4 bg-white rounded-md"
                           dataSource={session.lessonList}
-                          bordered
                           renderItem={(lesson, idx) => {
                             // Xử lý rút gọn content cho mỗi lesson
                             const words = getWordsFromHTML(
@@ -286,12 +308,18 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
                             }
 
                             return (
-                              <List.Item className="hover:bg-gray-50 transition-colors">
+                              <List.Item
+                                className="hover:bg-gray-50 transition-colors border-0 border-b border-dashed border-gray-100 last:border-b-0"
+                                style={{ background: "none" }}
+                              >
                                 <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                   <div>
-                                    <b className="text-gray-800">
-                                      {idx + 1}. {lesson.name}
-                                    </b>{" "}
+                                    <b
+                                      className="text-gray-800"
+                                      dangerouslySetInnerHTML={{
+                                        __html: `${idx + 1}. ${lesson.name}`,
+                                      }}
+                                    />
                                     <span className="text-gray-500">
                                       ({lesson.lessonType})
                                     </span>

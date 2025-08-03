@@ -4,13 +4,13 @@ import { ConsultantService } from "../../../../services/consultant/consultant.se
 import type { Consultant } from "../../../../types/consultant/consultant.res.type";
 
 interface AdminViewConsultantProps {
-  id: string;
+  userId: string; // Đổi tên prop thành userId cho rõ ràng
   open: boolean;
   onClose: () => void;
 }
 
 const AdminViewConsultant: React.FC<AdminViewConsultantProps> = ({
-  id,
+  userId,
   open,
   onClose,
 }) => {
@@ -18,20 +18,45 @@ const AdminViewConsultant: React.FC<AdminViewConsultantProps> = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (open && id) fetchData();
-  }, [open, id]);
+    if (open && userId) fetchData();
+    // eslint-disable-next-line
+  }, [open, userId]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await ConsultantService.getConsultantById({ id });
-      if (res.data.success) {
-        setConsultant(res.data.data);
+      // 1. Lấy danh sách consultant
+      const res = await ConsultantService.getAllConsultants({
+        PageNumber: 1,
+        PageSize: 1000,
+      });
+      if (!res.data || !Array.isArray(res.data.data)) {
+        message.error("Không thể tải danh sách tư vấn viên.");
+        setConsultant(null);
+        setLoading(false);
+        return;
+      }
+      // 2. Tìm consultant có userId trùng với userId truyền vào
+      const found = res.data.data.find((c: Consultant) => c.userId === userId);
+      if (!found) {
+        message.error("Không tìm thấy tư vấn viên.");
+        setConsultant(null);
+        setLoading(false);
+        return;
+      }
+      // 3. Gọi tiếp API getConsultantById với id của consultant
+      const detailRes = await ConsultantService.getConsultantById({
+        id: found.id,
+      });
+      if (detailRes.data && detailRes.data.success) {
+        setConsultant(detailRes.data.data);
       } else {
         message.error("Không thể tải thông tin tư vấn viên.");
+        setConsultant(null);
       }
     } catch (err) {
       message.error("Lỗi khi gọi API.");
+      setConsultant(null);
     } finally {
       setLoading(false);
     }
@@ -83,12 +108,6 @@ const AdminViewConsultant: React.FC<AdminViewConsultantProps> = ({
                 ? "Đang hoạt động"
                 : "Ngừng hoạt động"}
             </Tag>
-          </Descriptions.Item>
-          <Descriptions.Item label="Ngày tạo">
-            {new Date(consultant.createdAt).toLocaleString()}
-          </Descriptions.Item>
-          <Descriptions.Item label="Ngày cập nhật">
-            {new Date(consultant.updatedAt).toLocaleString()}
           </Descriptions.Item>
         </Descriptions>
       ) : (
