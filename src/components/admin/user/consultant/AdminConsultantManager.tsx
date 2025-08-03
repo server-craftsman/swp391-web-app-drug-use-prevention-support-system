@@ -1,54 +1,50 @@
 import { useEffect, useState } from "react";
-import { Table, Image, message, Button, Space, Tag, Modal } from "antd";
+import { Table, Image, message, Button, Space, Tag, Modal, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
-import { ConsultantService } from "../../../../services/consultant/consultant.service";
+import { UserService } from "../../../../services/user/user.service";
+import { UserRole } from "../../../../app/enums/userRole.enum";
 import type { Consultant } from "../../../../types/consultant/consultant.res.type";
-import type { ConsultantRequest } from "../../../../types/consultant/consultant.req.type";
 import CustomPagination from "../../../common/Pagiation.com";
 import CustomSearch from "../../../common/CustomSearch.com"; // ✅ thêm component tìm kiếm
 import AdminCreateConsultantForm from "./AdminCreateConsultant";
 import AdminDeleteConsultant from "./AdminDeleteConsultant";
 import AdminViewConsultant from "./AdminViewConsultant";
 
+const { Option } = Select;
+
 const AdminConsultantManager = () => {
   const [consultants, setConsultants] = useState<Consultant[]>([]);
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(6);
-  const [viewConsultantId, setViewConsultantId] = useState<string | null>(null);
-  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [total, setTotal] = useState(0);
-  const [searchKeyword, setSearchKeyword] = useState(""); // ✅ tìm kiếm
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [consultantToDelete, setConsultantToDelete] =
     useState<Consultant | null>(null);
+  const [isVerified, setIsVerified] = useState<boolean | undefined>(undefined);
+  const [viewConsultantId, setViewConsultantId] = useState<string | null>(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
 
   const fetchConsultants = async () => {
     setLoading(true);
-    const params: ConsultantRequest = {
-      PageNumber: 1,
-      PageSize: 1000,
-    };
-
     try {
-      const res = await ConsultantService.getAllConsultants(params);
-      const data = res.data;
+      const res = await UserService.getAllUsers({
+        pageNumber: current,
+        pageSize,
+        role: UserRole.CONSULTANT, // Lọc trực tiếp ở backend
+        searchCondition: searchKeyword || undefined,
+        isVerified,
+      });
+      const data = res.data as any;
 
-      let filtered = data.data;
-
-      // ✅ Lọc theo tên nếu có từ khóa
-      if (searchKeyword.trim()) {
-        filtered = filtered.filter((c: Consultant) =>
-          c.fullName?.toLowerCase().includes(searchKeyword.toLowerCase())
-        );
+      if (!Array.isArray(data?.data)) {
+        throw new Error("Invalid data format from API");
       }
 
-      const startIdx = (current - 1) * pageSize;
-      const paginated = filtered.slice(startIdx, startIdx + pageSize);
-
-      setConsultants(paginated);
-      setTotal(filtered.length);
+      setConsultants(data.data);
+      setTotal(data.total || data.data.length);
     } catch (err) {
       message.error("Lỗi khi lấy danh sách tư vấn viên!");
       setConsultants([]);
@@ -59,7 +55,8 @@ const AdminConsultantManager = () => {
 
   useEffect(() => {
     fetchConsultants();
-  }, [current, pageSize, searchKeyword]); // ✅ lắng nghe keyword
+    // eslint-disable-next-line
+  }, [current, pageSize, searchKeyword, isVerified]);
 
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);
@@ -119,11 +116,22 @@ const AdminConsultantManager = () => {
       title: "Giới tính",
       dataIndex: "gender",
       key: "gender",
-      render: (gender: string) => (
-        <Tag color={gender === "MALE" ? "blue" : "pink"}>
-          {gender === "MALE" ? "Nam" : "Nữ"}
-        </Tag>
-      ),
+      render: (gender: string) => {
+        const g = (gender || "").toLowerCase();
+        if (g === "male" || g === "nam") {
+          return <Tag color="blue">Nam</Tag>;
+        }
+        if (g === "female" || g === "nữ") {
+          return <Tag color="pink">Nữ</Tag>;
+        }
+        return <Tag color="default">Khác</Tag>;
+      },
+    },
+    {
+      title: "Vai trò",
+      dataIndex: "role",
+      key: "role",
+      render: () => <Tag color="purple">Tư vấn viên</Tag>,
     },
     {
       title: "Ngày sinh",
@@ -142,6 +150,7 @@ const AdminConsultantManager = () => {
             icon={<EyeOutlined />}
             size="small"
             onClick={() => handleView(record)}
+            title="Xem chi tiết"
           />
           <Button
             type="primary"
@@ -149,6 +158,7 @@ const AdminConsultantManager = () => {
             icon={<DeleteOutlined />}
             size="small"
             onClick={() => handleDelete(record)}
+            title="Xoá"
           />
         </Space>
       ),
@@ -177,15 +187,30 @@ const AdminConsultantManager = () => {
         </Button>
       </div>
 
-      <CustomSearch
-        placeholder="Tìm kiếm tư vấn viên theo tên"
-        onSearch={(keyword) => {
-          setCurrent(1);
-          setSearchKeyword(keyword);
-        }}
-        className="mb-4"
-        inputWidth="w-96"
-      />
+      {/* Thanh tìm kiếm và filter */}
+      <div className="flex flex-wrap gap-3 mb-4 items-center">
+        <CustomSearch
+          onSearch={(keyword) => {
+            setCurrent(1);
+            setSearchKeyword(keyword);
+          }}
+          placeholder="Tìm kiếm tư vấn viên theo tên, email, số điện thoại"
+          inputWidth="w-96"
+        />
+        <Select
+          allowClear
+          placeholder="Lọc trạng thái xác thực"
+          style={{ width: 200 }}
+          value={isVerified}
+          onChange={(value) => {
+            setCurrent(1);
+            setIsVerified(value);
+          }}
+        >
+          <Option value={true}>Đã xác thực</Option>
+          <Option value={false}>Chưa xác thực</Option>
+        </Select>
+      </div>
 
       <div className="mb-4">
         <Tag color="purple">Tổng cộng: {total} tư vấn viên</Tag>
@@ -234,7 +259,7 @@ const AdminConsultantManager = () => {
       />
       {viewConsultantId && (
         <AdminViewConsultant
-          id={viewConsultantId}
+          userId={viewConsultantId} // Sửa lại prop này cho đúng
           open={viewModalOpen}
           onClose={() => {
             setViewModalOpen(false);

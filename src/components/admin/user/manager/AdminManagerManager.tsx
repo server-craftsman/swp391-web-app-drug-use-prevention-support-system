@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { Table, Image, message, Button, Space, Tag, Modal } from "antd";
+import { Table, Image, message, Button, Space, Tag, Modal, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
 import { UserService } from "../../../../services/user/user.service";
 import type { UserResponse } from "../../../../types/user/User.res.type";
 import CustomPagination from "../../../common/Pagiation.com";
-import CustomSearch from "../../../common/CustomSearch.com"; // ✅ Thêm dòng này
+import CustomSearch from "../../../common/CustomSearch.com";
 import AdminCreateManagerForm from "./AdminCreateManager";
 import AdminDeleteManager from "./AdminDeleteManager";
 import AdminViewManager from "./AdminViewManager";
+import { UserRole } from "../../../../app/enums/userRole.enum";
+
+const { Option } = Select;
 
 const AdminManagerManager = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -16,7 +19,8 @@ const AdminManagerManager = () => {
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
-  const [searchKeyword, setSearchKeyword] = useState(""); // ✅ Thêm state tìm kiếm
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [isVerified, setIsVerified] = useState<boolean | undefined>(undefined);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
@@ -24,12 +28,16 @@ const AdminManagerManager = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [viewUserId, setViewUserId] = useState<string | null>(null);
+
   const fetchManagers = async () => {
     setLoading(true);
     try {
       const res = await UserService.getAllUsers({
-        pageNumber: 1,
-        pageSize: 10,
+        pageNumber: current,
+        pageSize,
+        role: UserRole.MANAGER, // Dùng enum cho role
+        searchCondition: searchKeyword || undefined,
+        isVerified,
       });
       const data = res.data as any;
 
@@ -37,23 +45,8 @@ const AdminManagerManager = () => {
         throw new Error("Invalid data format from API");
       }
 
-      let allManagers = data.data.filter(
-        (user: UserResponse) => user.role?.toLowerCase() === "manager"
-      );
-
-      // ✅ Lọc theo tên nếu có keyword
-      if (searchKeyword.trim()) {
-        allManagers = allManagers.filter((user: UserResponse) =>
-          user.fullName?.toLowerCase().includes(searchKeyword.toLowerCase())
-        );
-      }
-
-      const startIdx = (current - 1) * pageSize;
-      const endIdx = current * pageSize;
-      const paginatedManagers = allManagers.slice(startIdx, endIdx);
-
-      setUsers(paginatedManagers);
-      setTotal(allManagers.length);
+      setUsers(data.data);
+      setTotal(data.total || data.data.length);
     } catch (err) {
       message.error("Lỗi khi lấy danh sách quản lý viên!");
       setUsers([]);
@@ -64,7 +57,8 @@ const AdminManagerManager = () => {
 
   useEffect(() => {
     fetchManagers();
-  }, [current, pageSize, searchKeyword]); // ✅ Thêm searchKeyword vào dependency
+    // eslint-disable-next-line
+  }, [current, pageSize, searchKeyword, isVerified]);
 
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);
@@ -72,8 +66,8 @@ const AdminManagerManager = () => {
   };
 
   const handleView = (record: UserResponse) => {
-    setViewUserId(record.id); // ✅ Lưu ID
-    setViewModalOpen(true); // ✅ Mở modal
+    setViewUserId(record.id);
+    setViewModalOpen(true);
   };
   const handleDelete = (record: UserResponse) => {
     setSelectedUser(record);
@@ -193,16 +187,31 @@ const AdminManagerManager = () => {
         </Button>
       </div>
 
-      {/* ✅ Thanh tìm kiếm */}
-      <CustomSearch
-        onSearch={(keyword) => {
-          setCurrent(1);
-          setSearchKeyword(keyword);
-        }}
-        className="mb-4"
-        placeholder="Tìm kiếm quản lý viên theo tên"
-        inputWidth="w-96"
-      />
+      {/* Thanh tìm kiếm và filter */}
+      <div className="flex flex-wrap gap-3 mb-4 items-center">
+        <CustomSearch
+          onSearch={(keyword) => {
+            setCurrent(1);
+            setSearchKeyword(keyword);
+          }}
+          className="mb-0"
+          placeholder="Tìm kiếm quản lý viên theo tên, email, số điện thoại"
+          inputWidth="w-96"
+        />
+        <Select
+          allowClear
+          placeholder="Lọc trạng thái xác thực"
+          style={{ width: 200 }}
+          value={isVerified}
+          onChange={(value) => {
+            setCurrent(1);
+            setIsVerified(value);
+          }}
+        >
+          <Option value={true}>Đã xác thực</Option>
+          <Option value={false}>Chưa xác thực</Option>
+        </Select>
+      </div>
 
       <div className="mb-4">
         <Tag color="red">Tổng cộng: {total} quản lý viên</Tag>

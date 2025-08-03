@@ -40,6 +40,9 @@ export interface GetUsers {
   pageNumber: number;
   pageSize: number;
   filterByName?: string;
+  role?: UserRole;
+  searchCondition?: string;
+  isVerified?: boolean;
 }
 
 export interface UpdateUserRequest {

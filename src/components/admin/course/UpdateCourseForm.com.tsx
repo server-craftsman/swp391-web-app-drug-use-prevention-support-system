@@ -294,7 +294,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3 rounded-lg hover:from-blue-700 hover:to-blue-600 disabled:opacity-60 transition"
+        className="w-full bg-gradient-to-r bg-[#20558A] text-white font-bold py-3 rounded-lg transition"
       >
         {isPending ? "Đang cập nhật..." : "Cập nhật khóa học"}
       </button>

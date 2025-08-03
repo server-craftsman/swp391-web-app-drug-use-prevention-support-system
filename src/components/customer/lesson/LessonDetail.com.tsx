@@ -245,7 +245,7 @@ const LessonDetail: React.FC = () => {
                         </span>
 
                         {/* Hiển thị ảnh thumbnail nếu có */}
-                        {lessonItem.imageUrl && lessonItem.imageUrl !== "" && (
+                        {/* {lessonItem.imageUrl && lessonItem.imageUrl !== "" && (
                           <img
                             src={lessonItem.imageUrl}
                             alt={lessonItem.name}
@@ -258,7 +258,7 @@ const LessonDetail: React.FC = () => {
                               objectFit: "cover",
                             }}
                           />
-                        )}
+                        )} */}
                       </div>
                     </div>
                   ))}

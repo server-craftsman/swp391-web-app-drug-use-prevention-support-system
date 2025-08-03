@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Image, message, Button, Space, Tag, Modal } from "antd";
+import { Table, Image, message, Button, Space, Tag, Modal, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { UserService } from "../../../services/user/user.service";
 import CustomPagination from "../../common/Pagiation.com";
@@ -9,6 +9,9 @@ import type { UserResponse } from "../../../types/user/User.res.type";
 import AdminDeleteUser from "./AdminDeleteUser";
 import AdminCreateUserForm from "./AdminCreateUser"; // ✅ Đã thêm sẵn
 import AdminViewUser from "./AdminViewUser";
+import { UserRole } from "../../../app/enums/userRole.enum"; // Thêm dòng này
+
+const { Option } = Select;
 
 const AdminUserManager = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -19,6 +22,7 @@ const AdminUserManager = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [viewUserId, setViewUserId] = useState<string | null>(null);
   const [searchKeyword, setSearchKeyword] = useState(""); // ✅ State tìm kiếm
+  const [isVerified, setIsVerified] = useState<boolean | undefined>(undefined);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
@@ -29,8 +33,11 @@ const AdminUserManager = () => {
     setLoading(true);
     try {
       const res = await UserService.getAllUsers({
-        pageNumber: 1,
-        pageSize: 10,
+        pageNumber: current,
+        pageSize,
+        role: UserRole.CUSTOMER,
+        searchCondition: searchKeyword || undefined,
+        isVerified, // Thêm filter trạng thái xác thực
       });
       const data = res.data as any;
 
@@ -38,22 +45,8 @@ const AdminUserManager = () => {
         throw new Error("Invalid data format from API");
       }
 
-      let allCustomers = data.data.filter(
-        (user: UserResponse) => user.role?.toLowerCase() === "customer"
-      );
-
-      if (searchKeyword.trim()) {
-        allCustomers = allCustomers.filter((user: UserResponse) =>
-          user.fullName?.toLowerCase().includes(searchKeyword.toLowerCase())
-        );
-      }
-
-      const startIdx = (current - 1) * pageSize;
-      const endIdx = current * pageSize;
-      const paginatedCustomers = allCustomers.slice(startIdx, endIdx);
-
-      setUsers(paginatedCustomers);
-      setTotal(allCustomers.length);
+      setUsers(data.data);
+      setTotal(data.total || data.data.length);
     } catch (err) {
       message.error("Lỗi khi lấy danh sách khách hàng!");
       setUsers([]);
@@ -64,7 +57,8 @@ const AdminUserManager = () => {
 
   useEffect(() => {
     fetchCustomers();
-  }, [current, pageSize, searchKeyword]); // ✅ thêm searchKeyword
+    // eslint-disable-next-line
+  }, [current, pageSize, searchKeyword, isVerified]);
 
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);
@@ -194,16 +188,30 @@ const AdminUserManager = () => {
         </Button>
       </div>
 
-      {/* ✅ Thanh tìm kiếm theo tên khách hàng */}
-      <CustomSearch
-        onSearch={(keyword) => {
-          setCurrent(1); // reset về trang đầu khi tìm kiếm
-          setSearchKeyword(keyword);
-        }}
-        className="mb-4"
-        placeholder="Tìm kiếm khách hàng theo tên"
-        inputWidth="w-96"
-      />
+      {/* Thanh tìm kiếm và filter */}
+      <div className="flex flex-wrap gap-3 mb-4 items-center">
+        <CustomSearch
+          onSearch={(keyword) => {
+            setCurrent(1);
+            setSearchKeyword(keyword);
+          }}
+          placeholder="Tìm kiếm khách hàng theo tên, email, số điện thoại"
+          inputWidth="w-96"
+        />
+        <Select
+          allowClear
+          placeholder="Lọc trạng thái xác thực"
+          style={{ width: 200 }}
+          value={isVerified}
+          onChange={(value) => {
+            setCurrent(1);
+            setIsVerified(value);
+          }}
+        >
+          <Option value={true}>Đã xác thực</Option>
+          <Option value={false}>Chưa xác thực</Option>
+        </Select>
+      </div>
 
       <div className="mb-4">
         <Tag color="orange">Tổng cộng: {total} khách hàng</Tag>

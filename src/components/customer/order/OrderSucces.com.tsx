@@ -97,13 +97,7 @@ const OrderSuccessList: React.FC = () => {
 
   const columns = [
     // KHÔNG hiển thị orderId
-    {
-      title: "Ngày đặt",
-      dataIndex: "orderDate",
-      key: "orderDate",
-      render: (date: string) =>
-        date ? new Date(date).toLocaleDateString("vi-VN") : "",
-    },
+
     {
       title: "Khóa học",
       dataIndex: "orderDetails",
@@ -132,6 +126,16 @@ const OrderSuccessList: React.FC = () => {
       render: (amount: number) => (
         <div className="flex justify-end">
           {amount?.toLocaleString("vi-VN") + " đ"}
+        </div>
+      ),
+    },
+    {
+      title: "Ngày mua",
+      dataIndex: "orderDate",
+      key: "orderDate",
+      render: (date: string) => (
+        <div className="flex justify-end">
+          {date ? new Date(date).toLocaleDateString("vi-VN") : ""}
         </div>
       ),
     },
