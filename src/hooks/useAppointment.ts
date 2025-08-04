@@ -15,10 +15,7 @@ export const useCreateAppointment = () => {
     mutationFn: (data: CreateAppointmentRequest) =>
       AppointmentService.createAppointment(data),
     onSuccess: () => {
-      helpers.notificationMessage(
-        "Appointment created successfully",
-        "success"
-      );
+      helpers.notificationMessage("Đặt lịch thành công", "success");
       navigate(ROUTER_URL.CLIENT.COUNSEL);
     },
     onError: (error) => {
