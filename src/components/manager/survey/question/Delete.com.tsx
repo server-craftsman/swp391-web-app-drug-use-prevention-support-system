@@ -54,7 +54,7 @@ const QuestionDeleteButton: React.FC<Props> = ({ question, onSuccess, disabled =
                     </div>
                     <div>
                         <h3 className="text-lg font-bold text-gray-800 mb-1">Xác nhận xóa</h3>
-                        <p className="text-sm text-gray-600">Câu hỏi: <span className="font-semibold">"{getQuestionPreview()}"</span></p>
+                        <p className="text-sm text-gray-600">Câu hỏi: <span className="font-semibold" dangerouslySetInnerHTML={{ __html: `"${getQuestionPreview()}"` }} /></p>
                     </div>
                 </div>
             }

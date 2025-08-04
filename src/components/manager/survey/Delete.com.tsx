@@ -54,7 +54,7 @@ const SurveyDeleteButton: React.FC<Props> = ({ survey, onSuccess, disabled = fal
                     </div>
                     <div>
                         <h3 className="text-lg font-bold text-gray-800 mb-1">Xác nhận xóa</h3>
-                        <p className="text-sm text-gray-600">Khảo sát: <span className="font-semibold">"{survey.name}"</span></p>
+                        <p className="text-sm text-gray-600">Khảo sát: <span className="font-semibold" dangerouslySetInnerHTML={{ __html: `"${survey.name}"` }}></span></p>
                     </div>
                 </div>
             }
