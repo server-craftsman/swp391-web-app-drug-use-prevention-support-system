@@ -3,7 +3,7 @@ export const ROUTER_URL = {
     LOGIN: "/dang-nhap",
     SIGN_UP: "/dang-ky",
     FORGOT_PASSWORD: "/quen-mat-khau",
-    RESET_PASSWORD: "/doi-mat-khau",
+    RESET_PASSWORD: "/reset-password",
     VERIFY_EMAIL: "/confirm-email",
     CONFIRM_EMAIL: "/confirm-email",
     UNAUTHOZIZED: "/khong-co-quyen",

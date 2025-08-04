@@ -175,10 +175,14 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       </div>
 
       <div>
-        <label className="block mb-2 font-semibold text-gray-700">
+        <label className="block mb-2 font-semibold text-gray-700 ">
           Nội dung khóa học
         </label>
-        <Editor value={form.content} onChange={(value) => setForm({ ...form, content: value })} />
+        <Editor
+          height={300}
+          value={form.content}
+          onChange={(value) => setForm({ ...form, content: value })}
+        />
       </div>
 
       <div>

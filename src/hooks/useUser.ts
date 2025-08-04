@@ -17,7 +17,7 @@ export const useGetUserById = () => {
     mutationFn: (data: GetUserByIdRequest) => UserService.getUserById(data),
     onSuccess: () => {
       helpers.notificationMessage(
-        "User details fetched successfully",
+        "Lấy thông tin người dùng thành công",
         "success"
       );
       navigate(ROUTER_URL.ADMIN.USERS);
@@ -36,7 +36,7 @@ export const useCreateUser = () => {
   return useMutation({
     mutationFn: (data: CreateUserRequest) => UserService.createUser(data),
     onSuccess: () => {
-      helpers.notificationMessage("User created successfully", "success");
+      helpers.notificationMessage("Tạo người dùng thành công", "success");
       navigate(ROUTER_URL.ADMIN.USERS);
     },
     onError: (error) => {

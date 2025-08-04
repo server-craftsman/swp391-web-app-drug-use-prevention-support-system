@@ -169,6 +169,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         <label className="block mb-2 font-semibold text-gray-700">
           Nội dung khóa học
         </label>
+
         <Editor value={content} onChange={(value) => setContent(value)} />
       </div>
 
