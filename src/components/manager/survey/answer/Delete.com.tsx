@@ -39,7 +39,7 @@ const AnswerDeleteButton: React.FC<Props> = ({ answer, onSuccess, disabled = fal
                     </div>
                     <div>
                         <h3 className="text-lg font-bold text-gray-800 mb-1">Xác nhận xóa</h3>
-                        <p className="text-sm text-gray-600">Đáp án: <span className="font-semibold">"{getAnswerPreview()}"</span></p>
+                        <p className="text-sm text-gray-600">Đáp án: <span className="font-semibold" dangerouslySetInnerHTML={{ __html: `"${getAnswerPreview()}"` }}></span></p>
                     </div>
                 </div>
             }
