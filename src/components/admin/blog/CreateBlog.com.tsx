@@ -58,7 +58,6 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
       { title, content, blogImgUrl: imgUrl }, // Thêm title vào payload
       {
         onSuccess: () => {
-          alert("Tạo blog thành công!");
           setTitle("");
           setContent("");
           setBlogImgUrl("");
@@ -144,7 +143,7 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full bg-gradient-to-r from-[#20558A] to-blue-500 text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600 transition disabled:opacity-60"
+        className="w-full bg-gradient-to-r bg-[#20558A] text-white font-bold py-3 rounded-lg shadow-md hover:from-blue-800 hover:to-blue-600  "
       >
         {isPending ? (
           <span className="flex items-center justify-center gap-2">

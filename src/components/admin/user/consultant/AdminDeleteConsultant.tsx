@@ -2,7 +2,6 @@ import React from "react";
 import { Modal, message } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { ConsultantService } from "../../../../services/consultant/consultant.service";
-import { UserService } from "../../../../services/user/user.service"; // ✅ Import thêm
 import type { Consultant } from "../../../../types/consultant/consultant.res.type";
 
 interface AdminDeleteConsultantProps {
@@ -25,17 +24,24 @@ const AdminDeleteConsultant: React.FC<AdminDeleteConsultantProps> = ({
     }
 
     try {
-      // 🔥 Xoá chuyên viên
-      await ConsultantService.deleteConsultant({ id: consultant.id });
+      // Lấy toàn bộ consultant (hoặc nếu backend hỗ trợ filter theo userId thì truyền userId)
+      const res = await ConsultantService.getAllConsultants({
+        PageNumber: 1,
+        PageSize: 10, // hoặc số lớn hơn tổng số consultant
+      });
+      // Tìm consultant có userId === consultant.id (id ở đây là userId)
+      const consultantData = res.data?.data?.find(
+        (c) => c.userId === consultant.id
+      );
 
-      // 🔥 Xoá tài khoản user nếu có userId
-      if (consultant.userId) {
-        await UserService.deleteUser({ userId: consultant.userId });
+      if (consultantData) {
+        await ConsultantService.deleteConsultant({ id: consultantData.id });
+        message.success(`Đã xoá chuyên viên: ${consultant.fullName}`);
+        onClose();
+        onDeleted?.();
+      } else {
+        message.error("Không tìm thấy consultant tương ứng với user này!");
       }
-
-      message.success(`Đã xoá chuyên viên: ${consultant.fullName}`);
-      onClose();
-      onDeleted?.();
     } catch (error: any) {
       console.error("Delete consultant error:", error);
       message.error(

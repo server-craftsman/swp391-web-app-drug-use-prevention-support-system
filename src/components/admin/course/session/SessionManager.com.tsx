@@ -28,13 +28,14 @@ const SessionManager = () => {
   >([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [courseFilter, setCourseFilter] = useState<string | null>(null); // ✅ State filter course
+  const [courseFilter, setCourseFilter] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [editingSession, setEditingSession] = useState<Session | null>(null);
   const [viewSessionId, setViewSessionId] = useState<string | null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
+
   useEffect(() => {
     const loadAll = async () => {
       try {
@@ -51,6 +52,7 @@ const SessionManager = () => {
     };
 
     loadAll();
+    // eslint-disable-next-line
   }, [searchKeyword]);
 
   const fetchSessions = async (courseList: Course[] = courses) => {
@@ -93,18 +95,24 @@ const SessionManager = () => {
 
   const handleUpdated = () => {
     setShowUpdateModal(false);
+    setEditingSession(null); // Reset editingSession để modal luôn nhận session mới
     fetchSessions();
   };
 
   const openUpdateModal = (session: Session) => {
-    setEditingSession(session);
-    setShowUpdateModal(true);
+    setEditingSession(null); // Reset trước để đảm bảo form luôn nhận session mới
+    setTimeout(() => {
+      setEditingSession(session);
+      setShowUpdateModal(true);
+    }, 0);
   };
+
   const openViewModal = (id: string) => {
     setViewSessionId(id);
     setShowViewModal(true);
   };
-  // ✅ Filter FE theo courseId
+
+  // Filter FE theo courseId
   const filteredSessions = courseFilter
     ? sessions.filter((s) => s.courseId === courseFilter)
     : sessions;
@@ -140,7 +148,8 @@ const SessionManager = () => {
         <Tooltip title={text}>
           <span
             dangerouslySetInnerHTML={{
-              __html: text?.length > 50 ? text.slice(0, 50) + "..." : text || "-"
+              __html:
+                text?.length > 50 ? text.slice(0, 50) + "..." : text || "-",
             }}
           />
         </Tooltip>
@@ -196,7 +205,7 @@ const SessionManager = () => {
             inputWidth="w-80"
           />
 
-          {/* ✅ Filter khóa học FE */}
+          {/* Filter khóa học FE */}
           <Select
             allowClear
             showSearch
@@ -238,15 +247,20 @@ const SessionManager = () => {
         onCancel={() => setShowCreateModal(false)}
         footer={null}
         width={600}
+        destroyOnClose
       >
         <CreateSessionForm courses={courses} onSuccess={handleCreated} />
       </Modal>
 
       <Modal
         open={showUpdateModal}
-        onCancel={() => setShowUpdateModal(false)}
+        onCancel={() => {
+          setShowUpdateModal(false);
+          setEditingSession(null);
+        }}
         footer={null}
         width={600}
+        destroyOnClose
       >
         {editingSession && (
           <UpdateSessionForm
