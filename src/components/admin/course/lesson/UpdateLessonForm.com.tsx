@@ -33,23 +33,12 @@ const UpdateLessonForm = ({
   const [lessonType, setLessonType] = useState<"text" | "image" | "video">(
     "text"
   );
-
   const [fileImage, setFileImage] = useState<File | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState("");
-
   const [fileVideo, setFileVideo] = useState<File | null>(null);
   const [previewVideoUrl, setPreviewVideoUrl] = useState("");
 
-  // Reset form fields when lesson type changes
-  const handleLessonTypeChange = (type: "text" | "image" | "video") => {
-    setLessonType(type);
-    setFileImage(null);
-    setFileVideo(null);
-    setPreviewImageUrl("");
-    setPreviewVideoUrl("");
-    form.setFieldValue('content', ''); // Reset content field
-  };
-
+  // Khi lesson thay đổi, set lại toàn bộ giá trị vào form và state
   useEffect(() => {
     if (!lesson) return;
 
@@ -57,15 +46,21 @@ const UpdateLessonForm = ({
       name: lesson.name,
       content: lesson.content,
       positionOrder: lesson.positionOrder,
+      lessonType: lesson.lessonType,
+      courseId: lesson.courseId,
+      sessionId: lesson.sessionId,
     });
 
-    setLessonType(lesson.lessonType as any);
+    setLessonType(lesson.lessonType as "text" | "image" | "video");
     setPreviewImageUrl(lesson.imageUrl || "");
     setPreviewVideoUrl(lesson.videoUrl || "");
     setSelectedCourseId(lesson.courseId);
     setSelectedSessionId(lesson.sessionId);
+    setFileImage(null);
+    setFileVideo(null);
   }, [lesson, form]);
 
+  // Khi chọn lại khóa học, load lại danh sách session
   useEffect(() => {
     if (!selectedCourseId) {
       setFilteredSessions([]);
@@ -86,6 +81,17 @@ const UpdateLessonForm = ({
         setFilteredSessions([]);
       });
   }, [selectedCourseId, lesson]);
+
+  // Khi đổi loại bài học, reset các trường liên quan
+  const handleLessonTypeChange = (type: "text" | "image" | "video") => {
+    setLessonType(type);
+    setFileImage(null);
+    setFileVideo(null);
+    setPreviewImageUrl("");
+    setPreviewVideoUrl("");
+    form.setFieldValue("lessonType", type);
+    // Không reset content ở đây để giữ lại nội dung khi mở form update
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -160,12 +166,12 @@ const UpdateLessonForm = ({
       {
         id: lesson.id,
         name: values.name,
-        content: lessonType === "text" ? (values.content || "") : "",
+        content: values.content || "",
         positionOrder: values.positionOrder,
         fullTime: 0,
-        courseId: selectedCourseId,
-        sessionId: selectedSessionId,
-        lessonType,
+        courseId: values.courseId,
+        sessionId: values.sessionId,
+        lessonType: values.lessonType,
         imageUrl: lessonType === "image" ? uploadedImageUrl : "",
         videoUrl: lessonType === "video" ? uploadedVideoUrl : "",
       },
@@ -186,10 +192,15 @@ const UpdateLessonForm = ({
       <h2 className="text-2xl font-bold text-[#20558A] mb-2 text-center">
         Cập Nhập Bài Học
       </h2>
-      <Form.Item label="Khóa học" required>
+
+      <Form.Item
+        name="courseId"
+        label="Khóa học"
+        rules={[{ required: true, message: "Vui lòng chọn khóa học" }]}
+      >
         <Select
+          onChange={(val) => setSelectedCourseId(val)}
           value={selectedCourseId || undefined}
-          onChange={setSelectedCourseId}
         >
           {courses.map((c) => (
             <Option key={c.id} value={c.id}>
@@ -199,10 +210,14 @@ const UpdateLessonForm = ({
         </Select>
       </Form.Item>
 
-      <Form.Item label="Phiên học" required>
+      <Form.Item
+        name="sessionId"
+        label="Phiên học"
+        rules={[{ required: true, message: "Vui lòng chọn phiên học" }]}
+      >
         <Select
+          onChange={(val) => setSelectedSessionId(val)}
           value={selectedSessionId || undefined}
-          onChange={setSelectedSessionId}
           disabled={!selectedCourseId}
         >
           {filteredSessions.map((s) => (
@@ -213,7 +228,7 @@ const UpdateLessonForm = ({
         </Select>
       </Form.Item>
 
-      <Form.Item label="Loại bài học" required>
+      <Form.Item name="lessonType" label="Loại bài học" required>
         <Select value={lessonType} onChange={handleLessonTypeChange}>
           <Option value="text">Text</Option>
           <Option value="image">Image</Option>
@@ -229,18 +244,14 @@ const UpdateLessonForm = ({
         <Input />
       </Form.Item>
 
-      {/* Chỉ hiển thị description cho text type */}
-      {lessonType === "text" && (
-        <Form.Item
-          name="content"
-          label="Mô tả"
-          rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
-        >
-          <Editor />
-        </Form.Item>
-      )}
+      <Form.Item
+        name="content"
+        label="Mô tả"
+        rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
+      >
+        <Editor />
+      </Form.Item>
 
-      {/* Chỉ hiển thị image upload cho image type */}
       {lessonType === "image" && (
         <Form.Item label="Upload ảnh" required>
           <input
@@ -259,7 +270,6 @@ const UpdateLessonForm = ({
         </Form.Item>
       )}
 
-      {/* Chỉ hiển thị video upload cho video type */}
       {lessonType === "video" && (
         <Form.Item label="Upload video" required>
           <input
