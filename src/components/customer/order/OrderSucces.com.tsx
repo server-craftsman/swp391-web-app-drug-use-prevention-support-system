@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, message, Button, Modal, Spin, Tooltip, Tag } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 import { OrderService } from "../../../services/order/order.service";
+import { CourseService } from "../../../services/course/course.service";
 import type { OrderResponse } from "../../../types/order/Order.res.type";
 import { OrderStatus } from "../../../app/enums/orderStatus.enum";
 import CustomSearch from "../../common/CustomSearch.com";
@@ -23,6 +24,9 @@ const OrderSuccessList: React.FC = () => {
 
   // Search state
   const [search, setSearch] = useState("");
+
+  // Course details state
+  const [courseDetails, setCourseDetails] = useState<Record<string, any>>({});
 
   // Lấy userId từ localStorage (chỉ dùng để fetch, không render ra UI)
   let userId = "";
@@ -94,6 +98,26 @@ const OrderSuccessList: React.FC = () => {
       setViewLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (selectedOrder?.orderDetails) {
+      selectedOrder.orderDetails.forEach((d) => {
+        if (!courseDetails[d.courseId]) {
+          CourseService.getCourseById({ id: d.courseId })
+            .then((res) => {
+              if (res.data?.data) {
+                setCourseDetails((prev) => ({
+                  ...prev,
+                  [d.courseId]: res.data.data,
+                }));
+              }
+            })
+            .catch(() => {});
+        }
+      });
+    }
+    // eslint-disable-next-line
+  }, [selectedOrder]);
 
   const columns = [
     // KHÔNG hiển thị orderId
@@ -204,11 +228,11 @@ const OrderSuccessList: React.FC = () => {
             Đóng
           </Button>,
         ]}
-        width={420}
+        width={520}
         style={{ top: 40 }}
         bodyStyle={{
           padding: 32,
-          background: "#fff", // Đổi về trắng cho đồng nhất
+          background: "#fff",
           borderRadius: 12,
         }}
         centered
@@ -226,7 +250,6 @@ const OrderSuccessList: React.FC = () => {
           </div>
         ) : selectedOrder ? (
           <div style={{ fontSize: 16 }}>
-            {/* KHÔNG hiển thị orderId */}
             <div style={{ marginBottom: 10 }}>
               <b>Ngày đặt:</b>{" "}
               {selectedOrder.orderDate
@@ -238,15 +261,65 @@ const OrderSuccessList: React.FC = () => {
             </div>
             <div style={{ marginBottom: 10 }}>
               <b>Khóa học đã mua:</b>
-              <ul style={{ margin: 0, paddingLeft: 18 }}>
-                {selectedOrder.orderDetails?.map((d) => (
-                  <li key={d.courseId}>
-                    {d.courseName}{" "}
-                    <span style={{ color: "#888", fontSize: 13 }}>
-                      ({d.amount?.toLocaleString("vi-VN")} đ)
-                    </span>
-                  </li>
-                ))}
+              <ul style={{ margin: 0, paddingLeft: 0 }}>
+                {selectedOrder.orderDetails?.map((d) => {
+                  const course: import("../../../types/course/Course.res.type").CourseDetailResponse =
+                    courseDetails[d.courseId];
+                  return (
+                    <li
+                      key={d.courseId}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 14,
+                        marginBottom: 18,
+                        background: "#f7f9fa",
+                        borderRadius: 8,
+                        padding: 12,
+                        border: "1px solid #eee",
+                        listStyle: "none",
+                      }}
+                    >
+                      <img
+                        src={course?.imageUrls?.[0] || "/no-image.png"}
+                        alt={d.courseName}
+                        style={{
+                          width: 56,
+                          height: 56,
+                          objectFit: "cover",
+                          borderRadius: 8,
+                          border: "1px solid #eee",
+                          background: "#fafafa",
+                          flexShrink: 0,
+                        }}
+                      />
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{
+                            fontWeight: 700,
+                            fontSize: 17,
+                            color: "#20558A",
+                          }}
+                        >
+                          {d.courseName}
+                        </div>
+
+                        <div
+                          style={{
+                            fontSize: 14,
+                            color: "#555",
+                            margin: "4px 0",
+                          }}
+                        >
+                          <b>Giá mua:</b>{" "}
+                          <span style={{ color: "#888", fontSize: 13 }}>
+                            {d.amount?.toLocaleString("vi-VN")} đ
+                          </span>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
             <div style={{ marginBottom: 10 }}>
@@ -265,6 +338,11 @@ const OrderSuccessList: React.FC = () => {
                   : selectedOrder.paymentStatus}
               </Tag>
             </div>
+            {selectedOrder.orderStatus === "Paid" ? null : (
+              <div>
+                <b>Trạng thái:</b> <Tag color="red">Đã hủy</Tag>
+              </div>
+            )}
           </div>
         ) : (
           <div>Không tìm thấy dữ liệu đơn hàng.</div>
