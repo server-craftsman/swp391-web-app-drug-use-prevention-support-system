@@ -37,8 +37,8 @@ const CourseList = () => {
 
     // CHỈ GỬI CÁC PARAM CƠ BẢN LÊN API
     const params: any = {
-      pageNumber: 1, // Lấy tất cả từ page 1
-      pageSize: 1000, // Lấy nhiều để có đủ data filter
+      pageNumber: 1,
+      pageSize: 50,
       userId,
     };
 
@@ -118,7 +118,6 @@ const CourseList = () => {
     }
   };
 
-  // SỬA USEFFECT: Bỏ debounce vì không cần thiết khi filter frontend
   useEffect(() => {
     fetchCourses(current, pageSize);
   }, [
